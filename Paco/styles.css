@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Anek+Odia:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap');
+
+:root {
+    --gray-900: #101828;
+    --gray-800: #1E2939;
+    --gray-700: #364153;
+    --gray-600: #4A5565;
+    --gray-500: #6B7282;
+    --gray-400: #99A1AF;
+    --gray-100: #F3F4F6;
+    --gray-50: #f9fafb;
+
+    --white: #FFFFFF;
+
+    --emerald-900: #247857;
+    --emerald-700: #007A55;
+    --emerald-600: #009966;
+    --emerald-500: #00BC7D;
+    --emerald-400: #00D492;
+    --emerald-300: #5EE9B5;
+    --emerald-200: #D1FAE5;
+    --emerald-100: #D0FAE5;
+    --emerald-50: #ECFDF5;
+
+    --lime-400: #9AE600;
+    --lime-50: #f7fee7;
+
+    --bg: #FAFAF5;
+
+    --blue: #2B7FFF;
+    --pink: #FF2056;
+
+    --gradient-stories: linear-gradient(
+        135deg,
+        #10B981 0%,
+        #22C55E 23%,
+        #A3E635 48%,
+        #FB923C 75%,
+        #F472B6 93%
+    );
+
+    --gradient-profile: linear-gradient(
+        135deg,
+        var(--emerald-400) 17%,
+        var(--lime-400) 86%
+    );
+
+    --gradient-logo: linear-gradient(
+        135deg,
+        var(--emerald-500) 0%,
+        var(--lime-400) 81%
+    );
+
+    --gradient-branding: linear-gradient(
+        90deg,
+        var(--emerald-900) 0%,
+        var(--emerald-600) 50%,
+        var(--lime-400) 100%
+    );
+
+    --gradient-trending: linear-gradient(
+        135deg,
+        var(--emerald-50) 0%,
+        var(--lime-50) 100%
+    );
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg);
+    font-family: 'Alexandria';
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .8rem 15rem;
+    background-color: rgba(255, 255, 255, 0.8);
+    .logo {
+        a {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            
+            
+            .brand {
+                background: var(--gradient-logo);
+                border-radius: 15px;
+                height: 50px;
+                width: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                
+                svg {
+                    width: 35px;
+                    height: 35px;
+                }
+            }
+    
+            h1 {
+                display: flex;
+                font-size: 3rem;
+                font-family: 'Anek Odia';
+                background: var(--gradient-branding);
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+                line-height: 1;
+                transform: translateY(8px);
+            }
+        }
+    }
+
+    .menu {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        a {
+            padding: .5rem 1rem;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            color: var(--gray-500);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            transition: .2s ease;
+            svg {
+                
+                width: 30px;
+                height: 30px;
+                path {
+                    transition: .2s ease;
+                }
+                circle {
+                    transition: .2s ease;
+                }
+            }
+        }
+
+        a:hover {
+            color: var(--gray-800);
+            background-color: var(--gray-100);
+            svg {
+                path {
+                    stroke: var(--gray-800);
+                }
+                circle {
+                    stroke: var(--gray-800);
+                }
+                
+            }
+        }
+
+        .selected {
+            cursor: default;
+            color: var(--emerald-700);
+            background-color: var(--emerald-100);
+            svg {
+                path {
+                    stroke: var(--emerald-700);
+                }     
+            }
+        }
+        .selected:hover {
+            color: var(--emerald-700);
+            background-color: var(--emerald-100);
+
+            svg {
+                path {
+                    stroke: var(--emerald-700);
+                }
+                circle {
+                    stroke: var(--emerald-700);
+                }
+            }
+        }
+    }
+}
