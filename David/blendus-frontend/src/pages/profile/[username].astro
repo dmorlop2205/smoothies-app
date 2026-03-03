@@ -1,0 +1,92 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="Profile" activePage="profile">
+  <div class="page-wrapper">
+    <main class="page-main">
+      <div id="profile-mount">
+        <div class="loading-spinner">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="#00BC7D" stroke-width="2" stroke-dasharray="50" stroke-dashoffset="20">
+              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        </div>
+      </div>
+    </main>
+    <aside class="page-aside">
+      <div id="profile-aside-mount"></div>
+    </aside>
+  </div>
+
+  <script>
+    import { api } from '../../lib/api';
+
+    const pathParts = window.location.pathname.split('/');
+    const userId = parseInt(pathParts[pathParts.length - 1]);
+    const mount = document.getElementById('profile-mount');
+
+    if (!isNaN(userId) && mount) {
+      Promise.all([api.getUser(userId), api.getUserPosts(userId)])
+        .then(([user, posts]) => {
+          const initials = user.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+          const postsHtml = posts.length === 0
+            ? '<div class="empty-state"><p>No posts yet 🍹</p></div>'
+            : posts.map(post => {
+                const img = post.images?.[0]?.path;
+                const tags = (post.tags || []).map((t: any) => `<span class="post-hashtag">#${t.name}</span>`).join('');
+                const date = new Date(post.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+                return `
+                  <article class="post-card" style="margin-bottom:1.5rem">
+                    <div class="post-header">
+                      <div class="post-user">
+                        <div class="post-avatar" style="background:var(--gradient-profile)">
+                          <span style="color:white;font-weight:700;font-size:1.1rem;z-index:1;position:relative">${initials}</span>
+                        </div>
+                        <div>
+                          <div class="post-user-name">${user.name}</div>
+                          <div class="post-date">${date}</div>
+                          ${post.preparation_time ? `<div class="post-prep">⏱ ${post.preparation_time} min</div>` : ''}
+                        </div>
+                      </div>
+                      <a href="/post/${post.id}" class="post-options">
+                        <svg viewBox="0 0 24 24" fill="none" style="width:28px;height:28px">
+                          <circle cx="7" cy="12" r="0.5" stroke="#99A1AF" stroke-width="2"/>
+                          <circle cx="12" cy="12" r="0.5" stroke="#99A1AF" stroke-width="2"/>
+                          <circle cx="17" cy="12" r="0.5" stroke="#99A1AF" stroke-width="2"/>
+                        </svg>
+                      </a>
+                    </div>
+                    ${img ? `<div class="post-image"><img src="${img}" alt="${post.title}" loading="lazy" style="width:100%;height:100%;object-fit:cover"/></div>` : ''}
+                    <div class="post-description"><strong>${user.name}</strong> ${post.description}</div>
+                    ${tags ? `<div class="post-hashtags">${tags}</div>` : ''}
+                    <div class="post-interactions">
+                      <div class="post-actions">
+                        <span style="color:var(--gray-500);font-size:.9rem">❤️ ${post.likes_count} &nbsp; 💬 ${post.comments_count}</span>
+                      </div>
+                      <a href="/post/${post.id}" class="btn" style="font-size:.8rem;padding:.35rem .9rem">View</a>
+                    </div>
+                  </article>`;
+              }).join('');
+
+          mount.innerHTML = `
+            <div class="profile-hero">
+              <div class="profile-avatar-xl">
+                <span class="initials">${initials}</span>
+              </div>
+              <div>
+                <div class="profile-name">${user.name}</div>
+                <div class="profile-stat">${user.posts_count ?? posts.length} recipes shared</div>
+                <div class="profile-stat" style="margin-top:.2rem;color:var(--emerald-600)">🍹 BlendUs member</div>
+              </div>
+            </div>
+            <h3 style="font-size:1.25rem;font-weight:700;color:var(--gray-800);margin-bottom:1rem">Recipes</h3>
+            ${postsHtml}
+          `;
+        })
+        .catch(() => {
+          if (mount) mount.innerHTML = '<div class="empty-state"><p>User not found.</p></div>';
+        });
+    }
+  </script>
+</Layout>
