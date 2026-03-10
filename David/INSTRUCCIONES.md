@@ -10,8 +10,9 @@ Built with **Astro 5 + React** (frontend) and **Laravel 12 + Sanctum** (API back
 
 ```
 David/
-├── smoothies-api/       ← Laravel REST API  (port 8000)
-└── blendus-frontend/    ← Astro + React app (port 4321)
+└── Prototipo-version/
+    ├── smoothies-api/       ← Laravel REST API  (port 8000)
+    └── blendus-frontend/    ← Astro + React app (port 4321)
 ```
 
 ---
@@ -21,7 +22,7 @@ David/
 ### 1. Backend — Laravel API
 
 ```bash
-cd smoothies-api
+cd Prototipo-version/smoothies-api
 
 # Install PHP dependencies
 composer install
@@ -42,7 +43,7 @@ php artisan migrate:fresh --seed
 ### 2. Frontend — Astro
 
 ```bash
-cd blendus-frontend
+cd Prototipo-version/blendus-frontend
 
 # Install JS dependencies
 npm install
@@ -60,13 +61,13 @@ You need **two terminals** running simultaneously:
 
 **Terminal 1 — API:**
 ```bash
-cd smoothies-api
+cd Prototipo-version/smoothies-api
 php artisan serve --port=8000
 ```
 
 **Terminal 2 — Frontend:**
 ```bash
-cd blendus-frontend
+cd Prototipo-version/blendus-frontend
 npm run dev
 ```
 
