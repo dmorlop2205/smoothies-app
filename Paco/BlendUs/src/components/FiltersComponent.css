@@ -1,0 +1,42 @@
+.filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .filter {
+        padding: .5rem 1.5rem;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+        background-color: white;
+        transition: .3s ease;
+        border: 1px solid var(--gray-100);
+        cursor: pointer;
+        img {
+            width: 20px;
+            height: 20px;
+        }
+        p {
+            font-size: 1rem;
+            color: var(--gray-600);
+        }
+    }
+    .active {
+        background-color: var(--emerald-600);
+        box-shadow: 0px 2px 10px #5ee9b673;
+        cursor: default;
+        p {
+            color: var(--white);
+        }
+    }
+    
+    .filter:hover {
+        background-color: var(--emerald-100);
+
+    }
+
+    .active:hover {
+        background-color: var(--emerald-600);
+    }
+}
