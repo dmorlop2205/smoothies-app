@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostDetails from '../../components/PostDetails';
+
+const { id } = Astro.params;
+---
+
+<Layout title={`Post #${id}`} activePage="home">
+  <div class="create-page">
+    <PostDetails postId={Number(id)} client:load />
+  </div>
+</Layout>
