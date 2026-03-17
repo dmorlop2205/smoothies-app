@@ -1,0 +1,7 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AuthForm from '../components/AuthForm';
+---
+<Layout title="Login" activePage="login">
+  <AuthForm mode="login" client:load />
+</Layout>
