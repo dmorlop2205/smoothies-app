@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('images', function (Blueprint $table) {
+        Schema::create('follows', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained()->cascadeOnDelete();
-            $table->string('path');
-            $table->integer('order')->default(0);
+            $table->foreignId('follower_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('following_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
+
+            $table->unique(['follower_id', 'following_id']);
         });
     }
 
@@ -25,6 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('images');
+        Schema::dropIfExists('follows');
     }
 };
+
