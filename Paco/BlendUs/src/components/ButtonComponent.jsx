@@ -2,7 +2,7 @@ import './ButtonComponent.css';
 
 function ButtonComponent() {
   return (
-    <button class="btn follow-btn">Follow</button>
+    <button className="btn follow-btn">Follow</button>
   )
 }
 
