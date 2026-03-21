@@ -1,9 +1,51 @@
 .image {
-    height: 50vh;
+    height: 60vh;
     border: 2px dashed var(--emerald-200);
     background: var(--gradient-trending);
     border-radius: 40px;
-    transition: .3s ease-in-out;
+    transition: all .3s ease-in-out;
+    input {
+        display: none;
+    }
+    .preview-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+            border-radius: 40px;
+            
+        }
+        .delete-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border-radius: 50%;
+            padding: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s ease;
+        }
+
+        .delete-icon:hover {
+            transform: scale(1.1);
+            background-color: var(--gray-100);
+        }
+    }
+}
+
+.image.dragging {
+    border: 2px dashed var(--emerald-200);
+    background: none;
+    background-color: var(--emerald-200);
+    transform: scale(1.01);
 }
 
 .form {
@@ -160,6 +202,27 @@
     }
 }
 
+.tags-list {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    .tag {
+        background-color: var(--emerald-100);
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
+        padding: .2rem 1.2rem;
+        border-radius: 100px;
+        color: var(--emerald-800);
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .tag:hover {
+        color: var(--emerald-100);
+        background-color: var(--emerald-800);
+        transform: translateY(-5px);
+    }
+}
+
 .form-btn {
     width: 100%;
     padding: 1.5rem;
@@ -237,4 +300,21 @@
             fill: var(--emerald-200);
         }
     }
+}
+
+.select-img {
+    border: 1px solid red;
+    width: 20px;
+    height: 20px;
+}
+
+select {
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('assets/select-arrow.svg');
+    background-size: 30px;
+    background-position: right 12px center;
+    background-repeat: no-repeat;
 }

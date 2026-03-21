@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
-import './CreateForm.css'
-function CreateForm() {
+
+function EditForm() {
     const[ingredients, setIngredients] = useState([
         { ingredient: '', amount: '' }
     ])
@@ -128,7 +128,7 @@ function CreateForm() {
             <div className="category">
                 <label className="label" htmlFor="category">Category</label>
                 <select className="text-input" type="text" id="category">
-                    <option selected disabled value="">Choose a category</option>
+                    <option defaultValue="" selected disabled>Choose a category</option>
                     <option value="green">
                         🥬 Green
                     </option>
@@ -244,4 +244,4 @@ function CreateForm() {
     )
 }
 
-export default CreateForm
+export default EditForm
