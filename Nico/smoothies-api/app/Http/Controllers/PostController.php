@@ -72,7 +72,7 @@ class PostController extends Controller
 
         $posts = $this->postService->getByTag($tag, $perPage);
 
-        return response()->json($posts);
+        return (new PostCollection($posts))->response();
     }
 }
 
