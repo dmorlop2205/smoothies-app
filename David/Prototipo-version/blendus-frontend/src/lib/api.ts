@@ -1,4 +1,4 @@
-// Central API client for the BlendUs app
+// Central API client for the BlendUs app — aligned to Nico's API v2
 const API_URL = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8000';
 
 function getToken(): string | null {
@@ -6,17 +6,18 @@ function getToken(): string | null {
     return localStorage.getItem('blendus_token');
 }
 
-async function request<T>(
-    path: string,
-    options: RequestInit = {}
-): Promise<T> {
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const token = getToken();
     const headers: HeadersInit = {
-        'Content-Type': 'application/json',
         Accept: 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
     };
+
+    // Only set Content-Type for non-FormData requests
+    if (!(options.body instanceof FormData)) {
+        (headers as Record<string, string>)['Content-Type'] = 'application/json';
+    }
 
     const res = await fetch(`${API_URL}/api${path}`, { ...options, headers });
 
@@ -25,93 +26,91 @@ async function request<T>(
         throw new Error(err.message ?? 'API Error');
     }
 
+    if (res.status === 204) return undefined as T;
     return res.json();
 }
 
 export const api = {
-    // Auth
-    register: (data: { name: string; email: string; password: string; password_confirmation: string }) =>
-        request<{ user: User; token: string }>('/register', { method: 'POST', body: JSON.stringify(data) }),
+    // Auth — routes: POST /api/auth/register, /api/auth/login, /api/auth/logout
+    register: (data: { name: string; username: string; email: string; password: string; password_confirmation: string }) =>
+        request<{ user: User; token: string }>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
 
-    login: (data: { email: string; password: string }) =>
-        request<{ user: User; token: string }>('/login', { method: 'POST', body: JSON.stringify(data) }),
+    login: (email: string, password: string) =>
+        request<{ user: User; token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
 
-    logout: () => request<void>('/logout', { method: 'POST' }),
+    logout: () =>
+        request<void>('/auth/logout', { method: 'POST' }),
 
-    me: () => request<User>('/me'),
-
-    // Posts
-    getPosts: (params?: { tag?: string; search?: string; page?: number }) => {
+    // Posts — GET /api/posts, POST /api/posts, PUT /api/posts/{id}, DELETE /api/posts/{id}
+    getPosts: (params?: { tag?: string; page?: number; per_page?: number }) => {
         const qs = new URLSearchParams();
         if (params?.tag) qs.set('tag', params.tag);
-        if (params?.search) qs.set('search', params.search);
         if (params?.page) qs.set('page', String(params.page));
+        if (params?.per_page) qs.set('per_page', String(params.per_page));
         return request<PaginatedResponse<Post>>(`/posts?${qs.toString()}`);
     },
 
-    getPost: (id: number) => request<Post>(`/posts/${id}`),
+    getPost: (id: number) =>
+        request<Post>(`/posts/${id}`),
 
-    createPost: (data: {
-        title: string;
-        description: string;
-        preparation_time?: number;
-        tags?: number[];
-        image_url?: string;
-    }) => request<Post>('/posts', { method: 'POST', body: JSON.stringify(data) }),
+    createPost: (data: FormData) =>
+        request<Post>('/posts', { method: 'POST', body: data }),
 
-    likePost: (id: number) =>
-        request<{ liked: boolean; likes_count: number }>(`/posts/${id}/like`, { method: 'POST' }),
+    updatePost: (id: number, data: FormData) =>
+        request<Post>(`/posts/${id}`, { method: 'POST', body: data, headers: { 'X-HTTP-Method-Override': 'PUT' } }),
+
+    deletePost: (id: number) =>
+        request<void>(`/posts/${id}`, { method: 'DELETE' }),
+
+    // Likes — POST /api/likes  (body: { likeable_type, likeable_id })
+    likePost: (postId: number) =>
+        request<{ liked: boolean; count: number }>('/likes', { method: 'POST', body: JSON.stringify({ likeable_type: 'App\\Models\\Post', likeable_id: postId }) }),
 
     // Comments
-    getComments: (postId: number) => request<Comment[]>(`/posts/${postId}/comments`),
+    getComments: (postId: number) =>
+        request<{data: PostComment[]}>(`/posts/${postId}/comments`).then(res => res.data),
 
     createComment: (postId: number, body: string) =>
-        request<Comment>(`/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body }) }),
+        request<PostComment>(`/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body }) }),
 
-    deleteComment: (commentId: number) =>
-        request<void>(`/comments/${commentId}`, { method: 'DELETE' }),
+    deleteComment: (postId: number, commentId: number) =>
+        request<void>(`/posts/${postId}/comments/${commentId}`, { method: 'DELETE' }),
 
     // Tags
-    getTags: () => request<Tag[]>('/tags'),
+    getTags: () =>
+        request<{data: Tag[]}>('/tags').then(res => res.data),
+
+    getPostsByTag: (tagSlug: string, page = 1) =>
+        request<PaginatedResponse<Post>>(`/tags/${tagSlug}/posts?page=${page}`),
 
     // Users
-    getUser: (id: number) => request<User>(`/users/${id}`),
-    getUserPosts: (id: number) => request<Post[]>(`/users/${id}/posts`),
-    getSuggestedUsers: () => request<User[]>('/users/suggested'),
+    getUser: (id: number) =>
+        request<User>(`/users/${id}`),
+
+    followUser: (id: number) =>
+        request<void>(`/users/${id}/follow`, { method: 'POST' }),
+
+    unfollowUser: (id: number) =>
+        request<void>(`/users/${id}/follow`, { method: 'DELETE' }),
+
+    getSuggestedUsers: () =>
+        request<User[]>('/users/suggested'),
 };
 
-// Types
+// ────────── Types (aligned to Nico's API Resources) ──────────
+
 export interface User {
     id: number;
     name: string;
+    username: string;
     email: string;
     posts_count?: number;
 }
 
-export interface Post {
-    id: number;
-    user_id: number;
-    title: string;
-    description: string;
-    preparation_time: number | null;
-    is_premium: boolean;
-    is_liked?: boolean;
-    likes_count: number;
-    comments_count: number;
-    user: User;
-    images: Image[];
-    tags: Tag[];
-    comments?: Comment[];
-    created_at: string;
-}
-
-export interface Comment {
-    id: number;
-    post_id: number;
-    user_id: number;
-    body: string;
-    user: User;
-    created_at: string;
+export interface Ingredient {
+    name: string;
+    quantity: number;
+    unit: string;
 }
 
 export interface Tag {
@@ -120,16 +119,35 @@ export interface Tag {
     slug: string;
 }
 
-export interface Image {
+export interface PostComment {
     id: number;
     post_id: number;
-    path: string;
-    order: number;
+    body: string;
+    author: User;
+    created_at: string;
+}
+
+export interface Post {
+    id: number;
+    title: string;
+    description: string;
+    preparation_steps: string;
+    image_url: string | null;
+    created_at: string;
+    author: User;
+    ingredients: Ingredient[];
+    tags: Tag[];
+    likes_count: number;
+    comments_count: number;
+    has_liked: boolean;
+    comments?: PostComment[];
 }
 
 export interface PaginatedResponse<T> {
     data: T[];
-    current_page: number;
-    last_page: number;
-    total: number;
+    meta: {
+        current_page: number;
+        last_page: number;
+        total: number;
+    };
 }

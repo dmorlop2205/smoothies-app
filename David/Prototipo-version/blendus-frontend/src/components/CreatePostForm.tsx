@@ -1,47 +1,120 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { api } from '../lib/api';
-import type { Tag } from '../lib/api';
 import { $isLoggedIn } from '../stores/authStore';
+import './CreateForm.css';
+
+interface IngredientRow {
+    ingredient: string;
+    amount: string;
+}
 
 export default function CreatePostForm() {
-    const [tags, setTags] = useState<Tag[]>([]);
-    const [form, setForm] = useState({
-        title: '',
-        description: '',
-        preparation_time: '',
-        image_url: '',
-        selectedTags: [] as number[],
-    });
+    const [ingredients, setIngredients] = useState<IngredientRow[]>([{ ingredient: '', amount: '' }]);
+    const [tags, setTags] = useState<string[]>([]);
+    const [tagInput, setTagInput] = useState('');
+    const [file, setFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
-    useEffect(() => {
-        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
-        api.getTags().then(setTags).catch(() => { });
-    }, []);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleTagToggle = (id: number) => {
-        setForm(f => ({
-            ...f,
-            selectedTags: f.selectedTags.includes(id)
-                ? f.selectedTags.filter(t => t !== id)
-                : [...f.selectedTags, id],
-        }));
+    // ── Ingredient helpers ──
+    const addIngredient = () => setIngredients(prev => [...prev, { ingredient: '', amount: '' }]);
+    const removeIngredient = (i: number) => setIngredients(prev => prev.filter((_, idx) => idx !== i));
+    const handleIngredientChange = (i: number, field: keyof IngredientRow, value: string) => {
+        setIngredients(prev => {
+            const copy = [...prev];
+            copy[i] = { ...copy[i], [field]: value };
+            return copy;
+        });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    // ── Tag helpers ──
+    const addTag = () => {
+        let t = tagInput.trim();
+        if (!t) return;
+        if (!t.startsWith('#')) t = '#' + t;
+        setTags(prev => [...prev, t]);
+        setTagInput('');
+    };
+    const removeTag = (i: number) => setTags(prev => prev.filter((_, idx) => idx !== i));
+
+    // ── File helpers ──
+    const handleClick = () => fileInputRef.current?.click();
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        setFile(f);
+        setPreview(URL.createObjectURL(f));
+    };
+    const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
-        setError('');
-        setLoading(true);
-        try {
-            await api.createPost({
-                title: form.title,
-                description: form.description,
-                preparation_time: form.preparation_time ? parseInt(form.preparation_time) : undefined,
-                image_url: form.image_url || undefined,
-                tags: form.selectedTags,
+        setIsDragging(false);
+        const f = e.dataTransfer.files[0];
+        if (!f) return;
+        setFile(f);
+        setPreview(URL.createObjectURL(f));
+    };
+    const removeImage = () => {
+        setFile(null);
+        setPreview(null);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    // ── Submit ──
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
+
+        const form = e.currentTarget;
+        const title = (form.querySelector('#name') as HTMLInputElement)?.value.trim();
+        const category = (form.querySelector('#category') as HTMLSelectElement)?.value;
+        const description = (form.querySelector('#caption') as HTMLTextAreaElement)?.value.trim();
+        const preparation_steps = (form.querySelector('#instructions') as HTMLTextAreaElement)?.value.trim();
+
+        if (!title || !description || !preparation_steps) {
+            setError('Please fill in the name, caption and instructions.');
+            return;
+        }
+
+        // Parse ingredients into Nico's format: { name, quantity, unit }
+        const parsedIngredients = ingredients
+            .filter(i => i.ingredient.trim())
+            .map(i => {
+                const match = i.amount.match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+                return {
+                    name: i.ingredient.trim(),
+                    quantity: match ? parseFloat(match[1]) : 1,
+                    unit: match?.[2]?.trim() || 'piece',
+                };
             });
+
+        if (parsedIngredients.length === 0) {
+            setError('Please add at least one ingredient.');
+            return;
+        }
+
+        // Build FormData for file upload support
+        const fd = new FormData();
+        fd.append('title', title);
+        fd.append('description', description);
+        fd.append('preparation_steps', preparation_steps);
+        if (file) fd.append('image', file);
+        if (category) fd.append('tags[]', category);
+        tags.forEach(t => fd.append('tags[]', t.replace('#', '')));
+        parsedIngredients.forEach((ing, idx) => {
+            fd.append(`ingredients[${idx}][name]`, ing.name);
+            fd.append(`ingredients[${idx}][quantity]`, String(ing.quantity));
+            fd.append(`ingredients[${idx}][unit]`, ing.unit);
+        });
+
+        setLoading(true);
+        setError('');
+        try {
+            await api.createPost(fd);
             setSuccess(true);
             setTimeout(() => { window.location.href = '/'; }, 1500);
         } catch (err: any) {
@@ -53,66 +126,145 @@ export default function CreatePostForm() {
 
     if (success) {
         return (
-            <div className="create-page">
-                <div className="create-card" style={{ textAlign: 'center', padding: '3rem' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎉</div>
-                    <h2 style={{ color: 'var(--emerald-600)' }}>Post published!</h2>
-                    <p style={{ color: 'var(--gray-500)', marginTop: '.5rem' }}>Redirecting to your feed...</p>
-                </div>
+            <div className="form" style={{ textAlign: 'center', padding: '3rem' }}>
+                <p style={{ color: '#007A55', fontSize: '1.5rem', fontWeight: 700 }}>✅ Smoothie shared! Redirecting…</p>
             </div>
         );
     }
 
     return (
-        <div className="create-page">
-            <div className="create-card">
-                <h2>🍹 Share a Smoothie Recipe</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>Recipe Title *</label>
-                        <input className="form-input" type="text" placeholder="e.g. Ultimate Green Detox"
-                            value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} required />
-                    </div>
-                    <div className="form-group">
-                        <label>Description & Ingredients *</label>
-                        <textarea className="form-textarea" placeholder="Describe your recipe, ingredients, and tips..."
-                            value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} required />
-                    </div>
-                    <div className="form-group">
-                        <label>Preparation Time (minutes)</label>
-                        <input className="form-input" type="number" min="1" placeholder="e.g. 5"
-                            value={form.preparation_time} onChange={e => setForm(f => ({ ...f, preparation_time: e.target.value }))} />
-                    </div>
-                    <div className="form-group">
-                        <label>Image URL</label>
-                        <input className="form-input" type="url" placeholder="https://..."
-                            value={form.image_url} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))} />
-                    </div>
-                    <div className="form-group">
-                        <label>Categories</label>
-                        <div className="tag-checkboxes">
-                            {tags.map(tag => (
-                                <label key={tag.id} className="tag-checkbox-label">
-                                    <input type="checkbox" checked={form.selectedTags.includes(tag.id)}
-                                        onChange={() => handleTagToggle(tag.id)} />
-                                    #{tag.name}
-                                </label>
-                            ))}
+        <form className="form" onSubmit={handleSubmit}>
+            {/* Image upload */}
+            <div
+                className={`image ${isDragging ? 'dragging' : ''}`}
+                onClick={handleClick}
+                onDrop={handleDrop}
+                onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+            >
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
+                {preview ? (
+                    <div className="preview-wrapper">
+                        <img src={preview} alt="Preview" className="image-preview" />
+                        <div className="delete-icon" onClick={e => { e.stopPropagation(); removeImage(); }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="#E7000B">
+                                <path d="M256-200l-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                            </svg>
                         </div>
                     </div>
-
-                    {error && <p className="form-error">{error}</p>}
-
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <button type="submit" className="btn" disabled={loading} style={{ flex: 1, padding: '.8rem' }}>
-                            {loading ? 'Publishing...' : '🚀 Publish Recipe'}
-                        </button>
-                        <a href="/" className="btn btn-ghost" style={{ flex: 1, padding: '.8rem', textAlign: 'center', textDecoration: 'none' }}>
-                            Cancel
-                        </a>
-                    </div>
-                </form>
+                ) : (
+                    <>
+                        <div className="camera-logo">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#007A55">
+                                <path d="M479.5-267q72.5 0 121.5-49t49-121.5q0-72.5-49-121T479.5-607q-72.5 0-121 48.5t-48.5 121q0 72.5 48.5 121.5t121 49Zm0-60q-47.5 0-78.5-31.5t-31-79q0-47.5 31-78.5t78.5-31q47.5 0 79 31t31.5 78.5q0 47.5-31.5 79t-79 31.5ZM140-120q-24 0-42-18t-18-42v-513q0-23 18-41.5t42-18.5h147l73-87h240l73 87h147q23 0 41.5 18.5T880-693v513q0 24-18.5 42T820-120H140Zm0-60h680v-513H645l-73-87H388l-73 87H140v513Zm340-257Z"/>
+                            </svg>
+                        </div>
+                        <h2>{file ? file.name : 'Add a photo of your smoothie'}</h2>
+                        <h3>Drag and drop</h3>
+                    </>
+                )}
             </div>
-        </div>
+
+            {/* Smoothie Name */}
+            <div className="name">
+                <label className="label" htmlFor="name">Smoothie Name</label>
+                <input className="text-input" type="text" id="name" placeholder="Tropical Fruits Smoothie" />
+            </div>
+
+            {/* Category */}
+            <div className="category">
+                <label className="label" htmlFor="category">Category</label>
+                <select className="text-input" id="category">
+                    <option value="" disabled defaultValue="">Choose a category</option>
+                    <option value="green">🥬 Green</option>
+                    <option value="tropical">🍍 Tropical</option>
+                    <option value="berry">🫐 Berry</option>
+                    <option value="protein">💪 Protein</option>
+                    <option value="detox">🍃 Detox</option>
+                    <option value="dessert">🍨 Dessert</option>
+                </select>
+            </div>
+
+            {/* Caption */}
+            <div className="caption">
+                <label className="label" htmlFor="caption">Caption</label>
+                <textarea className="textarea" id="caption" placeholder="Share your smoothie story..." />
+            </div>
+
+            {/* Ingredients */}
+            <div className="ingredients-container">
+                <div className="ingredients-header">
+                    <label className="label">Ingredients</label>
+                    <div className="add-button" onClick={addIngredient}>
+                        <svg width="28px" height="28px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <line fill="none" stroke="#007A55" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="19" y2="5"/>
+                            <line fill="none" stroke="#007A55" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="5" x2="19" y1="12" y2="12"/>
+                        </svg>
+                        <p>Add</p>
+                    </div>
+                </div>
+                {ingredients.map((item, idx) => (
+                    <div className="ingredients" key={idx}>
+                        <input
+                            className="text-input ingredient"
+                            type="text"
+                            placeholder="Ingredient"
+                            value={item.ingredient}
+                            onChange={e => handleIngredientChange(idx, 'ingredient', e.target.value)}
+                        />
+                        <input
+                            className="text-input amount"
+                            type="text"
+                            placeholder="Amount (e.g. 200 g)"
+                            value={item.amount}
+                            onChange={e => handleIngredientChange(idx, 'amount', e.target.value)}
+                        />
+                        <div className="close-icon" onClick={() => removeIngredient(idx)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#99a1af">
+                                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/>
+                            </svg>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Tags */}
+            <div className="tags-container">
+                <label className="label">Tags</label>
+                <div className="tags-list">
+                    {tags.map((tag, idx) => (
+                        <div className="tag" key={idx} onClick={() => removeTag(idx)}>
+                            {tag} <span>✖</span>
+                        </div>
+                    ))}
+                </div>
+                <div className="tags">
+                    <input
+                        className="text-input"
+                        type="text"
+                        placeholder="Add a tag..."
+                        value={tagInput}
+                        onChange={e => setTagInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+                    />
+                    <button type="button" className="btn add-btn" onClick={addTag}>Add</button>
+                </div>
+            </div>
+
+            {/* Instructions */}
+            <div className="instructions">
+                <label className="label" htmlFor="instructions">Instructions</label>
+                <textarea className="textarea" id="instructions" placeholder="How to make this smoothie..." />
+            </div>
+
+            {error && <p style={{ color: '#E7000B', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}
+
+            <button className="btn form-btn" type="submit" disabled={loading}>
+                <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#fff">
+                    <path d="M447-280v-271.67L327.67-432.33 280.33-480l200-200 200 200-47.66 47.33-119-119V-280H447Z"/>
+                </svg>
+                {loading ? 'Sharing...' : 'Share Smoothie'}
+            </button>
+        </form>
     );
 }

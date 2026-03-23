@@ -2,149 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Post\StorePostRequest;
+use App\Http\Requests\Post\UpdatePostRequest;
+use App\Http\Resources\PostCollection;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
-use App\Models\Tag;
+use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function index(Request $request)
-    {
-        $query = Post::with(['user', 'images', 'tags', 'likes'])
-            ->withCount(['comments', 'likes']);
-
-        if ($request->has('tag')) {
-            $query->whereHas('tags', fn($q) => $q->where('slug', $request->tag));
-        }
-
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
-        }
-
-        $posts = $query->latest()->paginate(10);
-
-        // Attach isLiked for authenticated user
-        if ($user = $request->user()) {
-            $posts->getCollection()->transform(function ($post) use ($user) {
-                $post->is_liked = $post->likes->contains('user_id', $user->id);
-                return $post;
-            });
-        }
-
-        return response()->json($posts);
+    public function __construct(
+        protected PostService $postService
+    ) {
     }
 
-    public function show(Request $request, Post $post)
+    public function index(Request $request): JsonResponse
     {
-        $post->load(['user', 'images', 'tags', 'comments.user', 'likes']);
-        $post->loadCount(['comments', 'likes']);
+        $perPage = (int) $request->query('per_page', 15);
 
-        if ($user = $request->user()) {
-            $post->is_liked = $post->likes->contains('user_id', $user->id);
-        } else {
-            $post->is_liked = false;
-        }
+        $posts = $this->postService->getFeed($perPage);
 
-        return response()->json($post);
+        return (new PostCollection($posts))->response();
     }
 
-    public function store(Request $request)
+    public function store(StorePostRequest $request): JsonResponse
     {
-        $data = $request->validate([
-            'title'            => 'required|string|max:255',
-            'description'      => 'required|string',
-            'preparation_time' => 'nullable|integer|min:1',
-            'is_premium'       => 'boolean',
-            'tags'             => 'array',
-            'tags.*'           => 'exists:tags,id',
-            'image_url'        => 'nullable|string|url',
-        ]);
+        $post = $this->postService->store($request->user(), $request->validated());
 
-        $post = $request->user()->posts()->create([
-            'title'            => $data['title'],
-            'description'      => $data['description'],
-            'preparation_time' => $data['preparation_time'] ?? null,
-            'is_premium'       => $data['is_premium'] ?? false,
-        ]);
-
-        if (!empty($data['tags'])) {
-            $post->tags()->sync($data['tags']);
-        }
-
-        if (!empty($data['image_url'])) {
-            $post->images()->create(['path' => $data['image_url'], 'order' => 0]);
-        }
-
-        $post->load(['user', 'images', 'tags']);
-        $post->loadCount(['comments', 'likes']);
-        $post->is_liked = false;
-
-        return response()->json($post, 201);
+        return (new PostResource($post))->response()->setStatusCode(201);
     }
 
-    public function update(Request $request, Post $post)
+    public function show(Post $post): JsonResponse
+    {
+        $post->load(['user', 'ingredients', 'tags'])
+            ->loadCount(['likes', 'comments']);
+
+        if ($userId = auth()->id()) {
+            $post->load(['likes' => fn ($q) => $q->where('user_id', $userId)]);
+        }
+
+        return (new PostResource($post))->response();
+    }
+
+    public function update(UpdatePostRequest $request, Post $post): JsonResponse
     {
         $this->authorize('update', $post);
 
-        $data = $request->validate([
-            'title'            => 'string|max:255',
-            'description'      => 'string',
-            'preparation_time' => 'nullable|integer|min:1',
-            'is_premium'       => 'boolean',
-            'tags'             => 'array',
-            'tags.*'           => 'exists:tags,id',
-        ]);
+        $updated = $this->postService->update($post, $request->validated());
 
-        $post->update($data);
-
-        if (isset($data['tags'])) {
-            $post->tags()->sync($data['tags']);
-        }
-
-        $post->load(['user', 'images', 'tags']);
-        $post->loadCount(['comments', 'likes']);
-
-        return response()->json($post);
+        return (new PostResource($updated))->response();
     }
 
-    public function destroy(Post $post)
+    public function destroy(Request $request, Post $post): JsonResponse
     {
         $this->authorize('delete', $post);
-        $post->delete();
-        return response()->json(['message' => 'Post deleted.']);
-    }
 
-    public function like(Request $request, Post $post)
-    {
-        $user = $request->user();
-        $existing = $post->likes()->where('user_id', $user->id)->first();
-
-        if ($existing) {
-            $existing->delete();
-            $liked = false;
-        } else {
-            $post->likes()->create(['user_id' => $user->id]);
-            $liked = true;
-        }
+        $this->postService->delete($post);
 
         return response()->json([
-            'liked'       => $liked,
-            'likes_count' => $post->likes()->count(),
+            'message' => 'Post deleted',
         ]);
     }
 
-    public function userPosts(Request $request, $userId)
+    public function byTag(Request $request, string $tag): JsonResponse
     {
-        $posts = Post::where('user_id', $userId)
-            ->with(['user', 'images', 'tags'])
-            ->withCount(['comments', 'likes'])
-            ->latest()
-            ->get();
+        $perPage = (int) $request->query('per_page', 15);
 
-        return response()->json($posts);
+        $posts = $this->postService->getByTag($tag, $perPage);
+
+        return (new PostCollection($posts))->response();
     }
 }
+

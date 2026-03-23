@@ -1,0 +1,18 @@
+.btn {
+    width: fit-content;
+    padding: .5rem 1rem;
+    border-radius: 100px;
+    outline: none;
+    border: none;
+    background-color: var(--emerald-600);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'Alexandria';
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.btn:hover {
+    background-color: var(--emerald-700);
+}
