@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function AuthForm({ mode }: Props) {
-    const [form, setForm] = useState({ name: '', email: '', password: '', password_confirmation: '' });
+    const [form, setForm] = useState({ name: '', username: '', email: '', password: '', password_confirmation: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,7 @@ export default function AuthForm({ mode }: Props) {
         setLoading(true);
         try {
             const res = mode === 'login'
-                ? await api.login({ email: form.email, password: form.password })
+                ? await api.login(form.email, form.password)
                 : await api.register(form);
             setAuth(res.token, res.user);
             window.location.href = '/';
@@ -58,11 +58,18 @@ export default function AuthForm({ mode }: Props) {
 
                 <form onSubmit={handleSubmit}>
                     {mode === 'register' && (
-                        <div className="form-group">
-                            <label>Full Name</label>
-                            <input className="form-input" type="text" name="name" placeholder="John Smoothie"
-                                value={form.name} onChange={handleChange} required />
-                        </div>
+                        <>
+                            <div className="form-group">
+                                <label>Full Name</label>
+                                <input className="form-input" type="text" name="name" placeholder="John Smoothie"
+                                    value={form.name} onChange={handleChange} required />
+                            </div>
+                            <div className="form-group">
+                                <label>Username</label>
+                                <input className="form-input" type="text" name="username" placeholder="johnsmoothie"
+                                    value={form.username} onChange={handleChange} required />
+                            </div>
+                        </>
                     )}
                     <div className="form-group">
                         <label>Email</label>

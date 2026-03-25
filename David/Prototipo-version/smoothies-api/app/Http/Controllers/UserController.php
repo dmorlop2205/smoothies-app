@@ -3,29 +3,70 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\UserService;
+use App\Http\Resources\UserResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function show($id)
+    public function __construct(
+        protected UserService $userService
+    ) {
+    }
+
+    public function show(User $user): JsonResponse
     {
-        $user = User::findOrFail($id);
+        return (new UserResource($user))->response();
+    }
+
+    public function update(Request $request, User $user): JsonResponse
+    {
+        $this->authorize('update', $user);
+
+        $data = $request->validate([
+            'name'     => ['sometimes', 'string', 'max:100'],
+            'username' => ['sometimes', 'string', 'max:50', Rule::unique('users')->ignore($user->id)],
+            'bio'      => ['sometimes', 'nullable', 'string'],
+            'avatar'   => ['sometimes', 'nullable', 'url'],
+        ]);
+
+        $updated = $this->userService->updateProfile($user, $data);
+
+        return (new UserResource($updated))->response();
+    }
+
+    public function follow(Request $request, User $user): JsonResponse
+    {
+        $this->userService->follow($request->user(), $user);
+
         return response()->json([
-            'id'    => $user->id,
-            'name'  => $user->name,
-            'email' => $user->email,
-            'posts_count' => $user->posts()->count(),
+            'message' => 'Followed',
         ]);
     }
 
-    public function suggested(Request $request)
+    public function unfollow(Request $request, User $user): JsonResponse
     {
-        $users = User::when($request->user(), fn($q) => $q->where('id', '!=', $request->user()->id))
-            ->withCount('posts')
-            ->orderByDesc('posts_count')
-            ->limit(5)
-            ->get(['id', 'name', 'email']);
+        $this->userService->unfollow($request->user(), $user);
 
-        return response()->json($users);
+        return response()->json([
+            'message' => 'Unfollowed',
+        ]);
+    }
+
+    public function followers(User $user): JsonResponse
+    {
+        $followers = $this->userService->getFollowers($user);
+
+        return UserResource::collection($followers)->response();
+    }
+
+    public function following(User $user): JsonResponse
+    {
+        $following = $this->userService->getFollowing($user);
+
+        return UserResource::collection($following)->response();
     }
 }
+

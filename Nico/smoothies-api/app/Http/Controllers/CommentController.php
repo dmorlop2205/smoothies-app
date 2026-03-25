@@ -54,6 +54,8 @@ class CommentController extends Controller
 
     public function destroy(Request $request, Post $post, Comment $comment): JsonResponse
     {
+        $comment->loadMissing('post');
+        
         $this->authorize('delete', $comment);
 
         $this->commentService->delete($comment);

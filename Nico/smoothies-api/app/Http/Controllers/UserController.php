@@ -7,6 +7,7 @@ use App\Services\UserService;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -24,7 +25,12 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
 
-        $data = $request->only(['name', 'username', 'bio', 'avatar']);
+        $data = $request->validate([
+            'name'     => ['sometimes', 'string', 'max:100'],
+            'username' => ['sometimes', 'string', 'max:50', Rule::unique('users')->ignore($user->id)],
+            'bio'      => ['sometimes', 'nullable', 'string'],
+            'avatar'   => ['sometimes', 'nullable', 'url'],
+        ]);
 
         $updated = $this->userService->updateProfile($user, $data);
 

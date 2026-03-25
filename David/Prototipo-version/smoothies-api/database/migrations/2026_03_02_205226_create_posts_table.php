@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->text('description');
-            $table->integer('preparation_time')->nullable()->comment('en minutos');
-            $table->boolean('is_premium')->default(false);
+            $table->text('preparation_steps');
+            $table->string('image_url')->nullable();
             $table->timestamps();
         });
     }

@@ -4,50 +4,45 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Post extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'title',
         'description',
-        'preparation_time',
-        'is_premium',
+        'preparation_steps',
+        'image_url',
+        'user_id',
     ];
 
-    protected $casts = [
-        'is_premium' => 'boolean',
-    ];
-
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function comments()
+    public function ingredients(): HasMany
+    {
+        return $this->hasMany(Ingredient::class);
+    }
+
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
-    public function likes()
+    public function likes(): MorphMany
     {
-        return $this->hasMany(Like::class);
-    }
-
-    public function images()
-    {
-        return $this->hasMany(Image::class)->orderBy('order');
-    }
-
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class, 'post_tag');
-    }
-
-    public function isLikedBy(User $user): bool
-    {
-        return $this->likes()->where('user_id', $user->id)->exists();
+        return $this->morphMany(Like::class, 'likeable');
     }
 }

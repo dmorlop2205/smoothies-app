@@ -1,0 +1,35 @@
+.wrapper {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2rem;
+
+}
+.right-wrapper {
+    position: fixed;
+    margin-top: calc(3rem + 5rem);
+    grid-column: 9 / 13;
+    justify-self: end;
+    top: 0;
+    grid-row: 1/4;
+    padding: 0rem;
+
+    .right-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-items: start;
+        gap: 1.5rem;
+        z-index: 0;
+    }
+}
+
+.left-wrapper {
+    grid-column: span 8;
+    .left-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        gap: 2rem;
+
+    }
+}

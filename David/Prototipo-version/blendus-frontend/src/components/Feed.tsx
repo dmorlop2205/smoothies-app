@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { Post, Tag } from '../lib/api';
 import PostCard from './PostCard';
+import './Feed.css';
+import './FiltersComponent.css';
+import './StoriesComponent.css';
 
 const FILTER_ICONS: Record<string, string> = {
-    all: '/sparks.webp',
     green: '/greensmoothies.png',
     tropical: '/pineaple.webp',
     berry: '/berry.webp',
@@ -27,10 +29,14 @@ export default function Feed() {
 
     useEffect(() => {
         setLoading(true);
-        api.getPosts({ tag: activeTag ?? undefined, page })
+        const fetcher = activeTag
+            ? api.getPostsByTag(activeTag, page)
+            : api.getPosts({ page });
+
+        fetcher
             .then(res => {
                 setPosts(prev => page === 1 ? res.data : [...prev, ...res.data]);
-                setLastPage(res.last_page);
+                setLastPage(res.meta.last_page);
             })
             .catch(() => { })
             .finally(() => setLoading(false));
@@ -44,22 +50,22 @@ export default function Feed() {
 
     const handleLikeToggle = (postId: number, liked: boolean, count: number) => {
         setPosts(prev => prev.map(p =>
-            p.id === postId ? { ...p, is_liked: liked, likes_count: count } : p
+            p.id === postId ? { ...p, has_liked: liked, likes_count: count } : p
         ));
     };
 
     return (
-        <div>
-            {/* Stories Bar */}
-            <div className="stories-bar">
-                <div className="story-you">
-                    <div className="story-circle">
-                        <svg viewBox="0 0 24 24" fill="none">
-                            <line stroke="#009966" strokeLinecap="round" strokeWidth="2" x1="12" x2="12" y1="5" y2="19" />
-                            <line stroke="#009966" strokeLinecap="round" strokeWidth="2" x1="5" x2="19" y1="12" y2="12" />
+        <section className="left-content">
+            {/* Stories — static avatars for now */}
+            <section className="stories">
+                <div className="you">
+                    <div className="circle">
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <line fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="19" y2="5"/>
+                            <line fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="5" x2="19" y1="12" y2="12"/>
                         </svg>
                     </div>
-                    <span className="story-name">You</span>
+                    <p>You</p>
                 </div>
                 {[
                     { name: 'John', img: '/user1.jpg' },
@@ -69,39 +75,39 @@ export default function Feed() {
                     { name: 'Robert', img: '/user 4.jpg' },
                     { name: 'James', img: '/user 5.jpg' },
                 ].map(u => (
-                    <div className="story-item" key={u.name}>
-                        <div className="story-circle">
-                            <img src={u.img} alt={u.name} />
-                        </div>
-                        <span className="story-name">{u.name}</span>
+                    <div className="storie" key={u.name}>
+                        <div className="circle"><img src={u.img} alt={u.name} /></div>
+                        <p>{u.name}</p>
                     </div>
                 ))}
-            </div>
+            </section>
 
-            {/* Filter Bar */}
-            <div className="filter-bar" style={{ margin: '0' }}>
-                <button
-                    className={`filter-pill${activeTag === null ? ' active' : ''}`}
+            {/* Filters */}
+            <section className="filters">
+                <span
+                    className={`filter ${activeTag === null ? 'active' : ''}`}
                     onClick={() => handleFilterClick(null)}
+                    style={{ cursor: 'pointer' }}
                 >
                     <img src="/sparks.webp" alt="All" />
-                    All
-                </button>
+                    <p>All</p>
+                </span>
                 {tags.map(tag => (
-                    <button
+                    <span
                         key={tag.id}
-                        className={`filter-pill${activeTag === tag.slug ? ' active' : ''}`}
+                        className={`filter ${activeTag === tag.slug ? 'active' : ''}`}
                         onClick={() => handleFilterClick(tag.slug)}
+                        style={{ cursor: 'pointer' }}
                     >
                         {FILTER_ICONS[tag.slug] && <img src={FILTER_ICONS[tag.slug]} alt={tag.name} />}
-                        {tag.name}
-                    </button>
+                        <p>{tag.name}</p>
+                    </span>
                 ))}
-            </div>
+            </section>
 
             {/* Posts */}
             {loading && page === 1 ? (
-                <div className="loading-spinner">
+                <div style={{ textAlign: 'center', padding: '3rem' }}>
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" stroke="#00BC7D" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
                             <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
@@ -109,7 +115,7 @@ export default function Feed() {
                     </svg>
                 </div>
             ) : posts.length === 0 ? (
-                <div className="empty-state">
+                <div style={{ textAlign: 'center', color: '#888', padding: '3rem 0' }}>
                     <p>No smoothies yet. Be the first to post! 🍹</p>
                 </div>
             ) : (
@@ -120,11 +126,15 @@ export default function Feed() {
 
             {page < lastPage && (
                 <div style={{ textAlign: 'center', padding: '1rem' }}>
-                    <button className="btn" onClick={() => setPage(p => p + 1)} disabled={loading}>
+                    <button
+                        onClick={() => setPage(p => p + 1)}
+                        disabled={loading}
+                        style={{ background: '#007A55', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '20px', cursor: 'pointer', fontWeight: 600 }}
+                    >
                         {loading ? 'Loading...' : 'Load More'}
                     </button>
                 </div>
             )}
-        </div>
+        </section>
     );
 }
