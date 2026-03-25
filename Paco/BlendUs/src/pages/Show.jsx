@@ -1,0 +1,91 @@
+import { Link } from "react-router-dom"
+import NavComponent from "../components/NavComponent"
+import './Show.css'
+import UserInfo from "../components/UserInfo"
+import IngredientsComponent from "../components/IngredientsComponent"
+import CommentsComponent from "../components/CommentsComponent"
+
+function Show() {
+    return (
+        <section className="show-wrapper">
+            <NavComponent></NavComponent>
+            <section className="page-header">
+                <Link to="/feed" className="back">
+                    <div className="back-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#4a5565">
+                            <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
+                        </svg>
+                    </div>
+                    <h3>Back</h3>
+                </Link>
+            </section>
+            <section className="post-info">
+                <UserInfo></UserInfo>
+            </section>
+            <img className="post-image" src="assets/smoothie.avif" alt="Post Image" />
+            <section className="title-interactions">
+                <div className="title">
+                    <h1 className="smoothie-name">Tropical Sunrise Boost</h1>
+                    <span className="category">tropical</span>
+                </div>
+                <div className="interactions">
+                    <svg className="like" width="48px" height="48px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke="#364153" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <svg className="save" width="65px" height="65px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fillRule="evenodd" clipRule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#364153"/>
+                    </svg>
+                    <svg className="share" xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#364153" strokeWidth="20" stroke="#364153">
+                        <path d="M686-80q-47.5 0-80.75-33.25T572-194q0-8 5-34L278-403q-16.28 17.34-37.64 27.17Q219-366 194-366q-47.5 0-80.75-33T80-480q0-48 33.25-81T194-594q24 0 45 9.3 21 9.29 37 25.7l301-173q-2-8-3.5-16.5T572-766q0-47.5 33.25-80.75T686-880q47.5 0 80.75 33.25T800-766q0 47.5-33.25 80.75T686-652q-23.27 0-43.64-9Q622-670 606-685L302-516q3 8 4.5 17.5t1.5 18q0 8.5-1 16t-3 15.5l303 173q16-15 36.09-23.5 20.1-8.5 43.07-8.5Q734-308 767-274.75T800-194q0 47.5-33.25 80.75T686-80Zm.04-60q22.96 0 38.46-15.54 15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5Zm-492-286q22.96 0 38.46-15.54 15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5ZM724.5-727.54q15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5 22.96 0 38.46-15.54ZM686-194ZM194-480Zm492-286Z"/>
+                    </svg>
+                </div>
+            </section>
+            <p className="caption">
+                A refreshing tropical smoothie packed with vitamin C and natural energy to start your day. 
+            </p>
+            <section className="tag-list">
+                <div className="tag">#tropical</div>
+                <div className="tag">#energy</div>
+                <div className="tag">#vitamin-c</div>
+                <div className="tag">#breakfast</div>
+                <div className="tag">#refreshing</div>
+            </section>
+            <IngredientsComponent></IngredientsComponent>
+            <section className="instructions-wrapper">
+                <div className="instructions-header">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#006045">
+                        <path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z"/>
+                    </svg>
+                    <h3>Instructions</h3>
+                </div>
+                <p className="instructions-content">
+                    1. Add the pineapple, mango, and banana to the blender. <br></br><br></br>
+
+                    2. Pour in the orange juice and add the Greek yogurt. <br></br><br></br>
+
+                    3. Sprinkle the chia seeds for extra nutrients. <br></br><br></br>
+
+                    4. Add ice to make it cold and refreshing. <br></br><br></br>
+
+                    5. Blend until smooth and creamy. <br></br><br></br>
+
+                    6. Pour into a glass and enjoy your tropical boost.
+                </p>
+            </section>
+            <div className="line"></div>
+            <section className="likes-comments">
+                <div className="likes">
+                    <span className="number">123</span>
+                    <span className="name">likes</span>
+                </div>
+                <div className="comments">
+                    <span className="number">2</span>
+                    <span className="name">comments</span>
+                </div>
+            </section>
+            <CommentsComponent></CommentsComponent>
+        </section>
+    )
+}
+
+export default Show

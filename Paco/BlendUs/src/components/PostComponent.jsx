@@ -1,17 +1,10 @@
 import './PostComponent.css';
+import UserInfo from './UserInfo';
 function PostComponent() {
   return (
     <section className="post">
         <div className="post-header">
-            <div className="post-user">
-                <div className="circle">
-                    <img src="assets/Alexelcapo.webp"></img>
-                </div>
-                <div className="user-info">
-                    <p className="name">Nombre Usuario</p>
-                    <p className="launch-date">Mar 15</p>
-                </div>
-            </div>
+            <UserInfo></UserInfo>
 
             <div className="post-options">
                 <svg width="80px" height="80px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

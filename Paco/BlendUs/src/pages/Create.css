@@ -1,5 +1,5 @@
 .create {
-    margin: 0 17rem;
+    margin: 0 clamp(0rem, -4.474rem + 17.895vw, 17rem);
     display: flex;
     flex-direction: column;
     gap: 2rem;

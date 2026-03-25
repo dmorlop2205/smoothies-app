@@ -1,6 +1,6 @@
 body {
     background-color: var(--bg);
     font-family: 'Alexandria';
-    margin: 0 13rem 3rem 13rem;
+    margin: 0 clamp(1rem, -2.158rem + 12.632vw, 13rem) 3rem clamp(1rem, -2.158rem + 12.632vw, 13rem);
     padding-top: calc(3rem + 5rem);
 }
