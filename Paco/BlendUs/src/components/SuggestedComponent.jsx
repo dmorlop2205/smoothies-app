@@ -20,7 +20,7 @@ function SuggestedComponent() {
             <div className="suggested-user">
                 <div className="user-info">
                     <div className="circle">
-                        <img src="assets/user2.jpg" alt="" />
+                        <img src="assets/user2.jpg" alt="user-2" />
                     </div>
                     <div className="suggested-user-info">
                         <p className="suggested-name">Marie Parker</p>
