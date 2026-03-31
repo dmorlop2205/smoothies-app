@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { Post, PostComment } from '../lib/api';
 import { $isLoggedIn } from '../stores/authStore';
@@ -23,6 +23,18 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     const [submitting, setSubmitting] = useState(false);
     const [saved, setSaved] = useState(false);
     const [expanded, setExpanded] = useState(false);
+    const [fetchedComments, setFetchedComments] = useState(false);
+
+    useEffect(() => {
+        if (commentsOpen && !fetchedComments && comments.length === 0 && post.comments_count > 0) {
+            api.getComments(post.id)
+                .then(res => {
+                    setComments(res);
+                    setFetchedComments(true);
+                })
+                .catch(console.error);
+        }
+    }, [commentsOpen, fetchedComments, comments.length, post.comments_count, post.id]);
 
     const handleLike = async () => {
         if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
@@ -49,7 +61,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     };
 
     // Nico's API v2: image_url is a direct string, author is the user
-    const imageUrl = post.image_url;
+    const imageUrl = post.image_url || '/assets/smoothie.avif';
     const authorName = post.author?.name ?? 'Unknown';
     const initials = authorName.split(' ').map(n => n[0]).join('').slice(0, 2);
 
@@ -80,7 +92,9 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
             </div>
 
             {imageUrl && (
-                <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '300px', borderRadius: '12px', marginTop: '1rem' }} />
+                <a href={`/post/${post.id}`} style={{ display: 'block', textDecoration: 'none' }}>
+                    <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '300px', borderRadius: '12px', marginTop: '1rem' }} />
+                </a>
             )}
 
             <div className="interactions">

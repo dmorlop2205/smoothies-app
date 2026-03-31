@@ -10,6 +10,7 @@ El corazón de la aplicación ya está perfectamente integrado y funcionando:
 - **Feed Principal:** El `Feed.tsx` renderiza tarjetas preciosas, filtra por etiquetas y maneja paginación (`meta.last_page`).
 - **Creación y Edición de Smoothies:** Los formularios `CreatePostForm` y `EditPostForm` con arrastre de imágenes, parseo de ingredientes, y envío por `FormData` al backend.
 - **Interacciones Básicas:** Dar likes a los posts y actualizar la interfaz instantáneamente.
+- **Explorar:** La pestaña de buscar/explorar del menú izquierdo (`/explore`) con el diseño final de Paco y filtros.
 
 ---
 
@@ -18,7 +19,6 @@ Para que el prototipo no rompa al navegar y se pueda probar la experiencia compl
 - **Autenticación:** Las páginas de Login (`/login`) y Registro (`/register`), incluyendo su lógica de formulario (`AuthForm.tsx`).
 - **Vista de Receta (Post):** La página individual de un smoothie (`/post/[id]`) y su motor de comentarios (`PostDetails.tsx`).
 - **Perfiles de Usuario:** La página de perfil público (`/profile/[id]`) que muestra la información del usuario y su cuadrícula de batidos.
-- **Explorar:** La pestaña de buscar/explorar del menú izquierdo (`/explore`).
 - **Usuarios Sugeridos:** El panel lateral derecho (`SuggestedUsers.tsx`). Funciona con un endpoint simulado o datos estáticos, ya que la API no lo implementa aún.
 
 ---
