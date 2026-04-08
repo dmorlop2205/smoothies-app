@@ -1,37 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Feed from '../components/Feed';
+import ExplorePage from '../components/ExplorePage';
 import SuggestedUsers from '../components/SuggestedUsers';
 ---
 <Layout title="Explore" activePage="explore">
   <div class="page-wrapper">
     <main class="page-main">
-      <div id="explore-search" style="display:flex;gap:.75rem;align-items:center;margin-bottom:.5rem">
-        <input id="search-input" class="search-input" type="text" placeholder="🔍 Search smoothies, recipes, ingredients..." />
-        <button id="search-btn" class="btn">Search</button>
-      </div>
-      <div id="explore-feed">
-        <Feed client:load />
-      </div>
+      <ExplorePage client:load />
     </main>
     <aside class="page-aside">
       <SuggestedUsers client:load />
     </aside>
   </div>
-
-  <script>
-    const input = document.getElementById('search-input') as HTMLInputElement;
-    const btn = document.getElementById('search-btn');
-    btn?.addEventListener('click', () => {
-      const q = input?.value.trim();
-      if (q) window.location.href = `/explore?search=${encodeURIComponent(q)}`;
-    });
-    input?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') btn?.click();
-    });
-
-    // Pre-fill from URL
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('search') && input) input.value = params.get('search')!;
-  </script>
 </Layout>

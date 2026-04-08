@@ -51,13 +51,13 @@ export const api = {
     },
 
     getPost: (id: number) =>
-        request<Post>(`/posts/${id}`),
+        request<{data: Post}>(`/posts/${id}`).then(res => res.data),
 
     createPost: (data: FormData) =>
-        request<Post>('/posts', { method: 'POST', body: data }),
+        request<{data: Post}>('/posts', { method: 'POST', body: data }).then(res => res.data),
 
     updatePost: (id: number, data: FormData) =>
-        request<Post>(`/posts/${id}`, { method: 'POST', body: data, headers: { 'X-HTTP-Method-Override': 'PUT' } }),
+        request<{data: Post}>(`/posts/${id}`, { method: 'POST', body: data, headers: { 'X-HTTP-Method-Override': 'PUT' } }).then(res => res.data),
 
     deletePost: (id: number) =>
         request<void>(`/posts/${id}`, { method: 'DELETE' }),
@@ -71,7 +71,7 @@ export const api = {
         request<{data: PostComment[]}>(`/posts/${postId}/comments`).then(res => res.data),
 
     createComment: (postId: number, body: string) =>
-        request<PostComment>(`/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body }) }),
+        request<{data: PostComment}>(`/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify({ body }) }).then(res => res.data),
 
     deleteComment: (postId: number, commentId: number) =>
         request<void>(`/posts/${postId}/comments/${commentId}`, { method: 'DELETE' }),
@@ -85,7 +85,7 @@ export const api = {
 
     // Users
     getUser: (id: number) =>
-        request<User>(`/users/${id}`),
+        request<{data: User}>(`/users/${id}`).then(res => res.data),
 
     followUser: (id: number) =>
         request<void>(`/users/${id}/follow`, { method: 'POST' }),
