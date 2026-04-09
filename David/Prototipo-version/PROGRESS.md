@@ -24,8 +24,8 @@ Para convertir el prototipo actual en el producto final al 100%, existen discrep
 - **Brecha Frontend:** Aunque el backend lo permite mediante su SDK de endpoints (`DELETE /posts/{post}` y `DELETE /posts/{post}/comments/{comment}`), la interfaz de Paco **no tiene aún botones diseñados de "Borrar"** en las tarjetas ni en los detalles.
 
 ### 3. Autenticación, Roles y Auth
-- **Progreso:** El sistema por debajo inyecta el token y bloquea la navegación de invitados de forma nativa.
-- **Brecha Visual:** Las páginas y formularios de Login (`/login`) y Registro (`/register`) son placeholders (`AuthForm.tsx`). Necesitan incorporarse con el diseño premium en `global.css`.
+- **Progreso:** El sistema inyecta el token y bloquea la navegación de forma nativa.
+- **Brecha Visual:** (RESUELTA) Paco y el backend terminaron la integración! Diseños separados de Login y Registro implementados y conectados con `api.ts`.
 
 ### 4. Recetas e Inteligencia de Búsqueda
 - **Progreso:** El sistema de comentarios se carga directamente bajo la imagen en la vista individual.
