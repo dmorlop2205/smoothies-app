@@ -29,7 +29,7 @@ export default function RegisterForm() {
                 password_confirmation: form.password_confirmation
             });
             setAuth(res.token, res.user);
-            window.location.href = '/feed';
+            window.location.href = '/';
         } catch (err: any) {
             setError(err.message ?? 'Something went wrong.');
         } finally {

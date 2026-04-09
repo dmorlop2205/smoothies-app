@@ -18,7 +18,7 @@ export default function LoginForm() {
         try {
             const res = await api.login(form.email, form.password);
             setAuth(res.token, res.user);
-            window.location.href = '/feed';
+            window.location.href = '/';
         } catch (err: any) {
             setError(err.message ?? 'Invalid credentials.');
         } finally {

@@ -23,10 +23,7 @@ Para convertir el prototipo actual en el producto final al 100%, existen discrep
 ### 2. Moderación de Contenido
 - **Brecha Frontend:** Aunque el backend lo permite mediante su SDK de endpoints (`DELETE /posts/{post}` y `DELETE /posts/{post}/comments/{comment}`), la interfaz de Paco **no tiene aún botones diseñados de "Borrar"** en las tarjetas ni en los detalles.
 
-### 3. Autenticación, Roles y Auth
-- **Progreso:** El sistema inyecta el token y bloquea la navegación de forma nativa.
-- **Brecha Visual:** (RESUELTA) Paco y el backend terminaron la integración! Diseños separados de Login y Registro implementados y conectados con `api.ts`.
 
-### 4. Recetas e Inteligencia de Búsqueda
+### 3. Recetas e Inteligencia de Búsqueda
 - **Progreso:** El sistema de comentarios se carga directamente bajo la imagen en la vista individual.
 - **Brecha Backend:** La barra de búsqueda de la sección Explorar actualmente filtra resultados en vivo desde el navegador. Para que scale a miles de recetas, **el Backend deberá crear un motor de búsqueda** para parámetros como `GET /posts?search=...`. 

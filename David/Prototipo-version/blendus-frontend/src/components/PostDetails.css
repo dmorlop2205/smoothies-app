@@ -2,7 +2,9 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    margin: 0 clamp(0rem, -4.474rem + 17.895vw, 17rem);
+    max-width: 850px;
+    margin: 8rem auto 6rem auto;
+    padding: 0 1.5rem;
 }
 .page-header {
     .back {
@@ -138,7 +140,7 @@
         align-items: center;
         gap: .5rem;
         h3 {
-            font-size: 1.25rem;
+            font-size: 1.6rem;
             color: var(--gray-900);
             font-weight: 800;
         }

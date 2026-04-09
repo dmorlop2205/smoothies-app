@@ -6,7 +6,5 @@ const { id } = Astro.params;
 ---
 
 <Layout title={`Post #${id}`} activePage="home">
-  <div class="create-page">
-    <PostDetails postId={Number(id)} client:load />
-  </div>
+  <PostDetails postId={Number(id)} client:load />
 </Layout>

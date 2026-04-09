@@ -23,7 +23,11 @@ export default function PostDetails({ postId }: Props) {
 
     const loadPost = async () => {
         try {
-            const p = await api.getPost(postId);
+            const [p, comms] = await Promise.all([
+                api.getPost(postId),
+                api.getComments(postId).catch(() => [])
+            ]);
+            p.comments = comms;
             setPost(p);
             setError(false);
         } catch {
@@ -38,7 +42,7 @@ export default function PostDetails({ postId }: Props) {
         if (!commentText.trim() || isSubmitting) return;
         setIsSubmitting(true);
         try {
-            await api.addComment(postId, commentText);
+            await api.createComment(postId, commentText);
             setCommentText('');
             loadPost(); // reload to get new comment
         } catch (err) {
@@ -53,12 +57,11 @@ export default function PostDetails({ postId }: Props) {
         const previousState = { ...post };
         setPost({
             ...post,
-            liked_by_user: !post.liked_by_user,
-            likes_count: post.liked_by_user ? post.likes_count - 1 : post.likes_count + 1
+            has_liked: !post.has_liked,
+            likes_count: post.has_liked ? post.likes_count - 1 : post.likes_count + 1
         });
         try {
-            if (previousState.liked_by_user) await api.unlikePost(post.id);
-            else await api.likePost(post.id);
+            await api.likePost(post.id);
         } catch {
             setPost(previousState);
         }
@@ -77,14 +80,14 @@ export default function PostDetails({ postId }: Props) {
     if (error || !post) return (
         <div className="empty-state">
             <p>Post not found 🍹</p>
-            <a href="/feed" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Back to feed</a>
+            <a href="/" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Back to feed</a>
         </div>
     );
 
     return (
         <section className="show-wrapper">
             <section className="page-header">
-                <a href="/feed" className="back">
+                <a href="/" className="back">
                     <div className="back-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#4a5565">
                             <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
@@ -96,28 +99,37 @@ export default function PostDetails({ postId }: Props) {
             
             <section className="post-info">
                 <div className="post-user">
-                    <a className="circle" href={`/profile/${post.user.id}`}>
-                        <img src={post.user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${post.user.username}`} alt={post.user.username} />
+                    <a className="circle" href={`/profile/${post.author.id}`}>
+                        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${post.author.username}`} alt={post.author.username} />
                     </a>
                     <div className="user-info">
-                        <p className="name">{post.user.name}</p>
+                        <p className="name">{post.author.name}</p>
                         <p className="launch-date">{new Date(post.created_at).toLocaleDateString()}</p>
                     </div>
                 </div>
             </section>
 
-            {post.foto_url && (
-                <img className="post-image" src={post.foto_url.startsWith('http') ? post.foto_url : `http://localhost:8000/storage/${post.foto_url}`} alt={post.title} />
+            {post.image_url ? (
+                <img className="post-image" src={post.image_url.startsWith('http') ? post.image_url : `http://localhost:8000/storage/${post.image_url}`} alt={post.title} />
+            ) : (
+                <div className="post-image" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--gray-50)', border: '2px dashed var(--gray-200)', color: 'var(--gray-400)' }}>
+                    <div style={{ textAlign: 'center' }}>
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="48px" height="48px" style={{ margin: '0 auto 1rem auto' }}>
+                           <path d="M4 16L8.58579 11.4142C9.36683 10.6332 10.6332 10.6332 11.4142 11.4142L16 16M14 14L15.5858 12.4142C16.3668 11.6332 17.6332 11.6332 18.4142 12.4142L20 14M14 8H14.01M6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <p style={{ fontSize: '1.25rem', fontWeight: 500 }}>No photo provided</p>
+                    </div>
+                </div>
             )}
 
             <section className="title-interactions">
                 <div className="title">
                     <h1 className="smoothie-name">{post.title}</h1>
-                    <span className="category">{post.category ?? 'smoothie'}</span>
+                    <span className="category">smoothie</span>
                 </div>
                 <div className="interactions">
-                    <svg onClick={toggleLike} className="like" width="48px" height="48px" viewBox="0 0 24 24" fill={post.liked_by_user ? "var(--pink)" : "none"} xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke={post.liked_by_user ? "var(--pink)" : "#364153"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg onClick={toggleLike} className="like" width="48px" height="48px" viewBox="0 0 24 24" fill={post.has_liked ? "var(--pink)" : "none"} xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
+                        <path fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke={post.has_liked ? "var(--pink)" : "#364153"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                     <svg className="save" width="48px" height="48px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
                         <path fillRule="evenodd" clipRule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#364153"/>
@@ -203,15 +215,15 @@ export default function PostDetails({ postId }: Props) {
                 <div className="comments-section">
                     {(post.comments || []).map(comment => (
                         <div className="public-comment" key={comment.id}>
-                            <a className="circle" href={`/profile/${comment.user.id}`}>
-                                <img src={comment.user.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${comment.user.username}`} alt={comment.user.username} />
+                            <a className="circle" href={`/profile/${comment.author.id}`}>
+                                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${comment.author.username}`} alt={comment.author.username} />
                             </a>
                             <div className="user-info">
                                 <div className="info-head">
-                                    <p className="name">{comment.user.name}</p>
+                                    <p className="name">{comment.author.name}</p>
                                     <p className="launch-date">{new Date(comment.created_at).toLocaleDateString()}</p>
                                 </div>
-                                <p className="comment-content">{comment.content}</p>
+                                <p className="comment-content">{comment.body}</p>
                             </div>
                         </div>
                     ))}
