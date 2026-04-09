@@ -1,24 +1,32 @@
 # BlendUs Prototipo: Estado y Progreso 🚀
 
-Este documento resume el progreso actual de la integración entre la API v2 (Nico) y el Frontend v1.1 (Paco) en la rama/carpeta `Prototipo-version`.
+Este documento resume el progreso actual de la integración entre la API v2 (Nico) y el Frontend v1.1 (Paco) en la rama `Prototipo-version`.
 
-## ✅ Lo que ya está hecho (Trabajo 100% del Equipo)
-El corazón de la aplicación ya está perfectamente integrado y funcionando:
-- **Backend API:** Toda la API, servicios, recursos, roles, autenticación con Laravel Sanctum (tokens), base de datos relacional y migraciones (`ingredients`, `tags`, `posts`, `users`, `comments`, `likes`). Todo funcionando sin errores.
-- **Cliente API :** Vínculo 100% exacto con los endpoints de Nico (`api.ts`). Soporta peticiones protegidas capturando el token automáticamente del `localStorage`.
-- **Navegación:** Barra superior, menú lateral y diseño estructural (`NavComponent`).
-- **Feed Principal:** El `Feed.tsx` renderiza tarjetas preciosas, filtra por etiquetas y maneja paginación (`meta.last_page`).
-- **Creación y Edición de Smoothies:** Los formularios `CreatePostForm` y `EditPostForm` con arrastre de imágenes, parseo de ingredientes, y envío por `FormData` al backend.
-- **Interacciones Básicas:** Dar likes a los posts y actualizar la interfaz instantáneamente.
-- **Explorar:** La pestaña de buscar/explorar del menú izquierdo (`/explore`) con el diseño final de Paco y filtros.
+## ✅ Lo que ya está hecho (Componentes Finales 100% Equipo)
+El núcleo de la aplicación ya está perfectamente integrado, enrutado y funcionando con código nativo del equipo:
+- **Backend API:** Toda la API, recursos, roles, autenticación con Laravel Sanctum (tokens), base de datos relacional y migraciones (`ingredients`, `tags`, `posts`, `users`, `comments`, `likes`). Todo funcionando sin errores.
+- **Cliente API:** El archivo `api.ts` está sincronizado 100% con los endpoints de Nico, soportando peticiones protegidas y paginación.
+- **Navegación:** Barra superior, diseño estructural (`Layout`) y enrutamiento por páginas (Astro + TSX).
+- **Smoothies (Feed y Explorar):** Renderizado de las tarjetas (`PostCard.tsx`), filtros por etiquetas (`ExplorePage.tsx`), arrastre de imágenes, parseo de ingredientes, y publicación en la base de datos a través de `FormData`.
+- **Interacciones:** Dar y quitar likes, expandir listas de ingredientes dinámicos y cargar comentarios bajo demanda.
 
 ---
 
-## 🤖 Lo que es temporal (Hecho con IA para pruebas)
-Para que el prototipo no rompa al navegar y se pueda probar la experiencia completa, se han añadido algunos componentes y páginas generados por IA. **Estos están listos para ser rediseñados en el futuro:**
-- **Autenticación:** Las páginas de Login (`/login`) y Registro (`/register`), incluyendo su lógica de formulario (`AuthForm.tsx`).
-- **Vista de Receta (Post):** La página individual de un smoothie (`/post/[id]`) y su motor de comentarios (`PostDetails.tsx`).
-- **Perfiles de Usuario:** La página de perfil público (`/profile/[id]`) que muestra la información del usuario y su cuadrícula de batidos.
-- **Usuarios Sugeridos:** El panel lateral derecho (`SuggestedUsers.tsx`). Funciona con un endpoint simulado o datos estáticos, ya que la API no lo implementa aún.
+## 🚧 Brechas Actuales y Tareas Pendientes
+Para convertir el prototipo actual en el producto final al 100%, existen discrepancias entre lo que ofrece la API y lo que tiene el Frontend. Actualmente usamos algunos componentes funcionales temporales para rellenar vacíos.
 
----
+### 1. Perfiles y Relaciones Sociales
+- **Progreso:** La vista individual del perfil (`/profile/[id]`) funciona integrando el feed final de Paco.
+- **Brecha Frontend:** Faltan vistas para **Editar Perfil** (`PUT /users/{user}`) y listar el volumen de Seguidores/Siguiendo (`GET /users/{user}/followers`). 
+- **Brecha Backend:** El panel derecho (`SuggestedUsers.tsx`) usa datos simulados o pide `GET /api/users/suggested`, endpoint que el backend aún no implementa.
+
+### 2. Moderación de Contenido
+- **Brecha Frontend:** Aunque el backend lo permite mediante su SDK de endpoints (`DELETE /posts/{post}` y `DELETE /posts/{post}/comments/{comment}`), la interfaz de Paco **no tiene aún botones diseñados de "Borrar"** en las tarjetas ni en los detalles.
+
+### 3. Autenticación, Roles y Auth
+- **Progreso:** El sistema por debajo inyecta el token y bloquea la navegación de invitados de forma nativa.
+- **Brecha Visual:** Las páginas y formularios de Login (`/login`) y Registro (`/register`) son placeholders (`AuthForm.tsx`). Necesitan incorporarse con el diseño premium en `global.css`.
+
+### 4. Recetas e Inteligencia de Búsqueda
+- **Progreso:** El sistema de comentarios se carga directamente bajo la imagen en la vista individual.
+- **Brecha Backend:** La barra de búsqueda de la sección Explorar actualmente filtra resultados en vivo desde el navegador. Para que scale a miles de recetas, **el Backend deberá crear un motor de búsqueda** para parámetros como `GET /posts?search=...`. 
