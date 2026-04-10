@@ -1,6 +1,8 @@
 .filters {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: .75rem;
     align-items: center;
     .filter {
         padding: .5rem 1.5rem;

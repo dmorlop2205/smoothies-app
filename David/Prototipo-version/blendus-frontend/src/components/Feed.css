@@ -4,6 +4,7 @@
     gap: 2rem;
 
 }
+
 .right-wrapper {
     position: fixed;
     margin-top: calc(3rem + 5rem);
@@ -23,13 +24,15 @@
     }
 }
 
-.left-wrapper {
-    grid-column: span 8;
-    .left-content {
-        display: flex;
-        flex-direction: column;
-        justify-content: start;
-        gap: 2rem;
+.left-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    gap: 1rem;
+}
 
-    }
+.posts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
 }

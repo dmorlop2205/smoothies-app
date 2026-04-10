@@ -129,16 +129,16 @@ nav {
 
 /* ─── Page Wrapper ──────────────────────────── */
 .page-wrapper {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: calc(5rem + 1.5rem) 2rem 3rem;
+  padding: calc(5rem + 3rem) 2rem 5rem;
   display: grid;
   grid-template-columns: 1fr 340px;
-  gap: 2rem;
+  gap: 6rem;
   align-items: start;
 }
-.page-main { min-width: 0; display: flex; flex-direction: column; gap: 1.5rem; }
-.page-aside { display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: calc(5rem + 1.5rem); }
+.page-main { min-width: 0; display: flex; flex-direction: column; gap: 3rem; }
+.page-aside { display: flex; flex-direction: column; gap: 3rem; position: sticky; top: calc(5rem + 3rem); }
 
 /* ─── Stories ───────────────────────────────── */
 .stories-bar {
@@ -434,7 +434,7 @@ nav {
 
 /* ─── Create Post ────────────────────────────── */
 .create-page {
-  max-width: 700px;
+  max-width: 800px;
   margin: calc(5rem + 1.5rem) auto 3rem;
   padding: 0 2rem;
 }

@@ -106,23 +106,25 @@ export default function Feed() {
             </section>
 
             {/* Posts */}
-            {loading && page === 1 ? (
-                <div style={{ textAlign: 'center', padding: '3rem' }}>
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                        <circle cx="12" cy="12" r="10" stroke="#00BC7D" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
-                            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
-                        </circle>
-                    </svg>
-                </div>
-            ) : posts.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#888', padding: '3rem 0' }}>
-                    <p>No smoothies yet. Be the first to post! 🍹</p>
-                </div>
-            ) : (
-                posts.map(post => (
-                    <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
-                ))
-            )}
+            <div className="posts-list">
+                {loading && page === 1 ? (
+                    <div style={{ textAlign: 'center', padding: '3rem' }}>
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="10" stroke="#00BC7D" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
+                                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+                            </circle>
+                        </svg>
+                    </div>
+                ) : posts.length === 0 ? (
+                    <div style={{ textAlign: 'center', color: '#888', padding: '3rem 0' }}>
+                        <p>No smoothies yet. Be the first to post! 🍹</p>
+                    </div>
+                ) : (
+                    posts.map(post => (
+                        <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
+                    ))
+                )}
+            </div>
 
             {page < lastPage && (
                 <div style={{ textAlign: 'center', padding: '1rem' }}>

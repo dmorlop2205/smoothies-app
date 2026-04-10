@@ -93,7 +93,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
 
             {imageUrl && (
                 <a href={`/post/${post.id}`} style={{ display: 'block', textDecoration: 'none' }}>
-                    <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '300px', borderRadius: '12px', marginTop: '1rem' }} />
+                    <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '550px', borderRadius: '12px', marginTop: '1rem' }} />
                 </a>
             )}
 

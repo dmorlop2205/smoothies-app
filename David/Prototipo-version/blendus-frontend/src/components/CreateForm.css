@@ -217,9 +217,7 @@
     }
 
     .tag:hover {
-        color: var(--emerald-100);
-        background-color: var(--emerald-800);
-        transform: translateY(-5px);
+        opacity: 0.8;
     }
 }
 

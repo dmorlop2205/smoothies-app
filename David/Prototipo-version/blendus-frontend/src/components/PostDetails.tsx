@@ -108,20 +108,20 @@ export default function PostDetails({ postId }: Props) {
                     </div>
                 </div>
             </section>
-
-            {post.image_url ? (
-                <img className="post-image" src={post.image_url.startsWith('http') ? post.image_url : `http://localhost:8000/storage/${post.image_url}`} alt={post.title} />
-            ) : (
-                <div className="post-image" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--gray-50)', border: '2px dashed var(--gray-200)', color: 'var(--gray-400)' }}>
-                    <div style={{ textAlign: 'center' }}>
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="48px" height="48px" style={{ margin: '0 auto 1rem auto' }}>
-                           <path d="M4 16L8.58579 11.4142C9.36683 10.6332 10.6332 10.6332 11.4142 11.4142L16 16M14 14L15.5858 12.4142C16.3668 11.6332 17.6332 11.6332 18.4142 12.4142L20 14M14 8H14.01M6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        <p style={{ fontSize: '1.25rem', fontWeight: 500 }}>No photo provided</p>
+            <div className="post-image-container" style={{ marginTop: '1rem' }}>
+                {post.image_url ? (
+                    <img className="post-image" src={post.image_url} alt={post.title} style={{ width: '100%', borderRadius: '20px', height: '700px', objectFit: 'cover' }} />
+                ) : (
+                    <div className="post-image" style={{ width: '100%', height: '800px', borderRadius: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--gray-50)', border: '2px dashed var(--gray-200)', color: 'var(--gray-400)' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="48px" height="48px" style={{ margin: '0 auto 1rem auto' }}>
+                               <path d="M4 16L8.58579 11.4142C9.36683 10.6332 10.6332 10.6332 11.4142 11.4142L16 16M14 14L15.5858 12.4142C16.3668 11.6332 17.6332 11.6332 18.4142 12.4142L20 14M14 8H14.01M6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                            <p style={{ fontSize: '1.25rem', fontWeight: 500 }}>No photo provided</p>
+                        </div>
                     </div>
-                </div>
-            )}
-
+                )}
+            </div>
             <section className="title-interactions">
                 <div className="title">
                     <h1 className="smoothie-name">{post.title}</h1>

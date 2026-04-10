@@ -29,7 +29,14 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request): JsonResponse
     {
-        $post = $this->postService->store($request->user(), $request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('posts', 'public');
+            $data['image_url'] = url('/storage/' . $path);
+        }
+
+        $post = $this->postService->store($request->user(), $data);
 
         return (new PostResource($post))->response()->setStatusCode(201);
     }
