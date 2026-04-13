@@ -78,9 +78,61 @@
         }
         .post-options {
             cursor: pointer;
+            position: relative;
+            z-index: 5;
             svg {
                 circle {
                     transition: .2s ease;
+                }
+            }
+            
+            .options-dropdown {
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background: var(--white);
+                border-radius: 16px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+                border: 1px solid var(--gray-100);
+                padding: .6rem;
+                min-width: 170px;
+                display: flex;
+                flex-direction: column;
+                gap: .3rem;
+                animation: dropdownAnim .2s ease-out;
+
+                button {
+                    background: none;
+                    border: none;
+                    padding: .6rem .9rem;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: .7rem;
+                    font-size: 0.9rem;
+                    color: var(--gray-700);
+                    font-family: 'Alexandria', sans-serif;
+                    cursor: pointer;
+                    transition: .2s ease;
+                    width: 100%;
+                    text-align: left;
+
+                    &:hover {
+                        background: var(--gray-50);
+                        color: var(--gray-900);
+                    }
+
+                    &.delete {
+                        color: var(--pink);
+                        &:hover {
+                            background: #fff1f2;
+                        }
+                    }
+
+                    svg {
+                        flex-shrink: 0;
+                        opacity: .7;
+                    }
                 }
             }
         }
@@ -91,6 +143,11 @@
                 }
             }
         }
+    }
+
+    @keyframes dropdownAnim {
+        from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .post-image {
         background-image: url('assets/Alexelcapo.webp');

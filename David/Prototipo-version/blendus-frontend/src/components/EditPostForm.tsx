@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { Post } from '../lib/api';
 import { $isLoggedIn } from '../stores/authStore';
@@ -27,8 +27,38 @@ export default function EditPostForm({ postId, initial }: Props) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [fetching, setFetching] = useState(!initial);
+    const [originalPost, setOriginalPost] = useState<Post | null>(null);
+
+    // Form states
+    const [title, setTitle] = useState(initial?.title ?? '');
+    const [description, setDescription] = useState(initial?.description ?? '');
+    const [preparationSteps, setPreparationSteps] = useState(initial?.preparation_steps ?? '');
+    const [category, setCategory] = useState('');
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (!initial) {
+            api.getPost(postId).then(post => {
+                setIngredients(post.ingredients.map(i => ({ ingredient: i.name, amount: `${i.quantity} ${i.unit}` })));
+                setTags(post.tags.map(t => '#' + t.name));
+                setPreview(post.image_url);
+                setTitle(post.title);
+                setDescription(post.description);
+                setPreparationSteps(post.preparation_steps);
+                
+                const found = post.tags.find(t => ['green', 'tropical', 'berry', 'protein', 'detox', 'dessert'].includes(t.name));
+                if (found) setCategory(found.name);
+                
+                setOriginalPost(post);
+                setFetching(false);
+            }).catch(() => {
+                setError('Failed to load smoothie data.');
+                setFetching(false);
+            });
+        }
+    }, [postId, initial]);
 
     const addIngredient = () => setIngredients(prev => [...prev, { ingredient: '', amount: '' }]);
     const removeIngredient = (i: number) => setIngredients(prev => prev.filter((_, idx) => idx !== i));
@@ -59,17 +89,37 @@ export default function EditPostForm({ postId, initial }: Props) {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
+    const handleRevert = () => {
+        if (!originalPost) return;
+        if (!confirm('Are you sure you want to revert all changes? 🔄')) return;
+        
+        setIngredients(originalPost.ingredients.map(i => ({ 
+            ingredient: i.name, 
+            amount: `${i.quantity} ${i.unit === 'piece' ? 'pcs' : i.unit}` 
+        })));
+        setTags(originalPost.tags.map(t => '#' + t.name));
+        setPreview(originalPost.image_url);
+        setFile(null);
+        setTitle(originalPost.title);
+        setDescription(originalPost.description);
+        setPreparationSteps(originalPost.preparation_steps);
+        
+        const found = originalPost.tags.find(t => ['green', 'tropical', 'berry', 'protein', 'detox', 'dessert'].includes(t.name));
+        if (found) setCategory(found.name);
+        else setCategory('');
+
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
 
-        const form = e.currentTarget;
-        const title = (form.querySelector('#name') as HTMLInputElement)?.value.trim();
-        const description = (form.querySelector('#caption') as HTMLTextAreaElement)?.value.trim();
-        const preparation_steps = (form.querySelector('#instructions') as HTMLTextAreaElement)?.value.trim();
-        const category = (form.querySelector('#category') as HTMLSelectElement)?.value;
+        const trimmedTitle = title.trim();
+        const trimmedDescription = description.trim();
+        const trimmedSteps = preparationSteps.trim();
 
-        if (!title || !description || !preparation_steps) {
+        if (!trimmedTitle || !trimmedDescription || !trimmedSteps) {
             setError('Please fill in the name, caption and instructions.'); return;
         }
 
@@ -79,9 +129,9 @@ export default function EditPostForm({ postId, initial }: Props) {
         });
 
         const fd = new FormData();
-        fd.append('title', title);
-        fd.append('description', description);
-        fd.append('preparation_steps', preparation_steps);
+        fd.append('title', trimmedTitle);
+        fd.append('description', trimmedDescription);
+        fd.append('preparation_steps', trimmedSteps);
         if (file) fd.append('image', file);
         if (category) fd.append('tags[]', category);
         tags.forEach(t => fd.append('tags[]', t.replace('#', '')));
@@ -102,6 +152,10 @@ export default function EditPostForm({ postId, initial }: Props) {
             setLoading(false);
         }
     };
+
+    if (fetching) {
+        return <div className="loading-spinner" style={{ textAlign: 'center', padding: '5rem' }}>⌛ Loading smoothie data...</div>;
+    }
 
     if (success) {
         return (
@@ -145,11 +199,11 @@ export default function EditPostForm({ postId, initial }: Props) {
 
             <div className="name">
                 <label className="label" htmlFor="name">Smoothie Name</label>
-                <input className="text-input" type="text" id="name" defaultValue={initial?.title ?? ''} placeholder="Tropical Fruits Smoothie" />
+                <input className="text-input" type="text" id="name" value={title} onChange={e => setTitle(e.target.value)} placeholder="Tropical Fruits Smoothie" />
             </div>
             <div className="category">
                 <label className="label" htmlFor="category">Category</label>
-                <select className="text-input" id="category">
+                <select className="text-input" id="category" value={category} onChange={e => setCategory(e.target.value)}>
                     <option value="">Choose a category</option>
                     <option value="green">🥬 Green</option>
                     <option value="tropical">🍍 Tropical</option>
@@ -161,7 +215,7 @@ export default function EditPostForm({ postId, initial }: Props) {
             </div>
             <div className="caption">
                 <label className="label" htmlFor="caption">Caption</label>
-                <textarea className="textarea" id="caption" defaultValue={initial?.description ?? ''} placeholder="Share your smoothie story..." />
+                <textarea className="textarea" id="caption" value={description} onChange={e => setDescription(e.target.value)} placeholder="Share your smoothie story..." />
             </div>
 
             <div className="ingredients-container">
@@ -203,17 +257,31 @@ export default function EditPostForm({ postId, initial }: Props) {
 
             <div className="instructions">
                 <label className="label" htmlFor="instructions">Instructions</label>
-                <textarea className="textarea" id="instructions" defaultValue={initial?.preparation_steps ?? ''} placeholder="How to make this smoothie..." />
+                <textarea className="textarea" id="instructions" value={preparationSteps} onChange={e => setPreparationSteps(e.target.value)} placeholder="How to make this smoothie..." />
             </div>
 
             {error && <p style={{ color: '#E7000B', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}
 
-            <button className="btn form-btn" type="submit" disabled={loading}>
-                <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#fff">
-                    <path d="M447-280v-271.67L327.67-432.33 280.33-480l200-200 200 200-47.66 47.33-119-119V-280H447Z"/>
-                </svg>
-                {loading ? 'Saving...' : 'Save Changes'}
-            </button>
+            <div className="form-actions" style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <button 
+                    className="btn" 
+                    type="button" 
+                    onClick={handleRevert} 
+                    disabled={loading}
+                    style={{ background: 'var(--gray-100)', color: 'var(--gray-700)', flex: 1, padding: '1.5rem', borderRadius: '20px', fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', border: '1px solid var(--gray-200)' }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="var(--gray-700)">
+                        <path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 126.5 25.5T712-705l68-68v213H567l73-73q-31-30-74-48.5T480-700q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 137.5-42.5T703-420h64q-26 101-110 160.5T480-160Z"/>
+                    </svg>
+                    Revert changes
+                </button>
+                <button className="btn form-btn" type="submit" disabled={loading} style={{ flex: 2 }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#fff">
+                        <path d="M447-280v-271.67L327.67-432.33 280.33-480l200-200 200 200-47.66 47.33-119-119V-280H447Z"/>
+                    </svg>
+                    {loading ? 'Saving...' : 'Save Changes'}
+                </button>
+            </div>
         </form>
     );
 }

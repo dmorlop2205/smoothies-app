@@ -22,6 +22,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const res = await fetch(`${API_URL}/api${path}`, { ...options, headers });
 
     if (!res.ok) {
+        if (res.status === 401 && typeof window !== 'undefined') {
+            localStorage.removeItem('blendus_token');
+            localStorage.removeItem('blendus_user');
+            window.location.href = '/login?expired=1';
+        }
         const err = await res.json().catch(() => ({ message: res.statusText }));
         throw new Error(err.message ?? 'API Error');
     }
@@ -120,7 +125,7 @@ export const api = {
         request<void>(`/users/${id}/follow`, { method: 'DELETE' }),
 
     getSuggestedUsers: () =>
-        request<User[]>('/users/suggested'),
+        request<{data: User[]}>('/users/suggested').then(res => res.data),
 };
 
 // ────────── Types (aligned to Nico's API Resources) ──────────

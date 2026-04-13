@@ -74,5 +74,18 @@ class UserController extends Controller
 
         return UserResource::collection($following)->response();
     }
+
+    public function suggested(Request $request): JsonResponse
+    {
+        $userId = $request->user()?->id;
+
+        $users = User::query()
+            ->when($userId, fn($q) => $q->where('id', '!=', $userId))
+            ->inRandomOrder()
+            ->limit(3)
+            ->get();
+
+        return UserResource::collection($users)->response();
+    }
 }
 
