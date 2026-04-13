@@ -45,6 +45,9 @@ export default function LoginForm() {
             <button type="button" className="btn secondary-btn" onClick={() => window.location.href = '/register'}> 
                 I don't have an account
             </button>
+            <a href="/" style={{ textAlign: 'center', color: 'var(--gray-500)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 500 }}>
+                Continue as Guest
+            </a>
         </form>
     );
 }

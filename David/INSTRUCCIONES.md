@@ -1,20 +1,31 @@
 # BlendUs 🍹
-To launch the app:
+
+## 🚀 Recommended Launch (One Command)
+Run this single command from the project root:
+```bash
+cd David/Prototipo-version && ./dev.sh
+```
+This will start both the backend and frontend automatically. Press `Ctrl+C` to stop both.
+
+---
+
+## 🛠️ Manual Launch (Alternative)
+If you prefer to run them separately in different tabs:
 
 **Terminal 1 — API:**
 ```bash
-cd Prototipo-version/smoothies-api
+cd David/Prototipo-version/smoothies-api
 php artisan serve 
 ```
 
 **Terminal 2 — Frontend:**
 ```bash
-cd Prototipo-version/blendus-frontend
+cd David/Prototipo-version/blendus-frontend
 npm run dev
 ```
 
-Then open **http://localhost:4321** 
-
+## 🌐 Access
+Open **http://localhost:4321** in your browser.
 ---
 
 ## Default Accounts (from seeder)

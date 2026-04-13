@@ -18,6 +18,7 @@ class UserController extends Controller
 
     public function show(User $user): JsonResponse
     {
+        $user->loadCount(['posts', 'followers', 'following']);
         return (new UserResource($user))->response();
     }
 
@@ -29,8 +30,13 @@ class UserController extends Controller
             'name'     => ['sometimes', 'string', 'max:100'],
             'username' => ['sometimes', 'string', 'max:50', Rule::unique('users')->ignore($user->id)],
             'bio'      => ['sometimes', 'nullable', 'string'],
-            'avatar'   => ['sometimes', 'nullable', 'url'],
+            'avatar'   => ['sometimes', 'nullable', 'string'],
         ]);
+
+        if ($request->hasFile('avatar_file')) {
+            $path = $request->file('avatar_file')->store('avatars', 'public');
+            $data['avatar'] = url('/storage/' . $path);
+        }
 
         $updated = $this->userService->updateProfile($user, $data);
 

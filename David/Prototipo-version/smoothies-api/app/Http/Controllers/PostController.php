@@ -21,8 +21,19 @@ class PostController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = (int) $request->query('per_page', 15);
+        $page    = (int) $request->query('page', 1);
+        $userId  = $request->query('user_id');
 
-        $posts = $this->postService->getFeed($perPage);
+        if ($userId) {
+            $posts = Post::query()
+                ->where('user_id', (int) $userId)
+                ->with(['user', 'ingredients', 'tags'])
+                ->withCount(['likes', 'comments'])
+                ->latest('created_at')
+                ->paginate($perPage, ['*'], 'page', $page);
+        } else {
+            $posts = $this->postService->getFeed($perPage);
+        }
 
         return (new PostCollection($posts))->response();
     }

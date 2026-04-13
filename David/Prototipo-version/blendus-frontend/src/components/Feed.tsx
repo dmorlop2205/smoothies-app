@@ -56,31 +56,23 @@ export default function Feed() {
 
     return (
         <section className="left-content">
-            {/* Stories — static avatars for now */}
-            <section className="stories">
-                <div className="you">
-                    <div className="circle">
-                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <line fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="19" y2="5"/>
-                            <line fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="5" x2="19" y1="12" y2="12"/>
-                        </svg>
-                    </div>
-                    <p>You</p>
-                </div>
-                {[
-                    { name: 'John', img: '/user1.jpg' },
-                    { name: 'Marie', img: '/user2.jpg' },
-                    { name: 'Julia', img: '/user3.jpg' },
-                    { name: 'Alex', img: '/Alexelcapo.webp' },
-                    { name: 'Robert', img: '/user 4.jpg' },
-                    { name: 'James', img: '/user 5.jpg' },
-                ].map(u => (
-                    <div className="storie" key={u.name}>
-                        <div className="circle"><img src={u.img} alt={u.name} /></div>
-                        <p>{u.name}</p>
-                    </div>
-                ))}
-            </section>
+            {/* Hero / Welcome Banner */}
+            <div className="hero-banner" style={{
+                background: 'linear-gradient(135deg, var(--emerald-500), var(--emerald-700))',
+                borderRadius: '24px',
+                padding: '2.5rem 2rem',
+                color: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+                boxShadow: '0 4px 15px rgba(0, 188, 125, 0.2)',
+                marginBottom: '2rem'
+            }}>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>Welcome to BlendUs! 🍹</h2>
+                <p style={{ fontSize: '1.1rem', opacity: 0.9, margin: 0 }}>Discover, mix, and share the world's best smoothie recipes.</p>
+            </div>
 
             {/* Filters */}
             <section className="filters">

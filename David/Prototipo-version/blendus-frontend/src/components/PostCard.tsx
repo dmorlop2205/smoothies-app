@@ -68,7 +68,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     return (
         <section className="post">
             <div className="post-header">
-                <a href={`/profile`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <a href={`/profile/${post.author?.id}`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="circle" style={{
                         background: 'var(--gradient-profile, linear-gradient(135deg,#00D492,#9AE600))',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',

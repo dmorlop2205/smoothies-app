@@ -16,9 +16,11 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('users')->group(function () {
-    Route::get('{user}', [UserController::class, 'show']);
-    Route::get('{user}/followers', [UserController::class, 'followers']);
-    Route::get('{user}/following', [UserController::class, 'following']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('{user}', [UserController::class, 'show']);
+        Route::get('{user}/followers', [UserController::class, 'followers']);
+        Route::get('{user}/following', [UserController::class, 'following']);
+    });
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::put('{user}', [UserController::class, 'update']);
@@ -28,8 +30,10 @@ Route::prefix('users')->group(function () {
 });
 
 Route::prefix('posts')->group(function () {
-    Route::get('/', [PostController::class, 'index']);
-    Route::get('{post}', [PostController::class, 'show']);
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/', [PostController::class, 'index']);
+        Route::get('{post}', [PostController::class, 'show']);
+    });
 
     Route::prefix('{post}/comments')->group(function () {
         Route::get('/', [CommentController::class, 'index']);

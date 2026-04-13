@@ -5,6 +5,7 @@ import './PostDetails.css';
 import './UserInfo.css';
 import './IngredientsComponent.css';
 import './CommentsComponent.css';
+import { $isLoggedIn } from '../stores/authStore';
 
 interface Props {
     postId: number;
@@ -40,6 +41,7 @@ export default function PostDetails({ postId }: Props) {
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!commentText.trim() || isSubmitting) return;
+        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
         setIsSubmitting(true);
         try {
             await api.createComment(postId, commentText);
@@ -53,6 +55,7 @@ export default function PostDetails({ postId }: Props) {
     };
 
     const toggleLike = async () => {
+        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
         if (!post) return;
         const previousState = { ...post };
         setPost({

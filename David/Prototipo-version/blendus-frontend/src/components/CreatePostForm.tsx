@@ -16,6 +16,10 @@ export default function CreatePostForm() {
     const [tagInput, setTagInput] = useState('');
 
     useEffect(() => {
+        if (!$isLoggedIn.get()) {
+            window.location.href = '/login';
+            return;
+        }
         api.getTags().then(setAvailableTags).catch(() => {});
     }, []);
     const [file, setFile] = useState<File | null>(null);

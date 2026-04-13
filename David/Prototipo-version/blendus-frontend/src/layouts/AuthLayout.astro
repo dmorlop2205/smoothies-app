@@ -6,7 +6,17 @@ interface Props {
 }
 const { title = 'BlendUs' } = Astro.props;
 
-const backgrounds = ['/assets/login-1.jpg', '/assets/login-2.jpg', '/assets/login-3.jpg'];
+const backgrounds = [
+  'https://images.pexels.com/photos/616833/pexels-photo-616833.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  'https://images.pexels.com/photos/452737/pexels-photo-452737.jpeg?auto=compress&cs=tinysrgb&w=1200',
+  '/assets/login-1.jpg',
+  '/assets/login-2.jpg',
+  '/assets/login-3.jpg',
+  '/assets/smoothie2.jpg',
+  '/assets/smoothie4.jpg',
+  '/assets/smoothie5.jpg',
+  '/assets/smoothie6.jpg'
+];
 const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
 ---
 <!doctype html>
@@ -19,10 +29,18 @@ const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
     <style>
       body {
         margin: 0;
-        display: flex;
         min-height: 100vh;
         background-color: #fdfdfd;
         font-family: 'Alexandria', sans-serif;
+        display: flex;
+        flex-direction: column;
+      }
+      @media (min-width: 900px) {
+        body {
+          flex-direction: row;
+          height: 100vh;
+          overflow: hidden;
+        }
       }
       .auth-image-side {
         flex: 1.1;
@@ -35,14 +53,22 @@ const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
         flex: 1;
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        padding: 2rem clamp(1rem, 5vw, 6rem);
-        overflow-y: auto;
+        padding: 4rem clamp(1rem, 5vw, 6rem) 2rem;
         background-color: #fdfdfd;
+        overflow-y: auto;
+      }
+      /* Center content vertically if it fits, without cutting off the top */
+      .auth-form-side > :global(*) {
+        margin-top: auto;
+        margin-bottom: auto;
       }
       @media (min-width: 900px) {
         .auth-image-side {
           display: block;
+          height: 100vh;
+        }
+        .auth-form-side {
+          height: 100vh;
         }
       }
     </style>

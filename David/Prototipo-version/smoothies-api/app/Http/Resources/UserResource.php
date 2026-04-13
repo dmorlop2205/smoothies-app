@@ -15,11 +15,17 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'username' => $this->username,
-            'bio' => $this->bio,
-            'avatar' => $this->avatar,
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'username'        => $this->username,
+            'email'           => $this->when(auth()->check() && auth()->id() === $this->id, $this->email),
+            'bio'             => $this->bio,
+            'avatar'          => $this->avatar,
+            'posts_count'     => $this->when(
+                $this->offsetExists('posts_count'),
+                $this->posts_count,
+                fn () => $this->whenLoaded('posts', fn () => $this->posts->count())
+            ),
             'followers_count' => $this->when(
                 $this->offsetExists('followers_count'),
                 $this->followers_count,
@@ -30,7 +36,11 @@ class UserResource extends JsonResource
                 $this->following_count,
                 fn () => $this->whenLoaded('following', fn () => $this->following->count())
             ),
-            'created_at' => $this->created_at,
+            'is_following'    => $this->when(
+                auth()->check(),
+                fn () => auth()->user()->following()->where('following_id', $this->id)->exists()
+            ),
+            'created_at'      => $this->created_at,
         ];
     }
 }

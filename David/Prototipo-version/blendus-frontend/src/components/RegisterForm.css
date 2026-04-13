@@ -15,6 +15,33 @@
         }
     }
 
+    .label {
+        color: var(--gray-700);
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+    
+    .text-input {
+        background-color: white;
+        border: 1px solid var(--gray-200);
+        padding: 1rem;
+        font-family: inherit;
+        border-radius: 20px;
+        font-size: 1.1rem;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        outline: none;
+        transition: 0.2s ease;
+    }
+    
+    .text-input:hover {
+        border-color: var(--emerald-400);
+    }
+    
+    .text-input:focus {
+        border-color: var(--emerald-500);
+        box-shadow: 0 0 0 3px var(--emerald-100);
+    }
+
     .register-btn {
         width: 100%;
         padding: .8rem 1.5rem;
