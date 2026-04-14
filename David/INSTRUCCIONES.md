@@ -1,41 +1,55 @@
-# BlendUs 🍹
+# BlendUs 🍹 - Guía de Inicio
 
-## 🚀 Recommended Launch (One Command)
-Run this SINGLE command from the project root:
+¡Hola! Bienvenido a **BlendUs**, la red social definitiva para amantes de los smoothies. Aquí tienes todo lo necesario para poner el proyecto a funcionar en un segundo.
+
+## Lanzamiento Rápido (Recomendado)
+Para arrancar tanto el servidor de datos (backend) como la interfaz (frontend) a la vez, solo tienes que ejecutar este comando desde la raíz del proyecto:
+
 ```bash
 cd David/Prototipo-version && ./dev.sh
 ```
-This will start both the backend and frontend automatically. Press `Ctrl+C` to stop both.
+Esto abrirá todo automáticamente. Cuando quieras parar, simplemente pulsa `Ctrl+C`.
 
 ---
 
-## 🛠️ Manual Launch (Alternative)
-If you prefer to run them separately in different tabs:
+## Lanzamiento Manual (Por separado)
+Si prefieres un lanzado manual, puedes abrirlos en terminales distintos:
 
-**Terminal 1 — API:**
+**Terminal 1 — El Backend (Laravel):**
 ```bash
 cd David/Prototipo-version/smoothies-api
 php artisan serve 
 ```
 
-**Terminal 2 — Frontend:**
+**Terminal 2 — El Frontend (Astro/React):**
 ```bash
 cd David/Prototipo-version/blendus-frontend
 npm run dev
 ```
 
-## 🌐 Access
-Open **http://localhost:4321** in your browser.
+## Entrada al sitio
+Una vez encendido, abre tu navegador en: **http://localhost:4321**
+
 ---
 
-## Default Accounts (from seeder)
+## Cuentas de Prueba
+Para que no tengas que crear una desde cero (aunque puedes hacerlo en `/register`), aquí tienes unas cuantas:
 
-| Name | Username | Email | Password |
+| Nombre | Usuario | Email | Contraseña |
 |------|----------|-------|----------|
-| Test User | testuser | test@example.com | password |
+| Usuario Test | testuser | test@example.com | password |
 | Nico | nico | nico@test.com | password123 |
 | Paco | paco | paco@test.com | password123 |
 
-Or register a new account at `/register`.
-
 ---
+
+## ¿Qué puedes hacer en BlendUs? (Features)
+
+Hemos puesto mucho cariño en los detalles. Esto es lo que ya puedes esta programado:
+
+*   **Comunidad de Smoothies:** Explora un feed infinito con fotos espectaculares y recetas reales.
+*   **Interacción Total:** Dale a "Like" a tus favoritos, guarda recetas para verlas luego y comenta para compartir tu opinión.
+*   **Perfil Personalizado:** Gestiona tus propias creaciones, mira tus posts guardados y las fotos que te han gustado, todo organizado por pestañas.
+*   **Descubrimiento Inteligente:** Filtra por categorías (Verde, Tropical, Proteico...) y recibe sugerencias de usuarios a los que seguir.
+*   **Modo Invitado:** Cualquiera puede navegar y ver las recetas sin necesidad de registrarse.
+*   **Edición Avanzada:** Sube tus fotos, añade ingredientes detallados, pasos de preparación y etiquetas. ¡Y si te equivocas, tienes un botón para revertir los cambios!
