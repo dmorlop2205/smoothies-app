@@ -184,9 +184,14 @@
             }
         }
 
-        .save:hover {
+        .save:hover:not(.active) {
             path {
                 fill: var(--gray-900);
+            }
+        }
+        .save.active:hover {
+            path {
+                fill: #d97706; /* slightly darker yellow on hover */
             }
         }
     }

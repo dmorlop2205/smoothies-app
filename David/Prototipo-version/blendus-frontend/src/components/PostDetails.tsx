@@ -18,7 +18,6 @@ export default function PostDetails({ postId }: Props) {
     const [commentText, setCommentText] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
-    const [saved, setSaved] = useState(false);
     const optionsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -85,6 +84,18 @@ export default function PostDetails({ postId }: Props) {
         }
     };
 
+    const handleSave = async () => {
+        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
+        if (!post) return;
+        const previousState = { ...post };
+        setPost({ ...post, has_saved: !post.has_saved });
+        try {
+            await api.toggleSavePost(post.id);
+        } catch {
+            setPost(previousState);
+        }
+    };
+
     const handleDelete = async () => {
         if (!confirm('Are you sure you want to delete this smoothie? 🥤🗑️')) return;
         try {
@@ -96,6 +107,7 @@ export default function PostDetails({ postId }: Props) {
     };
 
     const isAuthor = $user.get()?.id === post?.author?.id;
+    const saved = post?.has_saved ?? false;
 
     if (loading) return (
         <div className="loading-spinner">
@@ -110,21 +122,21 @@ export default function PostDetails({ postId }: Props) {
     if (error || !post) return (
         <div className="empty-state">
             <p>Post not found 🍹</p>
-            <a href="/" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Back to feed</a>
+            <button onClick={() => window.history.back()} className="btn" style={{ display: 'inline-block', marginTop: '1rem', border: 'none', cursor: 'pointer' }}>Back to safety</button>
         </div>
     );
 
     return (
         <section className="show-wrapper">
             <section className="page-header">
-                <a href="/" className="back">
+                <div className="back" onClick={() => window.history.back()} style={{ cursor: 'pointer' }}>
                     <div className="back-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" height="28px" viewBox="0 -960 960 960" width="28px" fill="#4a5565">
                             <path d="m313-440 224 224-57 56-320-320 320-320 57 56-224 224h487v80H313Z" />
                         </svg>
                     </div>
                     <h3>Back</h3>
-                </a>
+                </div>
             </section>
             
             <section className="post-info">
@@ -175,7 +187,7 @@ export default function PostDetails({ postId }: Props) {
                                         </svg>
                                         User Info
                                     </button>
-                                    <button onClick={() => setSaved(!saved)}>
+                                    <button onClick={handleSave}>
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                         </svg>
@@ -206,11 +218,18 @@ export default function PostDetails({ postId }: Props) {
                     <span className="category">smoothie</span>
                 </div>
                 <div className="interactions">
-                    <svg onClick={handleLike} className="like" width="48px" height="48px" viewBox="0 0 24 24" fill={post.has_liked ? "var(--pink)" : "none"} xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke={post.has_liked ? "var(--pink)" : "#364153"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    <svg className="save" width="48px" height="48px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
-                        <path fillRule="evenodd" clipRule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#364153"/>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--gray-700)' }}>{post.likes_count ?? 0}</span>
+                        <svg onClick={handleLike} className="like" width="48px" height="48px" viewBox="0 0 24 24" fill={post.has_liked ? "var(--pink)" : "none"} xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke={post.has_liked ? "var(--pink)" : "#364153"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                    </div>
+                    <svg onClick={handleSave} className={`save ${saved ? 'active' : ''}`} width="48px" height="48px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ cursor: 'pointer' }}>
+                        {saved ? (
+                            <path d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6Z" fill="#FBBF24"/>
+                        ) : (
+                            <path fillRule="evenodd" clipRule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#364153"/>
+                        )}
                     </svg>
                     <svg className="share" width="45px" height="45px" viewBox="0 -960 960 960" fill="#364153" strokeWidth="20" stroke="#364153" style={{ cursor: 'pointer', marginLeft: '5px' }}>
                         <path d="M686-80q-47.5 0-80.75-33.25T572-194q0-8 5-34L278-403q-16.28 17.34-37.64 27.17Q219-366 194-366q-47.5 0-80.75-33T80-480q0-48 33.25-81T194-594q24 0 45 9.3 21 9.29 37 25.7l301-173q-2-8-3.5-16.5T572-766q0-47.5 33.25-80.75T686-880q47.5 0 80.75 33.25T800-766q0 47.5-33.25 80.75T686-652q-23.27 0-43.64-9Q622-670 606-685L302-516q3 8 4.5 17.5t1.5 18q0 8.5-1 16t-3 15.5l303 173q16-15 36.09-23.5 20.1-8.5 43.07-8.5Q734-308 767-274.75T800-194q0 47.5-33.25 80.75T686-80Zm.04-60q22.96 0 38.46-15.54 15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5Zm-492-286q22.96 0 38.46-15.54 15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5ZM724.5-727.54q15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5 22.96 0 38.46-15.54ZM686-194ZM194-480Zm492-286Z"/>

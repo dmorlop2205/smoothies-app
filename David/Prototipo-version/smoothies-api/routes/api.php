@@ -20,6 +20,8 @@ Route::prefix('users')->group(function () {
     Route::get('{user}', [UserController::class, 'show']);
     Route::get('{user}/followers', [UserController::class, 'followers']);
     Route::get('{user}/following', [UserController::class, 'following']);
+    Route::get('{user}/saved-posts', [UserController::class, 'saved_posts']);
+    Route::get('{user}/liked-posts', [UserController::class, 'liked_posts']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::put('{user}', [UserController::class, 'update']);
@@ -45,6 +47,7 @@ Route::prefix('posts')->group(function () {
         Route::post('/', [PostController::class, 'store']);
         Route::put('{post}', [PostController::class, 'update']);
         Route::delete('{post}', [PostController::class, 'destroy']);
+        Route::post('{post}/save', [PostController::class, 'toggleSave']);
     });
 });
 

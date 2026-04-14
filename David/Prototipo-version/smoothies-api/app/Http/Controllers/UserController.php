@@ -87,5 +87,41 @@ class UserController extends Controller
 
         return UserResource::collection($users)->response();
     }
+
+    public function saved_posts(Request $request, User $user): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 15);
+        $posts = $user->savedPosts()
+            ->with(['user', 'ingredients', 'tags'])
+            ->withCount(['likes', 'comments']);
+
+        if ($userId = auth()->id()) {
+            $posts->with([
+                'likes' => fn($q) => $q->where('user_id', $userId),
+                'savedBy' => fn($q) => $q->where('user_id', $userId)
+            ]);
+        }
+
+        $paginated = $posts->latest('saved_posts.created_at')->paginate($perPage);
+        return (new \App\Http\Resources\PostCollection($paginated))->response();
+    }
+
+    public function liked_posts(Request $request, User $user): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 15);
+        $posts = $user->likedPosts()
+            ->with(['user', 'ingredients', 'tags'])
+            ->withCount(['likes', 'comments']);
+
+        if ($userId = auth()->id()) {
+            $posts->with([
+                'likes' => fn($q) => $q->where('user_id', $userId),
+                'savedBy' => fn($q) => $q->where('user_id', $userId)
+            ]);
+        }
+
+        $paginated = $posts->latest('likes.created_at')->paginate($perPage);
+        return (new \App\Http\Resources\PostCollection($paginated))->response();
+    }
 }
 

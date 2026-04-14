@@ -95,6 +95,15 @@ export const api = {
     getUserPosts: (userId: number, page = 1) =>
         request<PaginatedResponse<Post>>(`/posts?user_id=${userId}&page=${page}`),
 
+    getUserSavedPosts: (userId: number, page = 1) =>
+        request<PaginatedResponse<Post>>(`/users/${userId}/saved-posts?page=${page}`),
+
+    getUserLikedPosts: (userId: number, page = 1) =>
+        request<PaginatedResponse<Post>>(`/users/${userId}/liked-posts?page=${page}`),
+
+    toggleSavePost: (postId: number) =>
+        request<{ saved: boolean }>(`/posts/${postId}/save`, { method: 'POST' }),
+
     getFollowers: (userId: number) =>
         request<{data: User[]}>(`/users/${userId}/followers`).then(res => res.data),
 
@@ -176,6 +185,7 @@ export interface Post {
     likes_count: number;
     comments_count: number;
     has_liked: boolean;
+    has_saved: boolean;
     comments?: PostComment[];
 }
 

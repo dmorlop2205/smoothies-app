@@ -110,7 +110,7 @@ class PostService
     {
         $query = Post::query()
             ->whereHas('tags', function ($query) use ($tagName) {
-                $query->where('name', $tagName);
+                $query->whereRaw('LOWER(name) = ?', [strtolower($tagName)]);
             })
             ->with(['user', 'ingredients', 'tags'])
             ->withCount(['likes', 'comments'])

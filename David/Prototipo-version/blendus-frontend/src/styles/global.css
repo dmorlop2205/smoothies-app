@@ -58,8 +58,10 @@ body {
   font-family: 'Alexandria', sans-serif;
   cursor: pointer;
   transition: .2s ease;
+  text-decoration: none;
 }
 .btn:hover { background-color: var(--emerald-700); }
+.btn:focus { text-decoration: underline; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .btn-ghost {
   background: transparent;

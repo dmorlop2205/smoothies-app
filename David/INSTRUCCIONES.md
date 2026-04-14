@@ -1,7 +1,7 @@
 # BlendUs 🍹
 
 ## 🚀 Recommended Launch (One Command)
-Run this single command from the project root:
+Run this SINGLE command from the project root:
 ```bash
 cd David/Prototipo-version && ./dev.sh
 ```

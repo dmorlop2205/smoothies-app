@@ -15,6 +15,7 @@ export default function ProfilePage({ userId }: Props) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [postsLoading, setPostsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState<'recipes' | 'saved' | 'liked'>('recipes');
     const [modal, setModal] = useState<ModalType>(null);
     const [modalUsers, setModalUsers] = useState<User[]>([]);
     const [modalLoading, setModalLoading] = useState(false);
@@ -35,8 +36,11 @@ export default function ProfilePage({ userId }: Props) {
 
     useEffect(() => {
         loadUser();
-        loadPosts();
     }, [userId]);
+
+    useEffect(() => {
+        loadPosts();
+    }, [userId, activeTab]);
 
     const loadUser = async () => {
         setLoading(true);
@@ -58,7 +62,14 @@ export default function ProfilePage({ userId }: Props) {
     const loadPosts = async () => {
         setPostsLoading(true);
         try {
-            const res = await api.getUserPosts(userId);
+            let res;
+            if (activeTab === 'recipes') {
+                res = await api.getUserPosts(userId);
+            } else if (activeTab === 'saved') {
+                res = await api.getUserSavedPosts(userId);
+            } else {
+                res = await api.getUserLikedPosts(userId);
+            }
             setPosts(res.data);
         } catch {
             setPosts([]);
@@ -146,7 +157,7 @@ export default function ProfilePage({ userId }: Props) {
     if (!user) return (
         <div className="empty-state">
             <p>User not found 🍹</p>
-            <a href="/" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Back to feed</a>
+            <button onClick={() => window.history.back()} className="btn" style={{ display: 'inline-block', marginTop: '1rem', border: 'none', cursor: 'pointer' }}>Back to safety</button>
         </div>
     );
 
@@ -203,9 +214,26 @@ export default function ProfilePage({ userId }: Props) {
                 </div>
             </div>
 
+            {/* ── TABS ── */}
+            <div className="profile-tabs">
+                <button className={`profile-tab ${activeTab === 'recipes' ? 'active' : ''}`} onClick={() => setActiveTab('recipes')}>
+                    <span className="tab-icon">🍹</span>
+                    Recipes
+                </button>
+                {isOwn && (
+                    <button className={`profile-tab ${activeTab === 'saved' ? 'active' : ''}`} onClick={() => setActiveTab('saved')}>
+                        <span className="tab-icon">🔖</span>
+                        Saved
+                    </button>
+                )}
+                <button className={`profile-tab ${activeTab === 'liked' ? 'active' : ''}`} onClick={() => setActiveTab('liked')}>
+                    <span className="tab-icon">❤️</span>
+                    Liked
+                </button>
+            </div>
+
             {/* ── POSTS GRID ── */}
             <div className="profile-section">
-                <h2 className="section-title">🍹 Recipes</h2>
                 {postsLoading ? (
                     <div className="profile-loading">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
@@ -216,8 +244,8 @@ export default function ProfilePage({ userId }: Props) {
                     </div>
                 ) : posts.length === 0 ? (
                     <div className="empty-state">
-                        <p>No recipes shared yet.</p>
-                        {isOwn && <a href="/create" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Share your first recipe!</a>}
+                        <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
+                        {isOwn && activeTab === 'recipes' && <a href="/create" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Share your first recipe!</a>}
                     </div>
                 ) : (
                     <div className="posts-grid">

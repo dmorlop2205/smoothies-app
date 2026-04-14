@@ -92,5 +92,21 @@ class PostController extends Controller
 
         return (new PostCollection($posts))->response();
     }
+
+    public function toggleSave(Request $request, Post $post): JsonResponse
+    {
+        $user = $request->user();
+        $isSaved = $user->savedPosts()->where('post_id', $post->id)->exists();
+
+        if ($isSaved) {
+            $user->savedPosts()->detach($post->id);
+            $saved = false;
+        } else {
+            $user->savedPosts()->attach($post->id);
+            $saved = true;
+        }
+
+        return response()->json(['saved' => $saved]);
+    }
 }
 
