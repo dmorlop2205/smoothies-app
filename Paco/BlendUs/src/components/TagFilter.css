@@ -1,0 +1,8 @@
+.tag-list {
+    .tag {
+        background: var(--amber-50) !important;
+    }
+    .tag:hover {
+        background: var(--amber-500) !important;
+    }
+}

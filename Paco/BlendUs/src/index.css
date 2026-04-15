@@ -14,20 +14,20 @@
 
     --white: #FFFFFF;
 
-    --emerald-900: #247857;
-    --emerald-800: #006045;
-    --emerald-700: #007A55;
-    --emerald-600: #009966;
-    --emerald-500: #00BC7D;
-    --emerald-400: #00D492;
-    --emerald-300: #5EE9B5;
-    --emerald-200: #D1FAE5;
-    --emerald-100: #D0FAE5;
-    --emerald-50: #ECFDF5;
+    --amber-900: oklch(41.4% 0.112 45.904);
+    --amber-800: oklch(47.3% 0.137 46.201);
+    --amber-700: oklch(55.5% 0.163 48.998);
+    --amber-600: oklch(66.6% 0.179 58.318);
+    --amber-500: oklch(76.9% 0.188 70.08);
+    --amber-400: oklch(82.8% 0.189 84.429);
+    --amber-300: oklch(87.9% 0.169 91.605);
+    --amber-200: oklch(92.4% 0.12 95.746);
+    --amber-100: oklch(96.2% 0.059 95.617);
+    --amber-50: oklch(98.7% 0.022 95.277);
 
-    --lime-300: #d8f999;
-    --lime-400: #9AE600;
-    --lime-50: #f7fee7;
+    --red-300: oklch(80.8% 0.114 19.571);
+    --red-400: oklch(70.4% 0.191 22.216);
+    --red-50: oklch(97.1% 0.013 17.38);
 
     --bg: #FAFAF5;
 
@@ -35,44 +35,35 @@
     --pink: #FF2056;
     --red: #E7000B;
 
-    --gradient-stories: linear-gradient(
-        135deg,
-        #10B981 0%,
-        #22C55E 23%,
-        #A3E635 48%,
-        #FB923C 75%,
-        #F472B6 93%
-    );
-
     --gradient-profile: linear-gradient(
         135deg,
-        var(--emerald-400) 17%,
-        var(--lime-400) 86%
+        var(--amber-400) 17%,
+        var(--red-400) 86%
     );
 
     --gradient-profile-hover: linear-gradient(
         315deg,
-        var(--emerald-400) 17%,
-        var(--lime-400) 86%
+        var(--amber-400) 17%,
+        var(--red-400) 86%
     );
 
     --gradient-logo: linear-gradient(
         135deg,
-        var(--emerald-500) 0%,
-        var(--lime-400) 81%
+        var(--amber-500) 0%,
+        oklch(90.5% 0.182 98.111) 81%
     );
 
     --gradient-branding: linear-gradient(
         90deg,
-        var(--emerald-900) 0%,
-        var(--emerald-600) 50%,
-        var(--lime-400) 100%
+        var(--amber-900) 0%,
+        var(--amber-600) 50%,
+        oklch(90.5% 0.182 98.111) 100%
     );
 
     --gradient-trending: linear-gradient(
         135deg,
-        var(--emerald-50) 0%,
-        var(--lime-50) 100%
+        var(--amber-50) 0%,
+        var(--red-50) 100%
     );
 }
 

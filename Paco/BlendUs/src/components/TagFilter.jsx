@@ -1,3 +1,4 @@
+import './TagFilter.css';
 function TagFilter() {
   return (
     <div className="tag-list">

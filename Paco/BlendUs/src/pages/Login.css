@@ -1,0 +1,42 @@
+
+
+.login-wrapper {
+    background-color: var(--amber-50);
+    height: 100vh;
+    margin: -8rem clamp(-13rem, -16.158rem + 12.632vw, -1rem);
+
+}
+.logo {
+    a {
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        
+        .brand {
+            background: var(--gradient-logo);
+            border-radius: 20px;
+            height: 100px;
+            width: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            svg {
+                width: 70px;
+                height: 70px;
+            }
+        }
+
+        h1 {
+            display: flex;
+            font-size: 6rem;
+            font-family: 'Anek Odia';
+            background: var(--gradient-branding);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            transform: translateY(16px);
+        }
+    }
+}

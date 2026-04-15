@@ -4,7 +4,7 @@
     border-radius: 100px;
     outline: none;
     border: none;
-    background-color: var(--emerald-600);
+    background-color: var(--amber-600);
     color: white;
     font-size: 0.875rem;
     font-weight: 500;
@@ -14,5 +14,5 @@
 }
 
 .btn:hover {
-    background-color: var(--emerald-700);
+    background-color: var(--amber-700);
 }

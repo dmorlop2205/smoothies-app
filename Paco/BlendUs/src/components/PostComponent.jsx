@@ -15,7 +15,7 @@ function PostComponent() {
             </div>
         </div>
 
-        <div className="post-image"></div>
+        <div className="post-main-image"></div>
 
         <div className="interactions">
 

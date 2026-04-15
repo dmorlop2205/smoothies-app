@@ -14,14 +14,14 @@ function RegisterForm() {
         <div className="birthdate">
             <label className="label" htmlFor="birthdate">Date of birth</label>
             <div className="day-month-year">
-                <select className="text-input birthdate-input" id="day">
-                    <option value="" disabled selected>Day</option>
+                <select defaultValue="" className="text-input birthdate-input" id="day">
+                    <option value="" disabled>Day</option>
                     {[...Array(31)].map((_, i) => (
                         <option key={i} value={i + 1}>{i + 1}</option>
                     ))}
                 </select>
-                <select className="text-input birthdate-input" id="month">
-                    <option value="" disabled selected>Month</option>
+                <select defaultValue="" className="text-input birthdate-input" id="month">
+                    <option value="" disabled>Month</option>
                     <option value="1">January</option>
                     <option value="2">February</option>
                     <option value="3">March</option>
@@ -35,8 +35,8 @@ function RegisterForm() {
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
-                <select className="text-input birthdate-input" id="year">
-                    <option value="" disabled selected>Year</option>
+                <select defaultValue=""className="text-input birthdate-input" id="year">
+                    <option value="" disabled>Year</option>
                     {[...Array(100)].map((_, i) => (
                         <option key={i} value={2026 - i}>{2026 - i}</option>
                     ))}
