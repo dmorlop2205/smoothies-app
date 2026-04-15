@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 import type { Post, PostComment } from '../lib/api';
-import { $isLoggedIn } from '../stores/authStore';
+import { $isLoggedIn, $user } from '../stores/authStore';
 import './PostCard.css';
 
 interface Props {
@@ -24,6 +24,20 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     const [saved, setSaved] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [fetchedComments, setFetchedComments] = useState(false);
+    const [showOptions, setShowOptions] = useState(false);
+    const optionsRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (optionsRef.current && !optionsRef.current.contains(event.target as Node)) {
+                setShowOptions(false);
+            }
+        };
+        if (showOptions) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showOptions]);
 
     useEffect(() => {
         if (commentsOpen && !fetchedComments && comments.length === 0 && post.comments_count > 0) {
@@ -60,6 +74,18 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
         }
     };
 
+    const handleDelete = async () => {
+        if (!confirm('Are you sure you want to delete this smoothie? 🥤🗑️')) return;
+        try {
+            await api.deletePost(post.id);
+            window.location.reload(); // Quick refresh to update feed
+        } catch (err) {
+            alert('Failed to delete post');
+        }
+    };
+
+    const isAuthor = $user.get()?.id === post.author?.id;
+
     // Nico's API v2: image_url is a direct string, author is the user
     const imageUrl = post.image_url || '/assets/smoothie.avif';
     const authorName = post.author?.name ?? 'Unknown';
@@ -68,7 +94,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     return (
         <section className="post">
             <div className="post-header">
-                <a href={`/profile`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <a href={`/profile/${post.author?.id}`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="circle" style={{
                         background: 'var(--gradient-profile, linear-gradient(135deg,#00D492,#9AE600))',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -82,18 +108,56 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                     </div>
                 </a>
 
-                <div className="post-options">
+                <div className="post-options" ref={optionsRef} onClick={() => setShowOptions(!showOptions)} style={{ position: 'relative' }}>
                     <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none">
                         <circle cx="7" cy="12" r="1.5" stroke="#99A1AF" strokeLinecap="round" strokeLinejoin="round"/>
                         <circle cx="12" cy="12" r="1.5" stroke="#99A1AF" strokeLinecap="round" strokeLinejoin="round"/>
                         <circle cx="17" cy="12" r="1.5" stroke="#99A1AF" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
+
+                    {showOptions && (
+                        <div className="options-dropdown">
+                            {isAuthor ? (
+                                <>
+                                    <button onClick={() => window.location.href = `/edit/${post.id}`}>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
+                                        Edit Post
+                                    </button>
+                                    <button onClick={handleDelete} className="delete">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Delete Post
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button onClick={() => window.location.href = `/profile/${post.author.id}`}>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                        User Info
+                                    </button>
+                                    <button onClick={() => setSaved(!saved)}>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                                        </svg>
+                                        {saved ? 'Saved' : 'Save Post'}
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
             {imageUrl && (
                 <a href={`/post/${post.id}`} style={{ display: 'block', textDecoration: 'none' }}>
-                    <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '300px', borderRadius: '12px', marginTop: '1rem' }} />
+                    <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '550px', borderRadius: '12px', marginTop: '1rem' }} />
                 </a>
             )}
 

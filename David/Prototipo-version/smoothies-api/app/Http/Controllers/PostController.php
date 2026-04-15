@@ -21,15 +21,33 @@ class PostController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = (int) $request->query('per_page', 15);
+        $page    = (int) $request->query('page', 1);
+        $userId  = $request->query('user_id');
 
-        $posts = $this->postService->getFeed($perPage);
+        if ($userId) {
+            $posts = Post::query()
+                ->where('user_id', (int) $userId)
+                ->with(['user', 'ingredients', 'tags'])
+                ->withCount(['likes', 'comments'])
+                ->latest('created_at')
+                ->paginate($perPage, ['*'], 'page', $page);
+        } else {
+            $posts = $this->postService->getFeed($perPage);
+        }
 
         return (new PostCollection($posts))->response();
     }
 
     public function store(StorePostRequest $request): JsonResponse
     {
-        $post = $this->postService->store($request->user(), $request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('posts', 'public');
+            $data['image_url'] = url('/storage/' . $path);
+        }
+
+        $post = $this->postService->store($request->user(), $data);
 
         return (new PostResource($post))->response()->setStatusCode(201);
     }
@@ -73,6 +91,22 @@ class PostController extends Controller
         $posts = $this->postService->getByTag($tag, $perPage);
 
         return (new PostCollection($posts))->response();
+    }
+
+    public function toggleSave(Request $request, Post $post): JsonResponse
+    {
+        $user = $request->user();
+        $isSaved = $user->savedPosts()->where('post_id', $post->id)->exists();
+
+        if ($isSaved) {
+            $user->savedPosts()->detach($post->id);
+            $saved = false;
+        } else {
+            $user->savedPosts()->attach($post->id);
+            $saved = true;
+        }
+
+        return response()->json(['saved' => $saved]);
     }
 }
 

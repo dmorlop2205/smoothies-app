@@ -1,7 +1,14 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AuthForm from '../components/AuthForm';
+import AuthLayout from '../layouts/AuthLayout.astro';
+import RegisterForm from '../components/RegisterForm';
+import '../components/Register.css';
 ---
-<Layout title="Register" activePage="register">
-  <AuthForm mode="register" client:load />
-</Layout>
+<AuthLayout title="Register">
+  <section class="register-wrapper" style="margin-top: 0; width: 100%;">
+        <div class="register-title" style="margin-bottom: 2.5rem;">
+            <h1 class="title">Register in BlendUs</h1>
+            <h3 class="subtitle" style="margin-top: 0.5rem">Start sharing your smoothies with other people!</h3>
+        </div>
+        <RegisterForm client:load />
+    </section>
+</AuthLayout>

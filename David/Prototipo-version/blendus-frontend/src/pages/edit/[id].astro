@@ -6,9 +6,7 @@ const { id } = Astro.params;
 ---
 
 <Layout title="Edit Smoothie" activePage="create">
-  <section class="wrapper">
-    <div class="center-content">
-      <EditPostForm client:load postId={Number(id)} />
-    </div>
-  </section>
+  <div class="create-page">
+    <EditPostForm client:load postId={Number(id)} />
+  </div>
 </Layout>

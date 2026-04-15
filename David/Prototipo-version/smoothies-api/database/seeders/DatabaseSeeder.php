@@ -113,5 +113,6 @@ class DatabaseSeeder extends Seeder
                 $post->ingredients()->create($ing);
             }
         }
+        $this->call(SampleDataSeeder::class);
     }
 }

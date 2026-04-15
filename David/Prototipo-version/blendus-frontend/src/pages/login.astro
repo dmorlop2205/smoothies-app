@@ -1,7 +1,14 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AuthForm from '../components/AuthForm';
+import AuthLayout from '../layouts/AuthLayout.astro';
+import LoginForm from '../components/LoginForm';
+import '../components/Register.css'; // Reusing Register CSS layout rules
 ---
-<Layout title="Login" activePage="login">
-  <AuthForm mode="login" client:load />
-</Layout>
+<AuthLayout title="Login">
+  <section class="register-wrapper" style="margin-top: 0; width: 100%;">
+        <div class="register-title" style="margin-bottom: 2.5rem;">
+            <h1 class="title">Welcome Back!</h1>
+            <h3 class="subtitle">Sign in to discover amazing smoothie recipes.</h3>
+        </div>
+        <LoginForm client:load />
+    </section>
+</AuthLayout>

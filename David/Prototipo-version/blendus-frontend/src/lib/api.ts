@@ -22,6 +22,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const res = await fetch(`${API_URL}/api${path}`, { ...options, headers });
 
     if (!res.ok) {
+        if (res.status === 401 && typeof window !== 'undefined') {
+            localStorage.removeItem('blendus_token');
+            localStorage.removeItem('blendus_user');
+            window.location.href = '/login?expired=1';
+        }
         const err = await res.json().catch(() => ({ message: res.statusText }));
         throw new Error(err.message ?? 'API Error');
     }
@@ -87,6 +92,41 @@ export const api = {
     getUser: (id: number) =>
         request<{data: User}>(`/users/${id}`).then(res => res.data),
 
+    getUserPosts: (userId: number, page = 1) =>
+        request<PaginatedResponse<Post>>(`/posts?user_id=${userId}&page=${page}`),
+
+    getUserSavedPosts: (userId: number, page = 1) =>
+        request<PaginatedResponse<Post>>(`/users/${userId}/saved-posts?page=${page}`),
+
+    getUserLikedPosts: (userId: number, page = 1) =>
+        request<PaginatedResponse<Post>>(`/users/${userId}/liked-posts?page=${page}`),
+
+    toggleSavePost: (postId: number) =>
+        request<{ saved: boolean }>(`/posts/${postId}/save`, { method: 'POST' }),
+
+    getFollowers: (userId: number) =>
+        request<{data: User[]}>(`/users/${userId}/followers`).then(res => res.data),
+
+    getFollowing: (userId: number) =>
+        request<{data: User[]}>(`/users/${userId}/following`).then(res => res.data),
+
+    updateUser: (userId: number, data: { name?: string; username?: string; bio?: string; avatar?: string; avatar_file?: File }) => {
+        const formData = new FormData();
+        if (data.name) formData.append('name', data.name);
+        if (data.username) formData.append('username', data.username);
+        if (data.bio) formData.append('bio', data.bio);
+        if (data.avatar) formData.append('avatar', data.avatar);
+        if (data.avatar_file) formData.append('avatar_file', data.avatar_file);
+        
+        // Use POST with _method=PUT for file upload compatibility in PHP/Laravel
+        formData.append('_method', 'PUT');
+        
+        return request<{data: User}>(`/users/${userId}`, { 
+            method: 'POST', 
+            body: formData 
+        }).then(res => res.data);
+    },
+
     followUser: (id: number) =>
         request<void>(`/users/${id}/follow`, { method: 'POST' }),
 
@@ -94,7 +134,7 @@ export const api = {
         request<void>(`/users/${id}/follow`, { method: 'DELETE' }),
 
     getSuggestedUsers: () =>
-        request<User[]>('/users/suggested'),
+        request<{data: User[]}>('/users/suggested').then(res => res.data),
 };
 
 // ────────── Types (aligned to Nico's API Resources) ──────────
@@ -104,7 +144,12 @@ export interface User {
     name: string;
     username: string;
     email: string;
+    bio?: string | null;
+    avatar?: string | null;
     posts_count?: number;
+    followers_count?: number;
+    following_count?: number;
+    is_following?: boolean;
 }
 
 export interface Ingredient {
@@ -140,6 +185,7 @@ export interface Post {
     likes_count: number;
     comments_count: number;
     has_liked: boolean;
+    has_saved: boolean;
     comments?: PostComment[];
 }
 

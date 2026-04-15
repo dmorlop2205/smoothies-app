@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { api } from '../lib/api';
+import type { Tag } from '../lib/api';
 import { $isLoggedIn } from '../stores/authStore';
 import './CreateForm.css';
 
@@ -11,7 +12,16 @@ interface IngredientRow {
 export default function CreatePostForm() {
     const [ingredients, setIngredients] = useState<IngredientRow[]>([{ ingredient: '', amount: '' }]);
     const [tags, setTags] = useState<string[]>([]);
+    const [availableTags, setAvailableTags] = useState<Tag[]>([]);
     const [tagInput, setTagInput] = useState('');
+
+    useEffect(() => {
+        if (!$isLoggedIn.get()) {
+            window.location.href = '/login';
+            return;
+        }
+        api.getTags().then(setAvailableTags).catch(() => {});
+    }, []);
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -37,7 +47,13 @@ export default function CreatePostForm() {
         let t = tagInput.trim();
         if (!t) return;
         if (!t.startsWith('#')) t = '#' + t;
-        setTags(prev => [...prev, t]);
+        if (tags.length >= 5) {
+            setTagInput('');
+            return;
+        }
+        if (!tags.includes(t)) {
+            setTags(prev => [...prev, t]);
+        }
         setTagInput('');
     };
     const removeTag = (i: number) => setTags(prev => prev.filter((_, idx) => idx !== i));
@@ -242,13 +258,34 @@ export default function CreatePostForm() {
                     <input
                         className="text-input"
                         type="text"
-                        placeholder="Add a tag..."
+                        placeholder="Type a new tag or select below..."
                         value={tagInput}
                         onChange={e => setTagInput(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                     />
                     <button type="button" className="btn add-btn" onClick={addTag}>Add</button>
                 </div>
+                
+                {availableTags.length > 0 && (
+                    <div className="available-tags" style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+                        {availableTags
+                            .filter(t => !tags.includes('#' + t.slug) && !tags.includes('#' + t.name.toLowerCase()))
+                            .map(tag => (
+                                <span
+                                    key={tag.id}
+                                    className="filter-pill"
+                                    style={{ fontSize: '0.8rem', padding: '.4rem 1rem', cursor: 'pointer', background: '#f3f4f6', border: '1px solid #e5e7eb' }}
+                                    onClick={() => {
+                                        if (tags.length < 5) {
+                                            setTags(prev => [...prev, '#' + tag.slug]);
+                                        }
+                                    }}
+                                >
+                                    + {tag.name}
+                                </span>
+                            ))}
+                    </div>
+                )}
             </div>
 
             {/* Instructions */}

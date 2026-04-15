@@ -18,6 +18,7 @@ class UserController extends Controller
 
     public function show(User $user): JsonResponse
     {
+        $user->loadCount(['posts', 'followers', 'following']);
         return (new UserResource($user))->response();
     }
 
@@ -29,8 +30,13 @@ class UserController extends Controller
             'name'     => ['sometimes', 'string', 'max:100'],
             'username' => ['sometimes', 'string', 'max:50', Rule::unique('users')->ignore($user->id)],
             'bio'      => ['sometimes', 'nullable', 'string'],
-            'avatar'   => ['sometimes', 'nullable', 'url'],
+            'avatar'   => ['sometimes', 'nullable', 'string'],
         ]);
+
+        if ($request->hasFile('avatar_file')) {
+            $path = $request->file('avatar_file')->store('avatars', 'public');
+            $data['avatar'] = url('/storage/' . $path);
+        }
 
         $updated = $this->userService->updateProfile($user, $data);
 
@@ -67,6 +73,55 @@ class UserController extends Controller
         $following = $this->userService->getFollowing($user);
 
         return UserResource::collection($following)->response();
+    }
+
+    public function suggested(Request $request): JsonResponse
+    {
+        $userId = $request->user()?->id;
+
+        $users = User::query()
+            ->when($userId, fn($q) => $q->where('id', '!=', $userId))
+            ->inRandomOrder()
+            ->limit(3)
+            ->get();
+
+        return UserResource::collection($users)->response();
+    }
+
+    public function saved_posts(Request $request, User $user): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 15);
+        $posts = $user->savedPosts()
+            ->with(['user', 'ingredients', 'tags'])
+            ->withCount(['likes', 'comments']);
+
+        if ($userId = auth()->id()) {
+            $posts->with([
+                'likes' => fn($q) => $q->where('user_id', $userId),
+                'savedBy' => fn($q) => $q->where('user_id', $userId)
+            ]);
+        }
+
+        $paginated = $posts->latest('saved_posts.created_at')->paginate($perPage);
+        return (new \App\Http\Resources\PostCollection($paginated))->response();
+    }
+
+    public function liked_posts(Request $request, User $user): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 15);
+        $posts = $user->likedPosts()
+            ->with(['user', 'ingredients', 'tags'])
+            ->withCount(['likes', 'comments']);
+
+        if ($userId = auth()->id()) {
+            $posts->with([
+                'likes' => fn($q) => $q->where('user_id', $userId),
+                'savedBy' => fn($q) => $q->where('user_id', $userId)
+            ]);
+        }
+
+        $paginated = $posts->latest('likes.created_at')->paginate($perPage);
+        return (new \App\Http\Resources\PostCollection($paginated))->response();
     }
 }
 
