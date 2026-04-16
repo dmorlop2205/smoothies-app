@@ -25,8 +25,8 @@
         }
     }
     .active {
-        background-color: var(--emerald-600);
-        box-shadow: 0px 2px 10px #5ee9b673;
+        background-color: var(--amber-600);
+        box-shadow: 0px 2px 10px oklch(92.4% 0.12 95.746);
         cursor: default;
         p {
             color: var(--white);
@@ -34,11 +34,11 @@
     }
     
     .filter:hover {
-        background-color: var(--emerald-100);
+        background-color: var(--amber-100);
 
     }
 
     .active:hover {
-        background-color: var(--emerald-600);
+        background-color: var(--amber-600);
     }
 }

@@ -185,7 +185,7 @@
             }
             .comment:hover {
                 path {
-                    stroke: var(--emerald-500);
+                    stroke: var(--amber-500);
                 }
             }
             .share:hover {
@@ -251,13 +251,13 @@
             padding: .3rem .8rem;
             border-radius: 15px;
             font-size: 1rem;
-            color: var(--emerald-700);
+            color: var(--amber-700);
             cursor: pointer;
             transition: .2s ease;
         }
 
         .hashtag:hover {
-            background-color: var(--emerald-100);
+            background-color: var(--amber-100);
         }
     }
 }

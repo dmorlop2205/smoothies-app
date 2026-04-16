@@ -36,12 +36,12 @@
         width: 100%;
     }
     .search-input:focus {
-        outline: 1px solid var(--emerald-500);
-        border: 1px solid var(--emerald-500);
+        outline: 1px solid var(--amber-500);
+        border: 1px solid var(--amber-500);
     }
     .search-input:focus:hover {
-        outline: 1px solid var(--emerald-500);
-        border: 1px solid var(--emerald-500);
+        outline: 1px solid var(--amber-500);
+        border: 1px solid var(--amber-500);
     }
     .search-input:hover {
         border: 1px solid var(--gray-500);
