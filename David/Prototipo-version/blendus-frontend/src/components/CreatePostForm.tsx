@@ -15,6 +15,12 @@ export default function CreatePostForm() {
     const [availableTags, setAvailableTags] = useState<Tag[]>([]);
     const [tagInput, setTagInput] = useState('');
 
+    // ── AI Generation state ──
+    const [aiPrompt, setAiPrompt] = useState('');
+    const [aiLoading, setAiLoading] = useState(false);
+    const [aiError, setAiError] = useState('');
+    const [aiOpen, setAiOpen] = useState(false);
+
     useEffect(() => {
         if (!$isLoggedIn.get()) {
             window.location.href = '/login';
@@ -30,6 +36,79 @@ export default function CreatePostForm() {
     const [success, setSuccess] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // ── AI Generate handler ──
+    const handleAiGenerate = async () => {
+        const prompt = aiPrompt.trim();
+        if (!prompt) {
+            setAiError('Please describe the smoothie you want.');
+            return;
+        }
+
+        setAiLoading(true);
+        setAiError('');
+        try {
+            const token = localStorage.getItem('blendus_token');
+            const apiUrl = import.meta.env.PUBLIC_API_URL ?? 'http://localhost:8000';
+            const res = await fetch(`${apiUrl}/api/ai/generate-smoothie`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+                },
+                body: JSON.stringify({ prompt }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || 'Failed to generate smoothie');
+            }
+
+            // Auto-fill form fields
+            const nameInput = document.querySelector('#name') as HTMLInputElement;
+            const captionInput = document.querySelector('#caption') as HTMLTextAreaElement;
+            const instructionsInput = document.querySelector('#instructions') as HTMLTextAreaElement;
+            const categorySelect = document.querySelector('#category') as HTMLSelectElement;
+
+            if (nameInput && data.name) nameInput.value = data.name;
+            if (captionInput && data.description) captionInput.value = data.description;
+            if (instructionsInput && data.preparation_steps) instructionsInput.value = data.preparation_steps;
+
+            // Set category if it matches one of the options
+            if (categorySelect && data.category) {
+                const validCategories = ['green', 'tropical', 'berry', 'protein', 'detox', 'dessert'];
+                const cat = data.category.toLowerCase();
+                if (validCategories.includes(cat)) {
+                    categorySelect.value = cat;
+                }
+            }
+
+            // Set ingredients
+            if (data.ingredients && Array.isArray(data.ingredients)) {
+                setIngredients(
+                    data.ingredients.map((ing: any) => ({
+                        ingredient: ing.name || '',
+                        amount: ing.amount || '',
+                    }))
+                );
+            }
+
+            // Set tags
+            if (data.tags && Array.isArray(data.tags)) {
+                setTags(data.tags.slice(0, 5).map((t: string) => t.startsWith('#') ? t : '#' + t));
+            }
+
+            // Collapse AI section after success
+            setAiOpen(false);
+            setAiPrompt('');
+        } catch (err: any) {
+            setAiError(err.message ?? 'Something went wrong. Try again.');
+        } finally {
+            setAiLoading(false);
+        }
+    };
 
     // ── Ingredient helpers ──
     const addIngredient = () => setIngredients(prev => [...prev, { ingredient: '', amount: '' }]);
@@ -47,6 +126,10 @@ export default function CreatePostForm() {
         let t = tagInput.trim();
         if (!t) return;
         if (!t.startsWith('#')) t = '#' + t;
+        
+        // Enforce max length of 19 characters (plus the #)
+        if (t.length > 20) t = t.slice(0, 20);
+
         if (tags.length >= 5) {
             setTagInput('');
             return;
@@ -150,6 +233,54 @@ export default function CreatePostForm() {
 
     return (
         <form className="form" onSubmit={handleSubmit}>
+            {/* ── AI Generation Section ── */}
+            <div className="ai-section">
+                <div className="ai-header" onClick={() => setAiOpen(!aiOpen)}>
+                    <div className="ai-title">
+                        <span className="ai-sparkle">✨</span>
+                        <span>Create with AI</span>
+                    </div>
+                    <svg
+                        className={`ai-chevron ${aiOpen ? 'open' : ''}`}
+                        xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"
+                    >
+                        <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z"/>
+                    </svg>
+                </div>
+
+                {aiOpen && (
+                    <div className="ai-body">
+                        <p className="ai-hint">Describe the smoothie you want and our AI will create a complete recipe for you.</p>
+                        <textarea
+                            className="textarea ai-prompt"
+                            placeholder="E.g. a refreshing tropical smoothie with mango, pineapple and coconut milk..."
+                            value={aiPrompt}
+                            onChange={e => setAiPrompt(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleAiGenerate(); } }}
+                        />
+                        {aiError && <p className="ai-error">{aiError}</p>}
+                        <button
+                            type="button"
+                            className="btn ai-generate-btn"
+                            onClick={handleAiGenerate}
+                            disabled={aiLoading}
+                        >
+                            {aiLoading ? (
+                                <>
+                                    <span className="ai-spinner" />
+                                    Generating…
+                                </>
+                            ) : (
+                                <>
+                                    <span className="ai-sparkle">✨</span>
+                                    Generate Smoothie
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
+            </div>
+
             {/* Image upload */}
             <div
                 className={`image ${isDragging ? 'dragging' : ''}`}
@@ -258,10 +389,11 @@ export default function CreatePostForm() {
                     <input
                         className="text-input"
                         type="text"
-                        placeholder="Type a new tag or select below..."
+                        placeholder="Type a new tag..."
                         value={tagInput}
                         onChange={e => setTagInput(e.target.value)}
                         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+                        maxLength={19}
                     />
                     <button type="button" className="btn add-btn" onClick={addTag}>Add</button>
                 </div>

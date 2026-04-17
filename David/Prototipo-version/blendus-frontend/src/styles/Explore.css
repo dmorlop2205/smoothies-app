@@ -48,13 +48,9 @@
     }
     
     .filter-icon {
-        position: absolute;
-        right: 0;
-        transform: translateY(-50%) rotate(90deg);
-        margin-right: 1rem;
+        transform: rotate(90deg);
         width: 39px;
         height: 39px;
-        z-index: 9;
         cursor: pointer;
         transition: .2s ease;
     }

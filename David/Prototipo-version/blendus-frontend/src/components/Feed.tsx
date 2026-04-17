@@ -58,7 +58,7 @@ export default function Feed() {
         <section className="left-content">
             {/* Hero / Welcome Banner */}
             <div className="hero-banner" style={{
-                background: 'linear-gradient(135deg, var(--emerald-500), var(--emerald-700))',
+                background: 'linear-gradient(135deg, var(--amber-500) 0%, var(--amber-700, #b45309) 100%)',
                 borderRadius: '24px',
                 padding: '2.5rem 2rem',
                 color: 'white',
@@ -67,35 +67,38 @@ export default function Feed() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 textAlign: 'center',
-                boxShadow: '0 4px 15px rgba(0, 188, 125, 0.2)',
+                boxShadow: '0 4px 20px rgba(180, 83, 9, 0.25)',
                 marginBottom: '2rem'
             }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>Welcome to BlendUs! 🍹</h2>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>Welcome to BlendUs! 🧋</h2>
                 <p style={{ fontSize: '1.1rem', opacity: 0.9, margin: 0 }}>Discover, mix, and share the world's best smoothie recipes.</p>
             </div>
 
             {/* Filters */}
-            <section className="filters">
-                <span
-                    className={`filter ${activeTag === null ? 'active' : ''}`}
-                    onClick={() => handleFilterClick(null)}
-                    style={{ cursor: 'pointer' }}
-                >
-                    <img src="/sparks.webp" alt="All" />
-                    <p>All</p>
-                </span>
-                {tags.map(tag => (
+            <div style={{ marginBottom: '0.5rem' }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.75rem' }}>Popular Categories</h3>
+                <section className="filters">
                     <span
-                        key={tag.id}
-                        className={`filter ${activeTag === tag.slug ? 'active' : ''}`}
-                        onClick={() => handleFilterClick(tag.slug)}
+                        className={`filter ${activeTag === null ? 'active' : ''}`}
+                        onClick={() => handleFilterClick(null)}
                         style={{ cursor: 'pointer' }}
                     >
-                        {FILTER_ICONS[tag.slug] && <img src={FILTER_ICONS[tag.slug]} alt={tag.name} />}
-                        <p>{tag.name}</p>
+                        <img src="/sparks.webp" alt="All" />
+                        <p>All</p>
                     </span>
-                ))}
-            </section>
+                    {tags.slice(0, 6).map(tag => (
+                        <span
+                            key={tag.id}
+                            className={`filter ${activeTag === tag.slug ? 'active' : ''}`}
+                            onClick={() => handleFilterClick(tag.slug)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            {FILTER_ICONS[tag.slug] && <img src={FILTER_ICONS[tag.slug]} alt={tag.name} />}
+                            <p>{tag.name}</p>
+                        </span>
+                    ))}
+                </section>
+            </div>
 
             {/* Posts */}
             <div className="posts-list">

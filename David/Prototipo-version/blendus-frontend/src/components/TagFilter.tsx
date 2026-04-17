@@ -16,7 +16,7 @@ export default function TagFilter({ tags, activeTag, onTagClick }: Props) {
           cursor: 'pointer',
           padding: '0.5rem 1rem',
           borderRadius: '20px',
-          background: activeTag === null ? 'var(--emerald-500)' : 'var(--gray-100)',
+          background: activeTag === null ? 'var(--amber-600)' : 'var(--gray-100)',
           color: activeTag === null ? 'white' : 'var(--gray-700)',
           fontWeight: 600
         }}
@@ -32,7 +32,7 @@ export default function TagFilter({ tags, activeTag, onTagClick }: Props) {
             cursor: 'pointer',
             padding: '0.5rem 1rem',
             borderRadius: '20px',
-            background: activeTag === tag ? 'var(--emerald-500)' : 'var(--gray-100)',
+            background: activeTag === tag ? 'var(--amber-600)' : 'var(--gray-100)',
             color: activeTag === tag ? 'white' : 'var(--gray-700)',
             fontWeight: 600
           }}

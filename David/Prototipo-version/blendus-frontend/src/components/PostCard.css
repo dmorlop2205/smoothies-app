@@ -207,13 +207,7 @@
             }
         }
 
-        .save:hover {
-            svg {
-                path {
-                    fill: var(--gray-900);
-                }
-            }
-        }
+
     }
 
     .description {

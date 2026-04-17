@@ -10,6 +10,7 @@ export default function ExplorePage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [showTags, setShowTags] = useState(false);
 
   useEffect(() => {
     // Fetch posts and tags in parallel
@@ -46,11 +47,11 @@ export default function ExplorePage() {
             <path d="M18.1553 18.1553L21.8871 21.8871" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </span>
-        <span className="filter">
-          <svg className="filter-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6B7280">
+        <div className="filter" onClick={() => setShowTags(!showTags)} style={{ cursor: 'pointer', position: 'absolute', right: 0, zIndex: 10, display: 'flex', alignItems: 'center', height: '100%', paddingRight: '1rem' }}>
+          <svg className="filter-icon" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#6B7280" style={{ transition: '.2s ease' }}>
             <path d="M200-160v-280h-80v-80h240v80h-80v280h-80Zm0-440v-200h80v200h-80Zm160 0v-80h80v-120h80v120h80v80H360Zm80 440v-360h80v360h-80Zm240 0v-120h-80v-80h240v80h-80v120h-80Zm0-280v-360h80v360h-80Z"/>
           </svg>
-        </span>
+        </div>
         <input 
           type="text" 
           className="search-input" 
@@ -60,7 +61,7 @@ export default function ExplorePage() {
         />
       </div>
 
-      <TagFilter tags={tags} activeTag={activeTag} onTagClick={handleTagClick} />
+      {showTags && <TagFilter tags={tags} activeTag={activeTag} onTagClick={handleTagClick} />}
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '2rem' }}>Loading posts...</div>
@@ -68,7 +69,11 @@ export default function ExplorePage() {
         <section className="posts-grid">
           {filteredPosts.map(post => (
             <a href={`/post/${post.id}`} className="grid" key={post.id} style={{ textDecoration: 'none', minHeight: '300px' }}>
-              <img src={post.image_url || '/assets/smoothie.avif'} alt={post.title} />
+              <img 
+                src={post.image_url || '/assets/smoothie2.jpg'} 
+                alt={post.title} 
+                onError={(e) => { e.currentTarget.src = '/assets/smoothie2.jpg' }}
+              />
               <div className="overlay">
                 <h4 className="title">{post.title}</h4>
                 <div className="likes-comments" style={{ display: 'flex', gap: '1rem' }}>

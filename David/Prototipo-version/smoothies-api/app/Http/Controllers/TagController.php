@@ -18,7 +18,8 @@ class TagController extends Controller
         }
 
         $tags = $query
-            ->orderBy('name')
+            ->withCount('posts')
+            ->orderByDesc('posts_count')
             ->get();
 
         return TagResource::collection($tags)->response();

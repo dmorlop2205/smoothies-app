@@ -21,7 +21,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     const [comments, setComments] = useState<PostComment[]>(post.comments ?? []);
     const [commentsOpen, setCommentsOpen] = useState(showComments);
     const [submitting, setSubmitting] = useState(false);
-    const [saved, setSaved] = useState(false);
+    const [saved, setSaved] = useState(post.has_saved ?? false);
     const [expanded, setExpanded] = useState(false);
     const [fetchedComments, setFetchedComments] = useState(false);
     const [showOptions, setShowOptions] = useState(false);
@@ -188,10 +188,12 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                 </div>
 
                 <div className="save" style={{ cursor: 'pointer' }} onClick={() => setSaved(!saved)}>
-                    <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none">
-                        <path fillRule="evenodd" clipRule="evenodd"
-                            d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z"
-                            fill={saved ? '#101828' : '#364153'}/>
+                    <svg className={`save-icon ${saved ? 'active' : ''}`} width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {saved ? (
+                            <path d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6Z" fill="#FBBF24"/>
+                        ) : (
+                            <path fillRule="evenodd" clipRule="evenodd" d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6ZM8.25 6.75V16.6838L12 14.4615L15.75 16.6838V6.75H8.25Z" fill="#364153"/>
+                        )}
                     </svg>
                 </div>
             </div>

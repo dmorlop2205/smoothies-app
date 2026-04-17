@@ -3,7 +3,7 @@ import '../styles/global.css';
 
 interface Props {
   title?: string;
-  activePage?: 'home' | 'explore' | 'create' | 'profile' | 'login' | 'register';
+  activePage?: 'home' | 'explore' | 'create' | 'sommelier' | 'profile' | 'login' | 'register';
 }
 const { title = 'BlendUs', activePage } = Astro.props;
 ---
@@ -44,9 +44,15 @@ const { title = 'BlendUs', activePage } = Astro.props;
         </a>
         <a href="/create" class={activePage === 'create' ? 'active' : ''}>
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 12H12M12 12H9M12 12V9M12 12V15M17 21H7C4.79086 21 3 19.2091 3 17V7C3 4.79086 4.79086 3 7 3H17C19.2091 3 21 4.79086 21 7V17C21 19.2091 19.2091 21 17 21Z" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
+            <path d="M15 12H12M12 12H9M12 12V9M12 12V15M17 21H7C4.79086 21 3 19.2091 3 17V7C3 4.79086 4.79086 3 7 3H17C19.2091 3 21 4.79086 21 7V17C21 19.2091 19.2091 21 17 21Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
           Create
+        </a>
+        <a href="/sommelier" class={activePage === 'sommelier' ? 'active' : ''} style="color: var(--amber-600); font-weight: 600;">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+            <path d="M480-120q-75 0-127.5-52.5T300-300q0-28 10.5-54t29.5-46L480-571l140 171q19 20 29.5 46t10.5 54q0 75-52.5 127.5T480-120Zm0-80q42 0 71-29t29-71q0-16-6.5-31.5T555-358L480-450l-75 92q-12 11-18.5 26.5T380-300q0 42 29 71t71 29ZM480-360Z"/>
+          </svg>
+          Sommelier
         </a>
         <div id="nav-auth-slot" style="display: flex; align-items: center; gap: 1rem;"></div>
       </div>
