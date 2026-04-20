@@ -94,6 +94,9 @@ nav {
             svg {
                 path {
                     stroke: var(--amber-700);
+                }
+                circle {
+                    stroke: var(--amber-700);
                 }     
             }
         }
