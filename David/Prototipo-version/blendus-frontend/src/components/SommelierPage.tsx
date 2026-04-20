@@ -4,6 +4,11 @@ import type { Post } from '../lib/api';
 import { $isLoggedIn } from '../stores/authStore';
 import './SommelierPage.css';
 
+const renderBoldText = (text: string) => {
+    const parts = text.split(/\*\*(.*?)\*\*/g);
+    return parts.map((part, i) => i % 2 === 1 ? <strong key={i} style={{ color: '#B45309' }}>{part}</strong> : part);
+};
+
 export default function SommelierPage() {
     const [mood, setMood] = useState('');
     const [loading, setLoading] = useState(false);
@@ -88,7 +93,7 @@ export default function SommelierPage() {
                 <div className="sommelier-results">
                     <div className="sommelier-explanation">
                         <h3>Here is what I recommend for you:</h3>
-                        <p>{result.explanation}</p>
+                        <p>{renderBoldText(result.explanation)}</p>
                     </div>
 
                     <div className="sommelier-posts-grid">

@@ -90,7 +90,7 @@ EOT;
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
-                'model'  => 'qwen2.5:1.5b',
+                'model'  => 'llama3.2:1b',
                 'system' => $systemPrompt,
                 'prompt' => $userPrompt,
                 'format' => [
@@ -178,8 +178,8 @@ You are the BlendUs AI Sommelier. Your job is to match a user's mood with the pe
 
 # Instructions
 1. You will receive the user's mood and a JSON array of available smoothies (each has an 'id', 'title', 'description', and 'tags').
-2. Select EXACTLY 3 smoothies from the inventory array that best match the user's mood. You must ONLY select smoothies that exist in the inventory.
-3. Write a friendly, 2-to-3 sentence explanation directly addressing the user about why these 3 smoothies are perfect for their current mood.
+2. Select EXACTLY 4 smoothies from the inventory array that best match the user's mood. You must ONLY select smoothies that exist in the inventory.
+3. Write a friendly, 2-to-3 sentence explanation directly addressing the user about why these 4 smoothies are perfect for their current mood.
 
 # Output Format
 Return ONLY valid JSON with this exact structure:
@@ -194,7 +194,7 @@ EOT;
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
-                'model'  => 'qwen2.5:1.5b',
+                'model'  => 'llama3.2:1b',
                 'system' => $systemPrompt,
                 'prompt' => $userPrompt,
                 'format' => [
@@ -245,6 +245,134 @@ EOT;
 
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to reach AI Sommelier: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * AI Cooking Assistant: Extract structured steps from a raw recipe.
+     */
+    public function extractSteps(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title'             => 'required|string|max:255',
+            'ingredients'       => 'required|array',
+            'preparation_steps' => 'required|string',
+        ]);
+
+        $title = $request->input('title');
+        $ingredients = json_encode($request->input('ingredients'));
+        $prep = $request->input('preparation_steps');
+
+        $systemPrompt = <<<EOT
+# Role
+You are an expert AI Cooking Assistant for the BlendUs app.
+
+# Instructions
+1. You will receive the raw 'preparation_steps' and 'ingredients' of a smoothie named "{$title}".
+2. Break the preparation down into a logical, sequential array of distinct cooking steps. 
+3. For EACH step, you MUST invent a creative, helpful tip about doing that step. Append the tip to the end of the text, starting with "💡 Tip: ".
+4. Do NOT include step numbers at the beginning of the text (e.g. write "Chop the kiwi" not "1. Chop the kiwi").
+
+# Output Format
+Return ONLY valid JSON with this exact structure:
+{
+  "steps": [
+    {
+      "instruction": "Chop the kiwi.",
+      "tip": "Use a serrated knife for an easier cut."
+    }
+  ]
+}
+EOT;
+
+        $userPrompt = "Ingredients: {$ingredients}\nRaw Instructions: {$prep}";
+        $ollamaHost = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+
+        try {
+            $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
+                'model'  => 'llama3.2:1b',
+                'system' => $systemPrompt,
+                'prompt' => $userPrompt,
+                'format' => [
+                    'type'       => 'object',
+                    'properties' => [
+                        'steps' => [
+                            'type'  => 'array',
+                            'items' => [
+                                'type' => 'object',
+                                'properties' => [
+                                    'instruction' => ['type' => 'string'],
+                                    'tip'         => ['type' => 'string']
+                                ],
+                                'required' => ['instruction', 'tip']
+                            ]
+                        ],
+                    ],
+                    'required' => ['steps'],
+                ],
+                'stream'  => false,
+                'options' => ['num_ctx' => 2048],
+            ]);
+
+            return response()->json(json_decode($response->json('response'), true));
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'AI Cooking Assistant failed (Parse Steps).'], 500);
+        }
+    }
+
+    /**
+     * AI Cooking Assistant: Contextual help for the current step.
+     */
+    public function cookingHelp(Request $request): JsonResponse
+    {
+        $request->validate([
+            'title'        => 'required|string|max:255',
+            'current_step' => 'required|string',
+            'question'     => 'required|string|max:500',
+        ]);
+
+        $title = $request->input('title');
+        $step = $request->input('current_step');
+        $question = $request->input('question');
+
+        $systemPrompt = <<<EOT
+# Role
+You are Chef Enrique, the friendly AI Cooking Assistant for the BlendUs app. 
+
+# Instructions
+1. The user is currently making the smoothie "{$title}". 
+2. They are on this specific step: "{$step}".
+3. They have asked a question or asked for help.
+4. Give a brief, friendly, and highly relevant answer. Keep it under 3 sentences for a chat interface.
+
+# Output Format
+Return ONLY valid JSON with this exact structure:
+{
+  "answer": "Your reply here"
+}
+EOT;
+
+        $ollamaHost = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+
+        try {
+            $response = Http::connectTimeout(5)->timeout(30)->post("{$ollamaHost}/api/generate", [
+                'model'  => 'llama3.2:1b',
+                'system' => $systemPrompt,
+                'prompt' => $question,
+                'format' => [
+                    'type'       => 'object',
+                    'properties' => [
+                        'answer' => ['type' => 'string'],
+                    ],
+                    'required' => ['answer'],
+                ],
+                'stream'  => false,
+                'options' => ['num_ctx' => 1024],
+            ]);
+
+            return response()->json(json_decode($response->json('response'), true));
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'AI Cooking Assistant failed (Help Chat).'], 500);
         }
     }
 }

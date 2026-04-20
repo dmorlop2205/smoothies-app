@@ -88,6 +88,19 @@ export const api = {
     getPostsByTag: (tagSlug: string, page = 1) =>
         request<PaginatedResponse<Post>>(`/tags/${tagSlug}/posts?page=${page}`),
 
+    // AI Cooking Assistant
+    generateCookingSteps: (title: string, ingredients: {name: string}[], prep: string) =>
+        request<{ steps: {instruction: string, tip: string}[] }>('/ai/extract-steps', {
+            method: 'POST',
+            body: JSON.stringify({ title, ingredients, preparation_steps: prep })
+        }),
+
+    getCookingHelp: (title: string, currentStep: string, question: string) =>
+        request<{ answer: string }>('/ai/cooking-help', {
+            method: 'POST',
+            body: JSON.stringify({ title, current_step: currentStep, question })
+        }),
+
     // Users
     getUser: (id: number) =>
         request<{data: User}>(`/users/${id}`).then(res => res.data),

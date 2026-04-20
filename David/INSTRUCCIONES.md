@@ -3,25 +3,41 @@
 ¡Hola! Bienvenido a **BlendUs**, la red social definitiva para amantes de los smoothies. Aquí tienes todo lo necesario para poner el proyecto a funcionar en un segundo.
 
 ## Lanzamiento Rápido (Recomendado)
-Para arrancar tanto el servidor de datos (backend) como la interfaz (frontend) a la vez, solo tienes que ejecutar este comando desde la raíz del proyecto:
 
+Antes de iniciar el servidor, asegúrate de encender el motor de Inteligencia Artificial (Ollama) para que funcione el creador y el sommelier.
+
+**Paso 1 - Motor de IA (Ollama):**
 ```bash
-cd David/Prototipo-version && ./dev.sh
+cd David
+docker compose up -d
+```
+
+**Paso 2 - Servidores Backend y Frontend:**
+Para arrancar tanto el servidor de datos como la interfaz a la vez, ejecuta:
+```bash
+cd David/Prototipo-version
+./dev.sh
 ```
 Esto abrirá todo automáticamente. Cuando quieras parar, simplemente pulsa `Ctrl+C`.
 
 ---
 
 ## Lanzamiento Manual (Por separado)
-Si prefieres un lanzado manual, puedes abrirlos en terminales distintos:
+Si prefieres un lanzado manual, recuerda arrancar siempre primero el Docker y luego abrir el resto en terminales distintos:
 
-**Terminal 1 — El Backend (Laravel):**
+**Terminal 1 — Motor de IA (Docker):**
+```bash
+cd David
+docker compose up -d
+```
+
+**Terminal 2 — El Backend (Laravel):**
 ```bash
 cd David/Prototipo-version/smoothies-api
 php artisan serve 
 ```
 
-**Terminal 2 — El Frontend (Astro/React):**
+**Terminal 3 — El Frontend (Astro/React):**
 ```bash
 cd David/Prototipo-version/blendus-frontend
 npm run dev

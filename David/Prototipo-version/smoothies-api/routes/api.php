@@ -59,3 +59,5 @@ Route::middleware('auth:sanctum')->post('likes', [LikeController::class, 'toggle
 
 Route::middleware('auth:sanctum')->post('ai/generate-smoothie', [AiController::class, 'generateSmoothie']);
 Route::middleware('auth:sanctum')->post('ai/sommelier', [AiController::class, 'sommelier']);
+Route::middleware('auth:sanctum')->post('ai/extract-steps', [AiController::class, 'extractSteps']);
+Route::middleware('auth:sanctum')->post('ai/cooking-help', [AiController::class, 'cookingHelp']);
