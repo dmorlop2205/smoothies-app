@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import './Login.css'
+import LoginForm from '../components/LoginForm'
 
 function Login() {
   return (
@@ -15,6 +16,15 @@ function Login() {
                 <h1>BlendUs</h1>
             </Link>
         </div>
+        <div className="hero-pic">
+          <h1 className="hero-title">Blend people together. Smoothies connect us.</h1>
+          <img src="public/assets/hero-pic.png" alt="" />
+        </div>
+            
+
+      </div>
+      <div className="right">
+          <LoginForm></LoginForm>
       </div>
     </section>
   )
