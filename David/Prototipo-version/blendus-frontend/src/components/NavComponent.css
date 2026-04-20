@@ -89,24 +89,24 @@ nav {
 
         .selected {
             cursor: default;
-            color: var(--emerald-700);
-            background-color: var(--emerald-100);
+            color: var(--amber-700);
+            background-color: var(--amber-100);
             svg {
                 path {
-                    stroke: var(--emerald-700);
+                    stroke: var(--amber-700);
                 }     
             }
         }
         .selected:hover {
-            color: var(--emerald-700);
-            background-color: var(--emerald-100);
+            color: var(--amber-700);
+            background-color: var(--amber-100);
 
             svg {
                 path {
-                    stroke: var(--emerald-700);
+                    stroke: var(--amber-700);
                 }
                 circle {
-                    stroke: var(--emerald-700);
+                    stroke: var(--amber-700);
                 }
             }
         }

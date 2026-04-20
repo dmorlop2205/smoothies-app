@@ -36,25 +36,21 @@
         width: 100%;
     }
     .search-input:focus {
-        outline: 1px solid var(--emerald-500);
-        border: 1px solid var(--emerald-500);
+        outline: 1px solid var(--amber-500);
+        border: 1px solid var(--amber-500);
     }
     .search-input:focus:hover {
-        outline: 1px solid var(--emerald-500);
-        border: 1px solid var(--emerald-500);
+        outline: 1px solid var(--amber-500);
+        border: 1px solid var(--amber-500);
     }
     .search-input:hover {
         border: 1px solid var(--gray-500);
     }
     
     .filter-icon {
-        position: absolute;
-        right: 0;
-        transform: translateY(-50%) rotate(90deg);
-        margin-right: 1rem;
+        transform: rotate(90deg);
         width: 39px;
         height: 39px;
-        z-index: 9;
         cursor: pointer;
         transition: .2s ease;
     }
