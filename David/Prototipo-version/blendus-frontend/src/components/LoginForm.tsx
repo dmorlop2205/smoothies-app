@@ -28,26 +28,29 @@ export default function LoginForm() {
 
     return (
         <form className='register-form' onSubmit={handleSubmit}>
-            <div className="email">
-                <label className="label" htmlFor="email">Email</label>
-                <input className="text-input" type="email" id="email" placeholder='youremail@example.org' required value={form.email} onChange={handleChange} />
+            <div className="form-title-group">
+                <label className="label" htmlFor="email">Sign in to BlendUs</label>
             </div>
-            <div className="password">
-                <label className="label" htmlFor="password">Password</label>
+            
+            <div className="email">
+                <input className="text-input" type="email" id="email" placeholder='Username or email' required value={form.email} onChange={handleChange} />
                 <input className="text-input" type="password" id="password" placeholder='Password' required value={form.password} onChange={handleChange} />
             </div>
             
-            {error && <p style={{ color: 'var(--pink)', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
+            {error && <p className="form-error-inline">{error}</p>}
 
             <button className="btn register-btn" type="submit" disabled={loading}>
-                {loading ? 'Logging in...' : 'Sign In'}
+                {loading ? 'Logging in...' : 'Log In'}
             </button>
+            
+            <a href="#" className="forgot-link">Forgot Your password?</a>
+            
             <button type="button" className="btn secondary-btn" onClick={() => window.location.href = '/register'}> 
-                I don't have an account
+                Create new account
             </button>
-            <a href="/" style={{ textAlign: 'center', color: 'var(--gray-500)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 500 }}>
-                Continue as Guest
-            </a>
+            <div className="guest-divider">
+                <a href="/" className="guest-link">Continue as Guest</a>
+            </div>
         </form>
     );
 }

@@ -7,17 +7,20 @@ const userId = parseInt(id ?? '0');
 ---
 
 <Layout title="Profile" activePage="profile">
-  <div class="page-wrapper">
-    <main class="page-main">
-      {isNaN(userId) ? (
-        <div class="empty-state"><p>Invalid profile.</p></div>
-      ) : (
-        <ProfilePage userId={userId} client:load />
-      )}
-    </main>
-
-    <aside class="page-aside">
-      <!-- Suggested sidebar can go here in the future -->
-    </aside>
+  <div class="profile-page-root">
+    {isNaN(userId) ? (
+      <div class="empty-state"><p>Invalid profile.</p></div>
+    ) : (
+      <ProfilePage userId={userId} client:load />
+    )}
   </div>
 </Layout>
+
+<style>
+  .profile-page-root {
+    padding-top: calc(5rem + 2rem);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+  }
+</style>
