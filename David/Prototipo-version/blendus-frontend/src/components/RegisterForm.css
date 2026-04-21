@@ -91,6 +91,49 @@
         background-color: var(--amber-500);
         box-shadow: 0 2px 10px 0 var(--amber-200);
         color: white;
-    
+    }
+
+    .form-title-group {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-error-inline {
+        color: var(--pink);
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    .forgot-link {
+        text-align: center;
+        color: var(--gray-500);
+        font-size: 1rem;
+        text-decoration: none;
+        font-weight: 500;
+        margin: -1rem 0 0.5rem;
+    }
+
+    .forgot-link:hover {
+        text-decoration: underline;
+    }
+
+    .guest-divider {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-100);
+    }
+
+    .guest-link {
+        color: var(--gray-500);
+        font-size: 1rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: .2s ease;
+    }
+
+    .guest-link:hover {
+        color: var(--amber-600);
     }
 }

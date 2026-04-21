@@ -33,6 +33,7 @@ Route::prefix('users')->group(function () {
 
 Route::prefix('posts')->group(function () {
     Route::get('/', [PostController::class, 'index']);
+    Route::middleware('auth:sanctum')->get('/personalized', [PostController::class, 'personalized']);
     Route::get('{post}', [PostController::class, 'show']);
 
     Route::prefix('{post}/comments')->group(function () {

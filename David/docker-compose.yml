@@ -7,14 +7,53 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
-    # Uncomment the following lines to enable GPU support (NVIDIA)
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: all
-    #           capabilities: [gpu]
+   
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: blendus
+      POSTGRES_USER: blendus
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./Prototipo-version/smoothies-api
+    container_name: blendus-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./Prototipo-version/smoothies-api:/var/www/html
+    environment:
+      - DB_HOST=postgres
+      - DB_CONNECTION=pgsql
+      - DB_DATABASE=blendus
+      - DB_USERNAME=blendus
+      - DB_PASSWORD=password
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Prototipo-version/blendus-frontend
+    container_name: blendus-frontend
+    ports:
+      - "4321:4321"
+    volumes:
+      - ./Prototipo-version/blendus-frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
 
 volumes:
   ollama_data:
+  postgres_data:

@@ -116,7 +116,7 @@ export default function AiCookingAssistant({ post, onClose }: Props) {
                             
                             <div className="chat-history">
                                 {chat.length === 0 && (
-                                    <p className="welcome-msg">¡Hola! Soy Enrique. ¿Necesitas ayuda con este paso?</p>
+                                    <p className="welcome-msg">Hello! I'm Enrique. Need help with this step?</p>
                                 )}
                                 {chat.map((msg, i) => (
                                     <div key={i} className={`chat-bubble ${msg.sender}`}>

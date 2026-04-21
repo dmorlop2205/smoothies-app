@@ -42,6 +42,17 @@ export default function ProfilePage({ userId }: Props) {
         loadPosts();
     }, [userId, activeTab]);
 
+    useEffect(() => {
+        if (modal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [modal]);
+
     const loadUser = async () => {
         setLoading(true);
         try {
@@ -75,6 +86,27 @@ export default function ProfilePage({ userId }: Props) {
             setPosts([]);
         } finally {
             setPostsLoading(false);
+        }
+    };
+
+    const handleFollowFromModal = async (targetUser: User) => {
+        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
+        try {
+            if (targetUser.is_following) {
+                await api.unfollowUser(targetUser.id);
+                setModalUsers(prev => prev.map(u => u.id === targetUser.id ? { ...u, is_following: false } : u));
+                if (isOwn) {
+                    setUser(prev => prev ? { ...prev, following_count: (prev.following_count ?? 1) - 1 } : prev);
+                }
+            } else {
+                await api.followUser(targetUser.id);
+                setModalUsers(prev => prev.map(u => u.id === targetUser.id ? { ...u, is_following: true } : u));
+                if (isOwn) {
+                    setUser(prev => prev ? { ...prev, following_count: (prev.following_count ?? 0) + 1 } : prev);
+                }
+            }
+        } catch (err) {
+            console.error('Modal follow failed', err);
         }
     };
 
@@ -165,70 +197,97 @@ export default function ProfilePage({ userId }: Props) {
 
     return (
         <div className="profile-dashboard">
-            {/* ── HERO ── */}
-            <div className="profile-hero-card">
-                <div className="profile-hero-bg" />
-                <div className="profile-hero-content">
-                    <div className="profile-avatar-wrap">
-                        {user.avatar ? (
-                            <img src={user.avatar} alt={user.name} className="profile-avatar-img" />
-                        ) : (
-                            <div className="profile-avatar-initials">{initials}</div>
-                        )}
-                    </div>
-                    <div className="profile-info">
-                        <h1 className="profile-name">{user.name}</h1>
-                        <p className="profile-username">@{user.username}</p>
-                        {user.bio && <p className="profile-bio">{user.bio}</p>}
-                        <div className="profile-stats">
-                            <button className="profile-stat-btn" onClick={() => openModal('followers')}>
-                                <span className="stat-num">{user.followers_count ?? 0}</span>
-                                <span className="stat-label">Followers</span>
-                            </button>
-                            <button className="profile-stat-btn" onClick={() => openModal('following')}>
-                                <span className="stat-num">{user.following_count ?? 0}</span>
-                                <span className="stat-label">Following</span>
-                            </button>
-                            <div className="profile-stat-btn">
-                                <span className="stat-num">{user.posts_count ?? posts.length}</span>
-                                <span className="stat-label">Recipes</span>
-                            </div>
+            <div className="user-container">
+                <div className="profile-header-side">
+                    <div className="avatar-side">
+                        <div className="user-pic">
+                            {user.avatar ? (
+                                <img src={user.avatar} alt={user.name} />
+                            ) : (
+                                <div className="profile-avatar-initials">{initials}</div>
+                            )}
                         </div>
                     </div>
-                    <div className="profile-actions">
-                        {isOwn ? (
-                            <button className="btn btn-outline" onClick={() => setModal('edit')}>
-                                <svg xmlns="http://www.w3.org/2000/svg" height="18px" viewBox="0 -960 960 960" width="18px" fill="currentColor"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg>
-                                Edit Profile
-                            </button>
-                        ) : (
-                            <button
-                                className={`btn ${isFollowing ? 'btn-outline' : ''}`}
-                                onClick={handleFollow}
-                                disabled={followLoading}
-                            >
-                                {followLoading ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
-                            </button>
-                        )}
+                    
+                    <div className="info-side">
+                        <div className="info-top">
+                            <h3 className="username">@{user.username}</h3>
+                            <div className="action-buttons">
+                                {isOwn ? (
+                                    <button className="btn-action-outline" onClick={() => setModal('edit')}>Edit Profile</button>
+                                ) : (
+                                    <button
+                                        className={`btn-action-primary ${isFollowing ? 'following' : ''}`}
+                                        onClick={handleFollow}
+                                        disabled={followLoading}
+                                    >
+                                        {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+                                    </button>
+                                )}
+                                <button className="btn-action-outline" onClick={() => {
+                                    navigator.clipboard.writeText(window.location.href);
+                                    alert('Profile link copied!');
+                                }}>Share Profile</button>
+                            </div>
+                        </div>
+
+                        <div className="stats-row">
+                            <div className="stat-item">
+                                <span className="stat-value">{user.posts_count ?? posts.length}</span>
+                                <span className="stat-text">posts</span>
+                            </div>
+                            <div className="stat-item" onClick={() => openModal('followers')} style={{ cursor: 'pointer' }}>
+                                <span className="stat-value">{user.followers_count ?? 0}</span>
+                                <span className="stat-text">followers</span>
+                            </div>
+                            <div className="stat-item" onClick={() => openModal('following')} style={{ cursor: 'pointer' }}>
+                                <span className="stat-value">{user.following_count ?? 0}</span>
+                                <span className="stat-text">following</span>
+                            </div>
+                        </div>
+
+                        <div className="info-bio">
+                            <p className="full-name">{user.name}</p>
+                            {user.bio && <p className="bio-text">{user.bio}</p>}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* ── TABS ── */}
-            <div className="profile-tabs">
-                <button className={`profile-tab ${activeTab === 'recipes' ? 'active' : ''}`} onClick={() => setActiveTab('recipes')}>
-                    <span className="tab-icon">🍹</span>
-                    Recipes
+            <div className="tabs">
+                <button
+                    type="button"
+                    className={`tab ${activeTab === 'recipes' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('recipes')}
+                >
+                    <svg height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                        <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h133v-133H200v133Zm213 0h134v-133H413v133Zm214 0h133v-133H627v133ZM200-413h133v-134H200v134Zm213 0h134v-134H413v134Zm214 0h133v-134H627v134ZM200-627h133v-133H200v133Zm213 0h134v-133H413v133Zm214 0h133v-133H627v133Z" />
+                    </svg>
+                    <span className="tab-name">Posts</span>
                 </button>
+
                 {isOwn && (
-                    <button className={`profile-tab ${activeTab === 'saved' ? 'active' : ''}`} onClick={() => setActiveTab('saved')}>
-                        <span className="tab-icon">🔖</span>
-                        Saved
+                    <button
+                        type="button"
+                        className={`tab ${activeTab === 'saved' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('saved')}
+                    >
+                        <svg height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                            <path d="M200-120v-640q0-33 23.5-56.5T280-840h400q33 0 56.5 23.5T760-760v640L480-240 200-120Zm80-122 200-86 200 86v-518H280v518Zm0-518h400-400Z" />
+                        </svg>
+                        <span className="tab-name">Saved</span>
                     </button>
                 )}
-                <button className={`profile-tab ${activeTab === 'liked' ? 'active' : ''}`} onClick={() => setActiveTab('liked')}>
-                    <span className="tab-icon">❤️</span>
-                    Liked
+
+                <button
+                    type="button"
+                    className={`tab ${activeTab === 'liked' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('liked')}
+                >
+                    <svg viewBox="0 0 24 24" width="24px" height="24px" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fillRule="evenodd" clipRule="evenodd" d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                    <span className="tab-name">Liked</span>
                 </button>
             </div>
 
@@ -248,19 +307,19 @@ export default function ProfilePage({ userId }: Props) {
                         {isOwn && activeTab === 'recipes' && <a href="/create" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Share your first recipe!</a>}
                     </div>
                 ) : (
-                    <div className="posts-grid">
+                    <div className="user-grid">
                         {posts.map(post => (
-                            <a href={`/post/${post.id}`} key={post.id} className="post-grid-card">
+                            <a href={`/post/${post.id}`} key={post.id} className="grid">
                                 {post.image_url ? (
-                                    <img src={post.image_url} alt={post.title} className="post-grid-img" />
+                                    <img src={post.image_url} alt={post.title} />
                                 ) : (
                                     <div className="post-grid-placeholder">🍹</div>
                                 )}
-                                <div className="post-grid-info">
-                                    <p className="post-grid-title">{post.title}</p>
-                                    <div className="post-grid-meta">
-                                        <span>❤️ {post.likes_count}</span>
-                                        <span>💬 {post.comments_count}</span>
+                                <div className="overlay">
+                                    <h4 className="title">{post.title}</h4>
+                                    <div className="likes-comments">
+                                        <span className="likes">{post.likes_count} ❤️</span>
+                                        <div className="comments">{post.comments_count} 💬</div>
                                     </div>
                                 </div>
                             </a>
@@ -285,14 +344,36 @@ export default function ProfilePage({ userId }: Props) {
                             ) : (
                                 modalUsers.map(u => {
                                     const ini = u.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                                    const isMe = u.id === authUser?.id;
                                     return (
-                                        <a href={`/profile/${u.id}`} key={u.id} className="modal-user-row" onClick={() => setModal(null)}>
-                                            <div className="modal-avatar">{u.avatar ? <img src={u.avatar} alt={u.name} /> : ini}</div>
-                                            <div>
-                                                <p className="modal-user-name">{u.name}</p>
-                                                <p className="modal-user-username">@{u.username}</p>
-                                            </div>
-                                        </a>
+                                        <div key={u.id} className="modal-user-row">
+                                            <a href={`/profile/${u.id}`} className="modal-user-link" onClick={() => setModal(null)}>
+                                                <div className="modal-avatar">{u.avatar ? <img src={u.avatar} alt={u.name} /> : ini}</div>
+                                                <div>
+                                                    <p className="modal-user-name">{u.name}</p>
+                                                    <p className="modal-user-username">@{u.username}</p>
+                                                </div>
+                                            </a>
+
+                                            {modal === 'following' && !isMe && (
+                                                <button
+                                                    className="modal-btn-action"
+                                                    onClick={() => handleFollowFromModal(u)}
+                                                >
+                                                    {u.is_following ? 'Unfollow' : 'Follow'}
+                                                </button>
+                                            )}
+
+                                            {modal === 'followers' && (
+                                                <a
+                                                    href={`/profile/${u.id}`}
+                                                    className="modal-btn-action"
+                                                    onClick={() => setModal(null)}
+                                                >
+                                                    View
+                                                </a>
+                                            )}
+                                        </div>
                                     );
                                 })
                             )}

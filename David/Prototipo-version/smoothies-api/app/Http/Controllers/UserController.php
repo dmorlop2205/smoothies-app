@@ -80,6 +80,7 @@ class UserController extends Controller
         $userId = $request->user()?->id;
 
         $users = User::query()
+            ->withCount(['posts'])
             ->when($userId, fn($q) => $q->where('id', '!=', $userId))
             ->inRandomOrder()
             ->limit(3)

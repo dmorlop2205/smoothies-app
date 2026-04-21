@@ -39,7 +39,7 @@ export default function SuggestedUsers() {
                         </div>
                         <div>
                             <div className="suggested-name">{user.name}</div>
-                            <div className="suggested-desc">{user.bio || `${user.posts_count ?? 0} smoothie recipes`}</div>
+                            <div className="suggested-desc">{descriptions[user.id] ?? `${user.posts_count ?? 0} posts`}</div>
                         </div>
                     </div>
                     <a href={`/profile/${user.id}`} className="btn" style={{ fontSize: '.8rem', padding: '.35rem .9rem' }}>

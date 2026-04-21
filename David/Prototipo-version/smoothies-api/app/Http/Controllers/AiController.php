@@ -86,7 +86,7 @@ EOT;
         }
 
         // ── Call Ollama ──
-        $ollamaHost = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+        $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
@@ -190,7 +190,7 @@ Return ONLY valid JSON with this exact structure:
 EOT;
 
         $userPrompt = "My mood is: {$mood}\n\nInventory:\n" . json_encode($inventory->toArray(), JSON_PRETTY_PRINT);
-        $ollamaHost = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+        $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
@@ -286,7 +286,7 @@ Return ONLY valid JSON with this exact structure:
 EOT;
 
         $userPrompt = "Ingredients: {$ingredients}\nRaw Instructions: {$prep}";
-        $ollamaHost = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+        $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
@@ -352,7 +352,7 @@ Return ONLY valid JSON with this exact structure:
 }
 EOT;
 
-        $ollamaHost = env('OLLAMA_HOST', 'http://127.0.0.1:11434');
+        $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
 
         try {
             $response = Http::connectTimeout(5)->timeout(30)->post("{$ollamaHost}/api/generate", [

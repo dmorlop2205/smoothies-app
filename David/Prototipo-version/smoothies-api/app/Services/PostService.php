@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 
 class PostService
 {
+    public function __construct(
+        protected EmbeddingService $embeddingService
+    ) {}
+
     public function store(User $user, array $data): Post
     {
         return DB::transaction(function () use ($user, $data) {
@@ -39,6 +43,9 @@ class PostService
 
                 $post->tags()->sync($tagIds);
             }
+
+            // Generate initial embedding
+            $this->embeddingService->updatePostEmbedding($post);
 
             return $post->load(['user', 'ingredients', 'tags'])
                 ->loadCount(['likes', 'comments']);
@@ -82,6 +89,9 @@ class PostService
                 $post->tags()->sync($tagIds);
             }
 
+            // Update embedding
+            $this->embeddingService->updatePostEmbedding($post);
+
             return $post->load(['user', 'ingredients', 'tags'])
                 ->loadCount(['likes', 'comments']);
         });
@@ -119,6 +129,32 @@ class PostService
         if ($userId = auth()->id()) {
             $query->with(['likes' => fn ($q) => $q->where('user_id', $userId)]);
         }
+
+        return $query->paginate($perPage);
+    }
+
+    public function getPersonalizedFeed(User $user, int $perPage = 15): LengthAwarePaginator
+    {
+        // 1. Ensure user has a preference vector
+        if (! $user->preference_embedding) {
+            $this->embeddingService->updateUserPreference($user);
+        }
+
+        $query = Post::query()
+            ->with(['user', 'ingredients', 'tags'])
+            ->withCount(['likes', 'comments']);
+
+        if ($user->preference_embedding) {
+            // Rank by similarity using pgvector distance operator <=> (cosine distance)
+            $query->select('*')
+                ->selectRaw('embedding <=> ? AS distance', [$user->preference_embedding])
+                ->orderBy('distance', 'asc');
+        } else {
+            // Fallback to latest if no preferences yet
+            $query->latest('created_at');
+        }
+
+        $query->with(['likes' => fn ($q) => $q->where('user_id', $user->id)]);
 
         return $query->paginate($perPage);
     }
