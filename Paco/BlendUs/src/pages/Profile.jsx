@@ -5,6 +5,7 @@ import './Profile.css';
 function Profile() {
     const [activeTab, setActiveTab] = useState(0);
     return (
+        // PRUEBA PARA VER SI FUNCIONA BIEN EL GIT
         <section className="profile">
             <NavComponent></NavComponent>
             <div className="user-container">
