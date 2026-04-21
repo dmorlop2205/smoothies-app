@@ -7,8 +7,9 @@ nav {
     display:flex;
     justify-content: space-between;
     align-items: center;
-    padding: .8rem 13rem;
+    padding: .8rem clamp(2rem, -6.925rem + 16.604vw, 13rem);
     background-color: rgba(255, 255, 255, 0.8);
+    flex-wrap: wrap;
     .logo {
         a {
             text-decoration: none;
@@ -49,11 +50,11 @@ nav {
     .menu {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: clamp(1rem, -0.087rem + 1.739vw, 2rem);
         a {
             padding: .5rem 1rem;
             border-radius: 15px;
-            font-size: 1.5rem;
+            font-size: clamp(1rem, 0.86rem + 0.533vw, 1.5rem);
             color: var(--gray-500);
             text-decoration: none;
             display: flex;
@@ -112,6 +113,68 @@ nav {
                     stroke: var(--amber-700);
                 }
             }
+        }
+    }
+}
+
+.collapsed-menu {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    span {
+        width: 35px;
+        height: 3px;
+        background-color: var(--gray-500);
+        border-radius: 2px;
+        transition: .3s ease;
+    }
+}
+
+@media (max-width: 960px) {
+    nav {
+        .menu {
+            display: flex;
+            padding: 0;
+            visibility: hidden;
+            opacity: 0;
+            max-height: 0;
+            
+            width: 100%;
+            flex-direction: column;
+            order: 3;
+            transform: translateY(-10px);
+            transition: opacity .3s ease, visibility .3s ease, transform .3s ease, max-height .3s ease, padding .3s ease;            
+            
+            a {
+                width: 100%;
+                border-radius: 10px;
+            }
+        }
+        .menu.menu-open {
+            visibility: visible;
+            opacity: 1;
+            display: flex;
+            transform: translateY(0);
+            max-height: 400px;
+            padding: .5rem 0 1rem;
+            backdrop-filter: blur(10px);
+        }
+        .collapsed-menu {
+            display: flex;
+     
+        }
+        .collapsed-menu.open span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .collapsed-menu.open span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .collapsed-menu.open span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
         }
     }
 }

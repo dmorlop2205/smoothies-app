@@ -64,8 +64,8 @@
                 gap: 1rem;
             
                 img {
-                    width: 36px;
-                    height: 36px;
+                    width: 2.25rem;
+                    height: 2.25rem;
                     object-fit: cover;
                     border-radius: 15px;
                 }
@@ -74,14 +74,14 @@
                     flex-direction: column;
                     gap: .3rem;
                     .hashtag-name {
-                        font-size: 1rem;
+                        font-size: clamp(0.9rem, 0.631rem + 0.308vw, 1rem);
                         color: var(--gray-800);
                         font-weight: 600;
                         transition: .2s ease;
                     }
                     .hashtag-posts {
                         font-weight: 400;
-                        font-size: 0.875rem;
+                        font-size: clamp(0.75rem, 0.413rem + 0.385vw, 0.875rem);
                         color: var(--gray-400);
                         font-weight: 400;
                     }
@@ -90,7 +90,6 @@
             .statistic {
                 width: 30px;
                 height: 30px;
-                transition: .2s ease;
                 opacity: 0;
                 transition: .3s ease;
             }
@@ -107,6 +106,16 @@
             .statistic {
                 fill: var(--amber-700);
                 opacity: 1;
+            }
+        }
+    }
+}
+
+@media (max-width: 1500px) {
+    .trending-hashtags {
+        .trending-body {
+            .statistic {
+                display: none;
             }
         }
     }

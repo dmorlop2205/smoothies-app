@@ -1,54 +1,79 @@
 import './StoriesComponent.css';
+import { useRef } from "react";
 function StoriesComponent() {
-  return (
-    <section className="stories">
-        <div className="you">
-            <div className="circle">
-                <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <line fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="19" y2="5"/>
-                    <line fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="5" x2="19" y1="12" y2="12"/>
-                </svg>
+    const sliderRef = useRef(null);
+    const isDragging = useRef(false);
+    const startX = useRef(0);
+    const scrollLeft = useRef(0);
+
+    const onMouseDown = (e) => {
+        isDragging.current = true;
+        sliderRef.current.classList.add('dragging');
+        startX.current = e.pageX - sliderRef.current.offsetLeft;
+        scrollLeft.current = sliderRef.current.scrollLeft;
+    };
+
+    const onMouseMove = (e) => {
+        if (!isDragging.current) return;
+        e.preventDefault();
+        const x = e.pageX - sliderRef.current.offsetLeft;
+        const walk = (x - startX.current) * 1.5;   // 1.5 = velocidad
+        sliderRef.current.scrollLeft = scrollLeft.current - walk;
+    };
+
+    const stopDragging = () => {
+        isDragging.current = false;
+        sliderRef.current.classList.remove('dragging');
+    };
+    return (
+        <section className="stories" ref={sliderRef} onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseLeave={stopDragging} onMouseUp={stopDragging}>
+            <div className="you">
+                <div className="circle">
+                    <svg width="800px" height="800px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <line fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="12" x2="12" y1="19" y2="5"/>
+                        <line fill="none" stroke="#000000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" x1="5" x2="19" y1="12" y2="12"/>
+                    </svg>
+                </div>
+                <p>You</p>
             </div>
-            <p>You</p>
-        </div>
-        <div className="storie">
-            <div className="circle">
-                <img src="assets/user1.jpg" alt="" />
+            <div className="storie">
+                <div className="circle">
+                    <img src="assets/user1.jpg" alt="" />
+                </div>
+                <p>John</p>
             </div>
-            <p>John</p>
-        </div>
-        <div className="storie">
-            <div className="circle">
-                <img src="assets/user2.jpg" alt="" />
+            <div className="storie">
+                <div className="circle">
+                    <img src="assets/user2.jpg" alt="" />
+                </div>
+                <p>Marie</p>
             </div>
-            <p>Marie</p>
-        </div>
-        <div className="storie">
-            <div className="circle">
-                <img src="assets/user3.jpg" alt="" />
+            <div className="storie">
+                <div className="circle">
+                    <img src="assets/user3.jpg" alt="" />
+                </div>
+                <p>Julia</p>
             </div>
-            <p>Julia</p>
-        </div>
-        <div className="storie">
-            <div className="circle">
-                <img src="assets/Alexelcapo.webp" alt="" />
+            <div className="storie">
+                <div className="circle">
+                    <img src="assets/Alexelcapo.webp" alt="" />
+                </div>
+                <p>Alex</p>
             </div>
-            <p>Alex</p>
-        </div>
-        <div className="storie">
-            <div className="circle">
-                <img src="assets/user 4.jpg" alt="" />
+            <div className="storie">
+                <div className="circle">
+                    <img src="assets/user 4.jpg" alt="" />
+                </div>
+                <p>Robert</p>
             </div>
-            <p>Robert</p>
-        </div>
-        <div className="storie">
-            <div className="circle">
-                <img src="assets/user 5.jpg" alt="" />
+            <div className="storie">
+                <div className="circle">
+                    <img src="assets/user 5.jpg" alt="" />
+                </div>
+                <p>James</p>
             </div>
-            <p>James</p>
-        </div>
-    </section>
-  )
+        </section>
+    )
 }
 
 export default StoriesComponent

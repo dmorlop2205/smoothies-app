@@ -12,8 +12,9 @@
     top: 0;
     grid-row: 1/4;
     padding: 0rem;
-
+    
     .right-content {
+        width: clamp(20rem, -1.538rem + 24.615vw, 28rem);
         display: flex;
         flex-direction: column;
         justify-content: start;
@@ -31,5 +32,16 @@
         justify-content: start;
         gap: 2rem;
 
+    }
+}
+
+@media (max-width: 1400px) {
+    .wrapper {
+        .right-wrapper {
+            display: none;
+        }
+        .left-wrapper {
+            grid-column: span 12;
+        }
     }
 }

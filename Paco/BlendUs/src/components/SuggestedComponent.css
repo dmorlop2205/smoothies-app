@@ -4,7 +4,7 @@
     box-shadow: -2px 2px 3px #dadada44;
     background-color: var(--white);
     border-radius: 40px;
-    padding: 1.5rem 3rem;
+    padding: 1.5rem clamp(1.5rem, -2.538rem + 4.615vw, 3rem);
 
     h2 { 
         margin-bottom: 1rem;
@@ -33,16 +33,20 @@
                     justify-content: center;
                     align-items: center;
                     background: var(--gradient-profile);
-                    height: 55px;
-                    width: 55px;
+                    height: clamp(2.875rem, 1.192rem + 1.923vw, 3.5rem);
+                    width: clamp(2.875rem, 1.192rem + 1.923vw, 3.5rem);
                     border-radius: 50%;
-    
+                    flex-shrink: 0;
+                    
                     img {
                         border-radius: 50%;
-                        width: 51px;
-                        height: 51px;
+                        width: clamp(2.5rem, 0.817rem + 1.923vw, 3.125rem);
+                        height: clamp(2.5rem, 0.817rem + 1.923vw, 3.125rem);
+
                         border: 2px solid var(--white);
                         object-fit: cover;
+                        object-position: center;
+                        flex-shrink: 0;
                         inset: 0;
                     }
                 }
@@ -52,12 +56,12 @@
                     flex-direction: column;
                     gap: .3rem;
                     .suggested-name {
-                        font-size: 1.125rem;
+                        font-size: clamp(0.8rem, -0.075rem + 1vw, 1.125rem);
                         color: var(--gray-800);
                         font-weight: 600;
                     }
                     .suggested-description {
-                        font-size: 0.875rem;
+                        font-size: clamp(0.7rem, 0.229rem + 0.538vw, 0.875rem);
                         color: var(--gray-400);
                         font-weight: 300;
                     }
