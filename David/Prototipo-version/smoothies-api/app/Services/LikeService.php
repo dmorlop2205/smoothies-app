@@ -11,6 +11,10 @@ use InvalidArgumentException;
 
 class LikeService
 {
+    public function __construct(
+        protected EmbeddingService $embeddingService
+    ) {}
+
     /**
      * @return array{liked: bool, count: int}
      */
@@ -50,6 +54,11 @@ class LikeService
             ]);
 
             $liked = true;
+
+            // Update user preference vector if the liked thing is a Post
+            if ($likeableType === Post::class) {
+                $this->embeddingService->updateUserPreference($user);
+            }
         }
 
         $count = Like::query()

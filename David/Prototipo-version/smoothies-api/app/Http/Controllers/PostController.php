@@ -7,6 +7,7 @@ use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\PostCollection;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
+use App\Services\EmbeddingService;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ use Illuminate\Http\Request;
 class PostController extends Controller
 {
     public function __construct(
-        protected PostService $postService
+        protected PostService $postService,
+        protected EmbeddingService $embeddingService
     ) {
     }
 
@@ -34,6 +36,15 @@ class PostController extends Controller
         } else {
             $posts = $this->postService->getFeed($perPage);
         }
+
+        return (new PostCollection($posts))->response();
+    }
+
+    public function personalized(Request $request): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 15);
+
+        $posts = $this->postService->getPersonalizedFeed($request->user(), $perPage);
 
         return (new PostCollection($posts))->response();
     }
@@ -104,6 +115,9 @@ class PostController extends Controller
         } else {
             $user->savedPosts()->attach($post->id);
             $saved = true;
+
+            // Update user preference vector
+            $this->embeddingService->updateUserPreference($user);
         }
 
         return response()->json(['saved' => $saved]);
