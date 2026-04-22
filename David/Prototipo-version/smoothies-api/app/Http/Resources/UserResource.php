@@ -21,21 +21,9 @@ class UserResource extends JsonResource
             'email'           => $this->when(auth()->check() && auth()->id() === $this->id, $this->email),
             'bio'             => $this->bio,
             'avatar'          => $this->avatar,
-            'posts_count'     => $this->when(
-                $this->offsetExists('posts_count'),
-                $this->posts_count,
-                fn () => $this->whenLoaded('posts', fn () => $this->posts->count())
-            ),
-            'followers_count' => $this->when(
-                $this->offsetExists('followers_count'),
-                $this->followers_count,
-                fn () => $this->whenLoaded('followers', fn () => $this->followers->count())
-            ),
-            'following_count' => $this->when(
-                $this->offsetExists('following_count'),
-                $this->following_count,
-                fn () => $this->whenLoaded('following', fn () => $this->following->count())
-            ),
+            'posts_count'     => $this->posts_count ?? $this->whenLoaded('posts', fn () => $this->posts->count()),
+            'followers_count' => $this->followers_count ?? $this->whenLoaded('followers', fn () => $this->followers->count()),
+            'following_count' => $this->following_count ?? $this->whenLoaded('following', fn () => $this->following->count()),
             'is_following'    => $this->when(
                 auth()->check(),
                 fn () => auth()->user()->following()->where('following_id', $this->id)->exists()

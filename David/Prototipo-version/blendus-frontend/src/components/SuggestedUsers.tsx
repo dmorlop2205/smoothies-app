@@ -33,9 +33,13 @@ export default function SuggestedUsers() {
                 <div className="suggested-user-row" key={user.id}>
                     <div className="suggested-user-info">
                         <div className="suggested-avatar" style={{ background: avatarColors[i % avatarColors.length] }}>
-                            <span style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>
-                                {user.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                            </span>
+                            {user.avatar ? (
+                                <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                            ) : (
+                                <span style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>
+                                    {user.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                </span>
+                            )}
                         </div>
                         <div>
                             <div className="suggested-name">{user.name}</div>

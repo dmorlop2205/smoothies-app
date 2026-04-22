@@ -143,9 +143,18 @@ export default function PostDetails({ postId }: Props) {
             
             <section className="post-info">
                 <div className="post-user">
-                    <a className="circle" href={`/profile/${post.author.id}`}>
-                        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${post.author.username}`} alt={post.author.username} />
-                    </a>
+                    {(() => {
+                        const authorInitials = post.author.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+                        return (
+                            <a className="circle" href={`/profile/${post.author.id}`} style={{ overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                {post.author.avatar ? (
+                                    <img src={post.author.avatar} alt={post.author.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <span style={{ position: 'relative', zIndex: 1, color: 'white', fontWeight: 700, fontSize: '0.9rem' }}>{authorInitials}</span>
+                                )}
+                            </a>
+                        );
+                    })()}
                     <div className="user-info">
                         <p className="name">{post.author.name}</p>
                         <p className="launch-date">{new Date(post.created_at).toLocaleDateString()}</p>
@@ -337,8 +346,14 @@ export default function PostDetails({ postId }: Props) {
                 <div className="comments-section">
                     {(post.comments || []).map(comment => (
                         <div className="public-comment" key={comment.id}>
-                            <a className="circle" href={`/profile/${comment.author.id}`}>
-                                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${comment.author.username}`} alt={comment.author.username} />
+                            <a className="circle" href={`/profile/${comment.author.id}`} style={{ overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                {comment.author.avatar ? (
+                                    <img src={comment.author.avatar} alt={comment.author.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                ) : (
+                                    <span style={{ position: 'relative', zIndex: 1, color: 'white', fontWeight: 700, fontSize: '0.75rem' }}>
+                                        {comment.author.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+                                    </span>
+                                )}
                             </a>
                             <div className="user-info">
                                 <div className="info-head">

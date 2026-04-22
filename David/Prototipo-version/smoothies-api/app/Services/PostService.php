@@ -104,13 +104,16 @@ class PostService
 
     public function getFeed(int $perPage = 15): LengthAwarePaginator
     {
+        $userId = auth('sanctum')->id();
+        
         $query = Post::query()
             ->with(['user', 'ingredients', 'tags'])
             ->withCount(['likes', 'comments'])
+            ->when($userId, fn($q) => $q->where('user_id', '!=', $userId))
             ->latest('created_at');
 
-        if ($userId = auth()->id()) {
-            $query->with(['likes' => fn ($q) => $q->where('user_id', $userId)]);
+        if ($userId) {
+            $query->with(['likes' => fn($q) => $q->where('user_id', $userId)]);
         }
 
         return $query->paginate($perPage);
@@ -118,15 +121,18 @@ class PostService
 
     public function getByTag(string $tagName, int $perPage = 15): LengthAwarePaginator
     {
+        $userId = auth('sanctum')->id();
+
         $query = Post::query()
             ->whereHas('tags', function ($query) use ($tagName) {
                 $query->whereRaw('LOWER(name) = ?', [strtolower($tagName)]);
             })
             ->with(['user', 'ingredients', 'tags'])
             ->withCount(['likes', 'comments'])
+            ->when($userId, fn($q) => $q->where('user_id', '!=', $userId))
             ->latest('created_at');
 
-        if ($userId = auth()->id()) {
+        if ($userId) {
             $query->with(['likes' => fn ($q) => $q->where('user_id', $userId)]);
         }
 
@@ -142,7 +148,8 @@ class PostService
 
         $query = Post::query()
             ->with(['user', 'ingredients', 'tags'])
-            ->withCount(['likes', 'comments']);
+            ->withCount(['likes', 'comments'])
+            ->where('user_id', '!=', $user->id);
 
         if ($user->preference_embedding) {
             // Rank by similarity using pgvector distance operator <=> (cosine distance)
