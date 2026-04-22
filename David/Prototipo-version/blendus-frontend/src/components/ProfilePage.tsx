@@ -305,9 +305,19 @@ export default function ProfilePage({ userId }: Props) {
                         </svg>
                     </div>
                 ) : posts.length === 0 ? (
-                    <div className="empty-state">
-                        <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
-                        {isOwn && activeTab === 'recipes' && <a href="/create" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Share your first recipe!</a>}
+                    <div className="user-grid ghost">
+                        {[...Array(9)].map((_, i) => (
+                            <div key={i} className="grid skeleton">
+                                {i === 4 && (
+                                    <div className="empty-message">
+                                        <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
+                                        {isOwn && activeTab === 'recipes' && (
+                                            <a href="/create" className="btn-ghost">Share First Recipe</a>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <div className="user-grid">
