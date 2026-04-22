@@ -128,7 +128,7 @@ export const api = {
         if (data.name) formData.append('name', data.name);
         if (data.username) formData.append('username', data.username);
         if (data.bio) formData.append('bio', data.bio);
-        if (data.avatar) formData.append('avatar', data.avatar);
+        if (data.avatar !== undefined) formData.append('avatar', data.avatar);
         if (data.avatar_file) formData.append('avatar_file', data.avatar_file);
         
         // Use POST with _method=PUT for file upload compatibility in PHP/Laravel

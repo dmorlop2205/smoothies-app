@@ -28,7 +28,7 @@ const { title = 'BlendUs', activePage } = Astro.props;
           <h1>BlendUs</h1>
         </a>
       </div>
-      <div class="nav-menu">
+      <div class="nav-menu" id="nav-menu">
         <a href="/" class={activePage === 'home' ? 'active' : ''}>
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 21H4C3.44772 21 3 20.5523 3 20V12.4142C3 12.149 3.10536 11.8946 3.29289 11.7071L11.2929 3.70711C11.6834 3.31658 12.3166 3.31658 12.7071 3.70711L20.7071 11.7071C20.8946 11.8946 21 12.149 21 12.4142V20C21 20.5523 20.5523 21 20 21H15M9 21H15M9 21V15C9 14.4477 9.44772 14 10 14H14C14.5523 14 15 14.4477 15 15V21" stroke="#6b7280" stroke-width="2" stroke-linejoin="round"/>
@@ -56,6 +56,11 @@ const { title = 'BlendUs', activePage } = Astro.props;
         </a>
         <div id="nav-auth-slot" style="display: flex; align-items: center; gap: 1rem;"></div>
       </div>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </nav>
 
     <slot />
@@ -70,17 +75,17 @@ const { title = 'BlendUs', activePage } = Astro.props;
         const render = () => {
           const loggedIn = $isLoggedIn.get();
           const user = $user.get();
+          const fruitAvatars = ['strawberry.png', 'mango.png', 'blueberry.png', 'kiwi.png'];
           if (loggedIn && user) {
+            const defaultAvatar = `/assets/avatars/${fruitAvatars[user.id % fruitAvatars.length]}`;
+            // If avatar is explicitly empty string, it was "removed", show silhouette
+            const displayAvatar = user.avatar === '' ? '/assets/avatars/no-user-pfp.svg' : (user.avatar || defaultAvatar);
             slot.innerHTML = `
-              <a href="/profile/${user.id}" style="gap:.4rem">
-                ${user.avatar ? 
-                  `<img src="${user.avatar}" alt="${user.name}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid #ddd" />` :
-                  `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:22px;height:22px">
-                    <path d="M20 21V19a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle cx="12" cy="7" r="4" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                  </svg>`
-                }
-                ${user.name.split(' ')[0]}
+              <a href="/profile/${user.id}" style="display:flex; align-items:center; gap:.6rem; text-decoration:none; color:inherit;">
+                <div class="pfp-circle" style="width:32px;height:32px;">
+                  <img src="${displayAvatar}" alt="${user.name}" style="width:100%; height:100%; object-fit:cover; border-radius:50%; ${user.avatar === '' ? 'padding: 4px;' : ''}" />
+                </div>
+                <span style="font-weight:600;">${user.name.split(' ')[0]}</span>
               </a>
               <button id="logout-btn" class="btn btn-ghost" style="font-size:.85rem;padding:.4rem .9rem">Logout</button>
             `;
@@ -107,6 +112,16 @@ const { title = 'BlendUs', activePage } = Astro.props;
               e.preventDefault();
               window.location.href = '/login';
             }
+          });
+        }
+
+        // Mobile Menu Toggle
+        const hamburger = document.getElementById('nav-hamburger');
+        const menu = document.getElementById('nav-menu');
+        if (hamburger && menu) {
+          hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            menu.classList.toggle('menu-open');
           });
         }
       }

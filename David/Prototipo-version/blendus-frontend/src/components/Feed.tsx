@@ -4,7 +4,6 @@ import type { Post, Tag } from '../lib/api';
 import PostCard from './PostCard';
 import './Feed.css';
 import './FiltersComponent.css';
-import './StoriesComponent.css';
 
 const FILTER_ICONS: Record<string, string> = {
     green: '/greensmoothies.png',
@@ -56,6 +55,7 @@ export default function Feed() {
 
     return (
         <section className="left-content">
+
             {/* Hero / Welcome Banner */}
             <div className="hero-banner" style={{
                 background: 'linear-gradient(135deg, var(--amber-500) 0%, var(--amber-700, #b45309) 100%)',
@@ -68,7 +68,7 @@ export default function Feed() {
                 alignItems: 'center',
                 textAlign: 'center',
                 boxShadow: '0 4px 20px rgba(180, 83, 9, 0.25)',
-                marginBottom: '2rem'
+                margin: '0 0 2rem 0'
             }}>
                 <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>Welcome to BlendUs! 🧋</h2>
                 <p style={{ fontSize: '1.1rem', opacity: 0.9, margin: 0 }}>Discover, mix, and share the world's best smoothie recipes.</p>

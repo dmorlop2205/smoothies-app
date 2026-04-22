@@ -20,8 +20,8 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 75px;
-                height: 75px;
+                width: clamp(4.063rem, 3.898rem + 0.658vw, 4.688rem);
+                height: clamp(4.063rem, 3.898rem + 0.658vw, 4.688rem);
                 border-radius: 50%;
                 img, span {
                     position: relative;
@@ -29,8 +29,8 @@
                 }
                 img {
                     position: relative;
-                    width: 69px;
-                    height: 69px;
+                    width: clamp(3.688rem, 3.523rem + 0.658vw, 4.313rem);
+                    height: clamp(3.688rem, 3.523rem + 0.658vw, 4.313rem);
                     border: 2px solid var(--white);
                     object-fit: cover;
                     border-radius: 50%;
@@ -74,12 +74,12 @@
                 flex-direction: column;
                 gap: .3rem;
                 .name {
-                    font-size: 1.25rem;
+                    font-size: clamp(1rem, 0.934rem + 0.263vw, 1.25rem);
                     color: var(--gray-800);
                     font-weight: 600;
                 }
                 .launch-date {
-                    font-size: 1rem;
+                    font-size: clamp(0.8rem, 0.747rem + 0.211vw, 1rem);
                     color: var(--gray-400);
                     font-weight: 400;
                 }
@@ -177,8 +177,8 @@
             gap: 1.5rem;
             cursor: pointer;
             svg {
-                width: 40px;
-                height: 40px;
+                width: clamp(1.875rem, 1.711rem + 0.658vw, 2.5rem);
+                height: clamp(1.875rem, 1.711rem + 0.658vw, 2.5rem);
                 path {
                     transition: .2s ease;
                 }
@@ -207,22 +207,27 @@
         .save {
             cursor: pointer;
             svg {
-                width: 60px;
-                height: 60px;
-                
+                width: clamp(3.125rem, 2.961rem + 0.658vw, 3.75rem);
+                height: clamp(3.125rem, 2.961rem + 0.658vw, 3.75rem);
                 path {
                     transition: .2s ease;
                 }
             }
         }
 
-
+        .save:hover {
+            svg {
+                path {
+                    fill: var(--gray-900);
+                }
+            }
+        }
     }
 
     .description {
         padding: 0 2rem 1rem 2rem;
         p {
-            font-size: 1.125rem;
+            font-size: clamp(0.9rem, 0.841rem + 0.237vw, 1.125rem);
             color: var(--gray-700);
             .name {
                 font-weight: 600;
@@ -248,6 +253,7 @@
 
     .hashtags {
         display: flex;
+        flex-wrap: wrap;
         gap: 1rem;
         padding: 0 2rem 2rem 2rem;
         .hashtag {

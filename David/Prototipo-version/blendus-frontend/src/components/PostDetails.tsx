@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 import type { Post } from '../lib/api';
+import { getDefaultAvatar, getInitials } from '../lib/utils';
 import './PostDetails.css';
 import './UserInfo.css';
 import './IngredientsComponent.css';
@@ -143,18 +144,13 @@ export default function PostDetails({ postId }: Props) {
             
             <section className="post-info">
                 <div className="post-user">
-                    {(() => {
-                        const authorInitials = post.author.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
-                        return (
-                            <a className="circle" href={`/profile/${post.author.id}`} style={{ overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {post.author.avatar ? (
-                                    <img src={post.author.avatar} alt={post.author.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                ) : (
-                                    <span style={{ position: 'relative', zIndex: 1, color: 'white', fontWeight: 700, fontSize: '0.9rem' }}>{authorInitials}</span>
-                                )}
-                            </a>
-                        );
-                    })()}
+                    <a href={`/profile/${post.author.id}`} className="pfp-circle" style={{ width: 64, height: 64 }}>
+                        {post.author.avatar ? (
+                            <img src={post.author.avatar} alt={post.author.name} />
+                        ) : (
+                            <img src={getDefaultAvatar(post.author.id)} alt={post.author.name} />
+                        )}
+                    </a>
                     <div className="user-info">
                         <p className="name">{post.author.name}</p>
                         <p className="launch-date">{new Date(post.created_at).toLocaleDateString()}</p>
@@ -328,12 +324,12 @@ export default function PostDetails({ postId }: Props) {
             <section className="comments-wrapper">
                 <h3>Comments</h3>
                 <form className="comments" onSubmit={handleCommentSubmit}>
-                    <div className="profile-picture">
-                        <svg width="30px" height="30px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#fff" stroke="#fff">
-                            <g transform="translate(-100.000000, -255.000000)" fill="#006045">
-                                <path d="M116,281 C114.832,281 113.704,280.864 112.62,280.633 L107.912,283.463 L107.975,278.824 C104.366,276.654 102,273.066 102,269 C102,262.373 108.268,257 116,257 C123.732,257 130,262.373 130,269 C130,275.628 123.732,281 116,281 L116,281 Z M116,255 C107.164,255 100,261.269 100,269 C100,273.419 102.345,277.354 106,279.919 L106,287 L113.009,282.747 C113.979,282.907 114.977,283 116,283 C124.836,283 132,276.732 132,269 C132,261.269 124.836,255 116,255 L116,255 Z"/>
-                            </g>
-                        </svg>
+                    <div className="pfp-circle" style={{ width: 34, height: 34 }}>
+                        {$user.get()?.avatar ? (
+                            <img src={$user.get()?.avatar as string} alt="Me" />
+                        ) : (
+                            <img src={getDefaultAvatar($user.get()?.id)} alt="Me" />
+                        )}
                     </div>
                     <input type="text" className="comment" placeholder="Add a comment" value={commentText} onChange={e => setCommentText(e.target.value)} required />
                     <button type="submit" className="comment-button" disabled={isSubmitting}>
@@ -346,13 +342,11 @@ export default function PostDetails({ postId }: Props) {
                 <div className="comments-section">
                     {(post.comments || []).map(comment => (
                         <div className="public-comment" key={comment.id}>
-                            <a className="circle" href={`/profile/${comment.author.id}`} style={{ overflow: 'hidden', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <a href={`/profile/${comment.author.id}`} className="pfp-circle" style={{ width: 32, height: 32 }}>
                                 {comment.author.avatar ? (
-                                    <img src={comment.author.avatar} alt={comment.author.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img src={comment.author.avatar} alt={comment.author.name} />
                                 ) : (
-                                    <span style={{ position: 'relative', zIndex: 1, color: 'white', fontWeight: 700, fontSize: '0.75rem' }}>
-                                        {comment.author.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
-                                    </span>
+                                    <img src={getDefaultAvatar(comment.author.id)} alt={comment.author.name} />
                                 )}
                             </a>
                             <div className="user-info">

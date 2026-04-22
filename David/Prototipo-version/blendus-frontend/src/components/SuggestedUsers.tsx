@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { User } from '../lib/api';
+import { getDefaultAvatar } from '../lib/utils';
 
 export default function SuggestedUsers() {
     const [users, setUsers] = useState<User[]>([]);
@@ -24,23 +25,19 @@ export default function SuggestedUsers() {
         5: 'Protein shake expert 💪',
     };
 
-    const avatarColors = ['#00D492', '#9AE600', '#00BC7D', '#007A55', '#247857'];
-
     return (
         <div className="suggested-card">
             <h2>Suggested for you</h2>
-            {users.map((user, i) => (
+            {users.map((user) => (
                 <div className="suggested-user-row" key={user.id}>
                     <div className="suggested-user-info">
-                        <div className="suggested-avatar" style={{ background: avatarColors[i % avatarColors.length] }}>
+                        <a href={`/profile/${user.id}`} className="pfp-circle" style={{ width: 44, height: 44 }}>
                             {user.avatar ? (
-                                <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                <img src={user.avatar} alt={user.name} />
                             ) : (
-                                <span style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>
-                                    {user.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                                </span>
+                                <img src={getDefaultAvatar(user.id)} alt={user.name} />
                             )}
-                        </div>
+                        </a>
                         <div>
                             <div className="suggested-name">{user.name}</div>
                             <div className="suggested-desc">{descriptions[user.id] ?? `${user.posts_count ?? 0} posts`}</div>
