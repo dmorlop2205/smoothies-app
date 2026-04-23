@@ -1,382 +1,59 @@
-# Blendus API — Manual de uso rápido
-
-Base URL: `http://localhost:8000/api`
-
-Todos los requests deben incluir el header `Accept: application/json`. Los endpoints marcados con 🔒 requieren el header `Authorization: Bearer {token}`.
-
----
-
-## Auth
-
-### POST `/auth/register`
-
-Crea una cuenta nueva. Devuelve el usuario y el token que se usa en todos los endpoints protegidos.
-
-**Body:**
-```json
-{
-    "name": "Nico Lopez",
-    "username": "nicolopez",
-    "email": "nico@test.com",
-    "password": "password123",
-    "password_confirmation": "password123"
-}
-```
-
-**Respuesta `201`:**
-```json
-{
-    "user": {
-        "id": 1,
-        "name": "Nico Lopez",
-        "username": "nicolopez",
-        "bio": null,
-        "avatar": null,
-        "followers_count": 0,
-        "following_count": 0,
-        "created_at": "2026-03-22T15:00:00.000000Z"
-    },
-    "token": "1|abc123xyz..."
-}
-```
-
----
-
-### POST `/auth/login`
-
-Autentica al usuario y devuelve un token nuevo.
-
-**Body:**
-```json
-{
-    "email": "nico@test.com",
-    "password": "password123"
-}
-```
-
-**Respuesta `200`:** igual que register, con `user` y `token`.
-
----
-
-### POST `/auth/logout` 🔒
-
-Invalida todos los tokens del usuario autenticado. No necesita body.
-
-**Respuesta `200`:**
-```json
-{ "message": "Logged out" }
-```
-
----
-
-## Posts
-
-### GET `/posts`
-
-Devuelve el feed paginado de todos los posts, ordenados del más reciente al más antiguo. Acepta el query param `?per_page=15`.
-
-**Respuesta `200`:**
-```json
-{
-    "data": [
-        {
-            "id": 1,
-            "title": "Batido verde energetico",
-            "description": "Un batido lleno de nutrientes para empezar el dia",
-            "preparation_steps": "1. Pela el platano...",
-            "image_url": null,
-            "created_at": "2026-03-22T15:00:00.000000Z",
-            "author": {
-                "id": 1,
-                "name": "Nico Lopez",
-                "username": "nicolopez",
-                "bio": null,
-                "avatar": null
-            },
-            "ingredients": [
-                { "name": "Espinacas", "quantity": "50.00", "unit": "g" },
-                { "name": "Platano", "quantity": "1.00", "unit": "unidad" }
-            ],
-            "tags": [
-                { "id": 1, "name": "vegano" },
-                { "id": 2, "name": "verde" }
-            ],
-            "likes_count": 0,
-            "comments_count": 0,
-            "has_liked": false
-        }
-    ],
-    "meta": {
-        "current_page": 1,
-        "last_page": 1,
-        "per_page": 15,
-        "total": 1
-    }
-}
-```
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
----
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-### GET `/posts/{id}`
+## About Laravel
 
-Devuelve un post individual con todos sus datos. Misma estructura que el objeto dentro de `data` del feed.
-
----
-
-### POST `/posts` 🔒
-
-Crea un post nuevo. El campo `ingredients` es obligatorio y debe tener al menos un elemento. `tags` es opcional.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-**Body:**
-```json
-{
-    "title": "Batido verde energetico",
-    "description": "Un batido lleno de nutrientes para empezar el dia",
-    "preparation_steps": "1. Pela el platano. 2. Aniade todo a la batidora. 3. Bate 60 segundos.",
-    "image_url": null,
-    "ingredients": [
-        { "name": "Espinacas", "quantity": 50, "unit": "g" },
-        { "name": "Platano", "quantity": 1, "unit": "unidad" },
-        { "name": "Leche de almendras", "quantity": 200, "unit": "ml" }
-    ],
-    "tags": ["vegano", "verde", "energia"]
-}
-```
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-**Respuesta `201`:** el objeto del post completo (misma estructura que el feed).
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
----
+## Learning Laravel
 
-### PUT `/posts/{id}` 🔒
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
-Actualiza un post. Solo el autor puede editarlo. Todos los campos son opcionales, solo se actualizan los que se envíen. Si se envía `ingredients`, reemplaza todos los anteriores.
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-**Body (ejemplo parcial):**
-```json
-{
-    "title": "Nuevo titulo",
-    "ingredients": [
-        { "name": "Agua", "quantity": 300, "unit": "ml" }
-    ]
-}
-```
+## Laravel Sponsors
 
-**Respuesta `200`:** el objeto del post actualizado.
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
----
+### Premium Partners
 
-### DELETE `/posts/{id}` 🔒
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-Elimina un post. Solo el autor puede borrarlo. Elimina también sus ingredientes, comentarios y likes en cascada.
+## Contributing
 
-**Respuesta `200`:**
-```json
-{ "message": "Post deleted" }
-```
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
----
+## Code of Conduct
 
-### GET `/tags/{tag}/posts`
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-Devuelve posts filtrados por nombre de tag. Paginado igual que el feed.
+## Security Vulnerabilities
 
-Ejemplo: `GET /tags/vegano/posts`
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
----
+## License
 
-## Comments
-
-### GET `/posts/{post_id}/comments`
-
-Devuelve los comentarios de un post, paginados y ordenados del más reciente al más antiguo.
-
-**Respuesta `200`:**
-```json
-{
-    "data": [
-        {
-            "id": 1,
-            "body": "Este batido esta increible!",
-            "created_at": "2026-03-22T15:10:00.000000Z",
-            "author": {
-                "id": 1,
-                "name": "Nico Lopez",
-                "username": "nicolopez"
-            },
-            "likes_count": 0,
-            "has_liked": false
-        }
-    ]
-}
-```
-
----
-
-### POST `/posts/{post_id}/comments` 🔒
-
-Crea un comentario en un post.
-
-**Body:**
-```json
-{
-    "body": "Este batido esta increible, lo hice esta maniana."
-}
-```
-
-**Respuesta `201`:** el objeto del comentario creado.
-
----
-
-### DELETE `/posts/{post_id}/comments/{comment_id}` 🔒
-
-Elimina un comentario. Puede hacerlo el autor del comentario o el autor del post.
-
-**Respuesta `200`:**
-```json
-{ "message": "Comment deleted" }
-```
-
----
-
-## Likes
-
-### POST `/likes` 🔒
-
-Funciona como toggle: si ya existe el like lo quita, si no existe lo añade. Sirve tanto para posts como para comentarios según el `likeable_type`.
-
-**Body para like en un post:**
-```json
-{
-    "likeable_type": "App\\Models\\Post",
-    "likeable_id": 1
-}
-```
-
-**Body para like en un comentario:**
-```json
-{
-    "likeable_type": "App\\Models\\Comment",
-    "likeable_id": 1
-}
-```
-
-**Respuesta `200`:**
-```json
-{
-    "liked": true,
-    "count": 1
-}
-```
-
-Si se llama dos veces seguidas: primera vez `liked: true`, segunda vez `liked: false`.
-
----
-
-## Users
-
-### GET `/users/{id}`
-
-Devuelve el perfil público de un usuario.
-
-**Respuesta `200`:**
-```json
-{
-    "data": {
-        "id": 1,
-        "name": "Nico Lopez",
-        "username": "nicolopez",
-        "bio": "Amante de los batidos saludables",
-        "avatar": null,
-        "followers_count": 2,
-        "following_count": 1,
-        "created_at": "2026-03-22T15:00:00.000000Z"
-    }
-}
-```
-
----
-
-### PUT `/users/{id}` 🔒
-
-Actualiza el perfil propio. Solo el propio usuario puede editarlo (devuelve `403` si se intenta editar a otro). Todos los campos son opcionales.
-
-**Body:**
-```json
-{
-    "name": "Nicolas Lopez",
-    "username": "nicolaslopez",
-    "bio": "Amante de los batidos saludables",
-    "avatar": "https://ejemplo.com/mi-foto.jpg"
-}
-```
-
-**Respuesta `200`:** el objeto del usuario actualizado.
-
----
-
-### POST `/users/{id}/follow` 🔒
-
-Sigue al usuario con el `id` indicado. Si ya lo sigues, no hace nada (idempotente).
-
-**Respuesta `200`:**
-```json
-{ "message": "Followed" }
-```
-
----
-
-### DELETE `/users/{id}/follow` 🔒
-
-Deja de seguir al usuario con el `id` indicado.
-
-**Respuesta `200`:**
-```json
-{ "message": "Unfollowed" }
-```
-
----
-
-### GET `/users/{id}/followers`
-
-Devuelve la lista de usuarios que siguen al usuario indicado.
-
-**Respuesta `200`:** array de objetos `UserResource`.
-
----
-
-### GET `/users/{id}/following`
-
-Devuelve la lista de usuarios a los que sigue el usuario indicado.
-
-**Respuesta `200`:** array de objetos `UserResource`.
-
----
-
-## Tags
-
-### GET `/tags`
-
-Devuelve todos los tags ordenados alfabéticamente. Acepta `?search=texto` para filtrar por nombre (útil para autocompletado).
-
-Ejemplo: `GET /tags?search=veg`
-
-**Respuesta `200`:**
-```json
-{
-    "data": [
-        { "id": 1, "name": "vegano" },
-        { "id": 2, "name": "verde" }
-    ]
-}
-```
-
----
-
-## Códigos de error comunes
-
-| Código | Motivo |
-|--------|--------|
-| `401` | Token no enviado o inválido |
-| `403` | Acción no permitida (ej: editar post de otro usuario) |
-| `404` | Recurso no encontrado |
-| `422` | Error de validación — el cuerpo de la respuesta incluye un objeto `errors` con el detalle por campo |
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

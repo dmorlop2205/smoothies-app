@@ -45,4 +45,24 @@ class Post extends Model
     {
         return $this->morphMany(Like::class, 'likeable');
     }
+
+    public function savedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'saved_posts')->withTimestamps();
+    }
+
+    /**
+     * Scope for vector similarity search.
+     */
+    public function scopeNearestTo($query, $vector, int $limit = 10)
+    {
+        if (is_array($vector)) {
+            $vector = json_encode($vector);
+        }
+
+        return $query->select('*')
+            ->selectRaw('embedding <=> ? AS distance', [$vector])
+            ->orderBy('distance', 'asc')
+            ->limit($limit);
+    }
 }

@@ -15,22 +15,20 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'username' => $this->username,
-            'bio' => $this->bio,
-            'avatar' => $this->avatar,
-            'followers_count' => $this->when(
-                $this->offsetExists('followers_count'),
-                $this->followers_count,
-                fn () => $this->whenLoaded('followers', fn () => $this->followers->count())
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'username'        => $this->username,
+            'email'           => $this->when(auth()->check() && auth()->id() === $this->id, $this->email),
+            'bio'             => $this->bio,
+            'avatar'          => $this->avatar,
+            'posts_count'     => $this->posts_count ?? $this->whenLoaded('posts', fn () => $this->posts->count()),
+            'followers_count' => $this->followers_count ?? $this->whenLoaded('followers', fn () => $this->followers->count()),
+            'following_count' => $this->following_count ?? $this->whenLoaded('following', fn () => $this->following->count()),
+            'is_following'    => $this->when(
+                auth()->check(),
+                fn () => auth()->user()->following()->where('following_id', $this->id)->exists()
             ),
-            'following_count' => $this->when(
-                $this->offsetExists('following_count'),
-                $this->following_count,
-                fn () => $this->whenLoaded('following', fn () => $this->following->count())
-            ),
-            'created_at' => $this->created_at,
+            'created_at'      => $this->created_at,
         ];
     }
 }

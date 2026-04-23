@@ -1,12 +1,18 @@
 <?php
 
 return [
-    'paths' => ['api/*'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cross-Origin Resource Sharing (CORS) Configuration
+    |--------------------------------------------------------------------------
+    */
+
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    // Development: allow any origin (tighten in production).
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://localhost:4321', 'http://localhost:3000'],
 
     'allowed_origins_patterns' => [],
 
@@ -16,7 +22,6 @@ return [
 
     'max_age' => 0,
 
-    // Wildcard origins require credentials to be false.
-    'supports_credentials' => false,
-];
+    'supports_credentials' => true,
 
+];

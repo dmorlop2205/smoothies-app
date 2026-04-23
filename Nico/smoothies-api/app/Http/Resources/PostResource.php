@@ -12,15 +12,24 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $user = $request->user();
+        $user = auth('sanctum')->user();
 
         $hasLiked = false;
+        $hasSaved = false;
 
         if ($user) {
             if ($this->relationLoaded('likes')) {
                 $hasLiked = $this->likes->contains('user_id', $user->id);
             } else {
                 $hasLiked = $this->likes()
+                    ->where('user_id', $user->id)
+                    ->exists();
+            }
+
+            if ($this->relationLoaded('savedBy')) {
+                $hasSaved = $this->savedBy->contains('id', $user->id);
+            } else {
+                $hasSaved = $this->savedBy()
                     ->where('user_id', $user->id)
                     ->exists();
             }
@@ -53,6 +62,7 @@ class PostResource extends JsonResource
                 fn () => $this->whenLoaded('comments', fn () => $this->comments->count())
             ),
             'has_liked' => $hasLiked,
+            'has_saved' => $hasSaved,
         ];
     }
 }

@@ -69,6 +69,38 @@ class User extends Authenticatable
         return $this->hasMany(Like::class);
     }
 
+    public function likedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Post::class,
+            'likes',
+            'user_id',
+            'likeable_id'
+        )->where('likes.likeable_type', Post::class)->withTimestamps();
+    }
+
+    public function savedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Post::class,
+            'saved_posts',
+            'user_id',
+            'post_id'
+        )->withTimestamps();
+    }
+
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(Conversation::class)
+            ->withPivot(['role', 'last_read_at'])
+            ->withTimestamps();
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+
     public function followers(): BelongsToMany
     {
         return $this->belongsToMany(
