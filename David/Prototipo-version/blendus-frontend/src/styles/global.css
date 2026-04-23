@@ -346,8 +346,9 @@ nav {
 .save-btn {
   background: none; border: none; cursor: pointer; transition: .2s ease;
 }
-.save-btn svg { width: 32px; height: 32px; }
-.save-btn:hover svg path { fill: var(--gray-900); }
+.save-btn svg { width: 32px; height: 32px; transition: transform .2s ease; }
+.save-btn:hover svg { transform: scale(1.1); }
+
 
 .post-description {
   padding: 0 1.5rem .75rem;

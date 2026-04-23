@@ -17,11 +17,9 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('users')->group(function () {
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('suggested', [UserController::class, 'suggested']);
-    });
-
+    Route::get('suggested', [UserController::class, 'suggested']);
     Route::get('{user}', [UserController::class, 'show']);
+
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('{user}/followers', [UserController::class, 'followers']);

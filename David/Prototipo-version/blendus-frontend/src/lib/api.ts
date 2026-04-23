@@ -55,6 +55,9 @@ export const api = {
         return request<PaginatedResponse<Post>>(`/posts?${qs.toString()}`);
     },
 
+    getPersonalizedPosts: (page = 1) =>
+        request<PaginatedResponse<Post>>(`/posts/personalized?page=${page}`),
+
     getPost: (id: number) =>
         request<{data: Post}>(`/posts/${id}`).then(res => res.data),
 

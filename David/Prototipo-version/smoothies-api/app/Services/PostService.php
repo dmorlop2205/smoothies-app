@@ -113,7 +113,10 @@ class PostService
             ->latest('created_at');
 
         if ($userId) {
-            $query->with(['likes' => fn($q) => $q->where('user_id', $userId)]);
+            $query->with([
+                'likes' => fn($q) => $q->where('user_id', $userId),
+                'savedBy' => fn($q) => $q->where('users.id', $userId)
+            ]);
         }
 
         return $query->paginate($perPage);
@@ -133,7 +136,10 @@ class PostService
             ->latest('created_at');
 
         if ($userId) {
-            $query->with(['likes' => fn ($q) => $q->where('user_id', $userId)]);
+            $query->with([
+                'likes' => fn ($q) => $q->where('user_id', $userId),
+                'savedBy' => fn ($q) => $q->where('users.id', $userId)
+            ]);
         }
 
         return $query->paginate($perPage);
@@ -161,7 +167,10 @@ class PostService
             $query->latest('created_at');
         }
 
-        $query->with(['likes' => fn ($q) => $q->where('user_id', $user->id)]);
+        $query->with([
+            'likes' => fn ($q) => $q->where('user_id', $user->id),
+            'savedBy' => fn ($q) => $q->where('users.id', $user->id)
+        ]);
 
         return $query->paginate($perPage);
     }

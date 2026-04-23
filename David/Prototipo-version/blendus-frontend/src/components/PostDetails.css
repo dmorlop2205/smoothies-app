@@ -167,6 +167,7 @@
         gap: 1rem;
         svg {
             cursor: pointer;
+            transition: transform .2s ease;
             path {
                 transition: .2s ease;
             }
@@ -184,15 +185,8 @@
             }
         }
 
-        .save:hover:not(.active) {
-            path {
-                fill: var(--gray-900);
-            }
-        }
-        .save.active:hover {
-            path {
-                fill: #d97706; /* slightly darker yellow on hover */
-            }
+        .save:hover {
+            transform: scale(1.1);
         }
     }
 }

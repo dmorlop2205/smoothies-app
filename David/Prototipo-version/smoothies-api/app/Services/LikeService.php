@@ -46,6 +46,11 @@ class LikeService
             $existing->delete();
 
             $liked = false;
+
+            // Update user preference vector if the unliked thing is a Post
+            if ($likeableType === Post::class) {
+                $this->embeddingService->updateUserPreference($user);
+            }
         } else {
             Like::create([
                 'user_id' => $user->id,

@@ -69,7 +69,10 @@ class PostController extends Controller
             ->loadCount(['likes', 'comments']);
 
         if ($userId = auth()->id()) {
-            $post->load(['likes' => fn ($q) => $q->where('user_id', $userId)]);
+            $post->load([
+                'likes' => fn ($q) => $q->where('user_id', $userId),
+                'savedBy' => fn ($q) => $q->where('users.id', $userId)
+            ]);
         }
 
         return (new PostResource($post))->response();
