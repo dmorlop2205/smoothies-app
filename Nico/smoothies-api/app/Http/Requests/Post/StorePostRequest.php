@@ -17,7 +17,8 @@ class StorePostRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'preparation_steps' => ['required', 'string'],
-            'image_url' => ['nullable', 'url'],
+            'image' => ['nullable', 'image', 'max:5120'],
+            'image_url' => ['nullable', 'string'],
 
             'ingredients' => ['required', 'array', 'min:1'],
             'ingredients.*.name' => ['required', 'string'],

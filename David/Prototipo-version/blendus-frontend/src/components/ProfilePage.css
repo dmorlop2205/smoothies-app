@@ -2,10 +2,10 @@
 .profile-dashboard {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    max-width: 900px;
+    padding: 2rem;
+    width: 60%;
     margin: 0 auto;
-    padding: 0 1rem 4rem;
+    gap: 3rem;
 }
 
 /* ── Loading ── */
@@ -14,17 +14,6 @@
     justify-content: center;
     align-items: center;
     padding: 4rem;
-}
-
-/* ── Global Dashboard Container ── */
-.profile-dashboard {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-
-    gap: 3rem;
 }
 
 /* ── User Container (Instagram Style) ── */
@@ -60,14 +49,28 @@
     box-shadow: 0 0 0 1px var(--gray-200);
 }
 
-.user-pic img,
-.profile-avatar-initials {
+.user-pic img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
     outline: 2px solid var(--white);
+}
+
+.profile-avatar-initials {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
     background: var(--gradient-profile);
+    outline: 2px solid var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    user-select: none;
 }
 
 .info-side {
@@ -205,6 +208,60 @@
     color: var(--amber-600);
 }
 
+/* ── Profile Sections ── */
+.profile-section {
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-grid.ghost {
+    background: var(--gray-50);
+    padding: 2rem;
+    border-radius: 30px;
+}
+
+.grid.skeleton {
+    background-color: var(--white);
+    border: 1px dashed var(--gray-200);
+    border-radius: 20px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.grid.skeleton .empty-message {
+    position: absolute;
+    z-index: 10;
+    text-align: center;
+    width: 100%;
+    padding: 1rem;
+}
+
+.grid.skeleton .empty-message p {
+    color: var(--gray-500);
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.btn-ghost {
+    padding: 0.6rem 1.2rem;
+    background: var(--amber-500);
+    color: white;
+    border-radius: 100px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: transform 0.2s;
+}
+
+.btn-ghost:hover {
+    transform: scale(1.05);
+}
+
 /* ── User Grid (Hover Overlay) ── */
 .user-grid {
     display: grid;
@@ -233,7 +290,7 @@
 .user-grid .grid .overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.3) 50%, transparent 100%);
+    background: transparent;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -257,6 +314,7 @@
     font-weight: 700;
     margin-bottom: 0.5rem;
     line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .likes-comments {

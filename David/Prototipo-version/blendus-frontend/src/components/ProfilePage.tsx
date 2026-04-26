@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { User, Post } from '../lib/api';
 import { $user as $authUser, $isLoggedIn } from '../stores/authStore';
+import { getDefaultAvatar } from '../lib/utils';
 import './ProfilePage.css';
 
 interface Props {
@@ -153,7 +154,7 @@ export default function ProfilePage({ userId }: Props) {
                 name: editName,
                 username: editUsername,
                 bio: editBio,
-                avatar: editAvatar || undefined,
+                avatar: editAvatarFile ? undefined : editAvatar, // Use editAvatar ('' if removed) if no file is selected
                 avatar_file: editAvatarFile || undefined,
             });
             setUser(updated);
@@ -200,11 +201,13 @@ export default function ProfilePage({ userId }: Props) {
             <div className="user-container">
                 <div className="profile-header-side">
                     <div className="avatar-side">
-                        <div className="user-pic">
+                        <div className="pfp-circle" style={{ width: 120, height: 120 }}>
                             {user.avatar ? (
                                 <img src={user.avatar} alt={user.name} />
+                            ) : user.avatar === '' ? (
+                                <img src="/assets/avatars/no-user-pfp.svg" alt="No profile" style={{ padding: '20%' }} />
                             ) : (
-                                <div className="profile-avatar-initials">{initials}</div>
+                                <img src={getDefaultAvatar(user.id)} alt={user.name} />
                             )}
                         </div>
                     </div>
@@ -302,9 +305,19 @@ export default function ProfilePage({ userId }: Props) {
                         </svg>
                     </div>
                 ) : posts.length === 0 ? (
-                    <div className="empty-state">
-                        <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
-                        {isOwn && activeTab === 'recipes' && <a href="/create" className="btn" style={{ display: 'inline-block', marginTop: '1rem' }}>Share your first recipe!</a>}
+                    <div className="user-grid ghost">
+                        {[...Array(9)].map((_, i) => (
+                            <div key={i} className="grid skeleton">
+                                {i === 4 && (
+                                    <div className="empty-message">
+                                        <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
+                                        {isOwn && activeTab === 'recipes' && (
+                                            <a href="/create" className="btn-ghost">Share First Recipe</a>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ))}
                     </div>
                 ) : (
                     <div className="user-grid">
@@ -348,7 +361,13 @@ export default function ProfilePage({ userId }: Props) {
                                     return (
                                         <div key={u.id} className="modal-user-row">
                                             <a href={`/profile/${u.id}`} className="modal-user-link" onClick={() => setModal(null)}>
-                                                <div className="modal-avatar">{u.avatar ? <img src={u.avatar} alt={u.name} /> : ini}</div>
+                                                <div className="pfp-circle" style={{ width: 44, height: 44 }}>
+                                                    {u.avatar ? (
+                                                        <img src={u.avatar} alt={u.name} />
+                                                    ) : (
+                                                        <img src={getDefaultAvatar(u.id)} alt={u.name} />
+                                                    )}
+                                                </div>
                                                 <div>
                                                     <p className="modal-user-name">{u.name}</p>
                                                     <p className="modal-user-username">@{u.username}</p>
@@ -418,24 +437,19 @@ export default function ProfilePage({ userId }: Props) {
                                     rows={3}
                                 />
                             </div>
-                            <div className="edit-field">
-                                <label>Avatar URL</label>
-                                <input
-                                    type="url"
-                                    value={editAvatar}
-                                    onChange={e => setEditAvatar(e.target.value)}
-                                    placeholder="https://example.com/avatar.jpg"
-                                />
-                            </div>
-                            <div className="edit-field">
+                             <div className="edit-field">
                                 <label>Or Upload Photo</label>
                                 <input
                                     type="file"
                                     accept="image/*"
-                                    onChange={e => setEditAvatarFile(e.target.files?.[0] || null)}
+                                    onChange={e => {
+                                        setEditAvatarFile(e.target.files?.[0] || null);
+                                        setEditAvatar(''); // Clear URL if file is chosen
+                                    }}
                                     style={{ padding: '0.5rem 0' }}
                                 />
                             </div>
+                            
                             {editError && <p className="edit-error">{editError}</p>}
                             <button className="btn edit-save-btn" onClick={handleEditSave} disabled={editLoading}>
                                 {editLoading ? 'Saving...' : 'Save Changes'}

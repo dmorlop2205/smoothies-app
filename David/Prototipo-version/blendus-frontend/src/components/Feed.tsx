@@ -4,7 +4,6 @@ import type { Post, Tag } from '../lib/api';
 import PostCard from './PostCard';
 import './Feed.css';
 import './FiltersComponent.css';
-import './StoriesComponent.css';
 
 const FILTER_ICONS: Record<string, string> = {
     green: '/greensmoothies.png',
@@ -22,6 +21,7 @@ export default function Feed() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [feedType, setFeedType] = useState<'latest' | 'personalized'>('latest');
 
     useEffect(() => {
         api.getTags().then(setTags).catch(() => { });
@@ -29,9 +29,12 @@ export default function Feed() {
 
     useEffect(() => {
         setLoading(true);
+
         const fetcher = activeTag
             ? api.getPostsByTag(activeTag, page)
-            : api.getPosts({ page });
+            : feedType === 'personalized'
+                ? api.getPersonalizedPosts(page)
+                : api.getPosts({ page });
 
         fetcher
             .then(res => {
@@ -40,10 +43,22 @@ export default function Feed() {
             })
             .catch(() => { })
             .finally(() => setLoading(false));
-    }, [activeTag, page]);
+    }, [activeTag, page, feedType]);
 
     const handleFilterClick = (slug: string | null) => {
+        if (activeTag === slug) return;
+        
         setActiveTag(slug);
+        setFeedType('latest');
+        setPage(1);
+        setPosts([]);
+    };
+
+    const handleFeedTypeChange = (type: 'latest' | 'personalized') => {
+        if (feedType === type && !activeTag) return;
+
+        setFeedType(type);
+        setActiveTag(null);
         setPage(1);
         setPosts([]);
     };
@@ -56,46 +71,52 @@ export default function Feed() {
 
     return (
         <section className="left-content">
+
             {/* Hero / Welcome Banner */}
-            <div className="hero-banner" style={{
-                background: 'linear-gradient(135deg, var(--amber-500) 0%, var(--amber-700, #b45309) 100%)',
-                borderRadius: '24px',
-                padding: '2.5rem 2rem',
-                color: 'white',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                boxShadow: '0 4px 20px rgba(180, 83, 9, 0.25)',
-                marginBottom: '2rem'
-            }}>
-                <h2 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>Welcome to BlendUs! 🧋</h2>
-                <p style={{ fontSize: '1.1rem', opacity: 0.9, margin: 0 }}>Discover, mix, and share the world's best smoothie recipes.</p>
+            <div className="hero-banner">
+                <h2>Welcome to BlendUs! 🧋</h2>
+                <p>Discover, mix, and share the world's best smoothie recipes.</p>
+            </div>
+
+            {/* Feed Type Switcher (Segmented Control) */}
+            <div>
+                <div className="feed-tabs-container">
+                    <button
+                        className={`feed-tab ${feedType === 'latest' ? 'active' : ''}`}
+                        onClick={() => handleFeedTypeChange('latest')}
+                    >
+                        <span>Latest</span>
+                    </button>
+                    <button
+                        className={`feed-tab ${feedType === 'personalized' ? 'active' : ''}`}
+                        onClick={() => handleFeedTypeChange('personalized')}
+                    >
+                        <span>For You</span>
+                        <span className="ai-badge">WORK IN PROGRESS</span>
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}
-            <div style={{ marginBottom: '0.5rem' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--gray-400)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.75rem' }}>Popular Categories</h3>
+            <div className="filters-section">
+                <h3 className="section-title">Popular Categories</h3>
                 <section className="filters">
-                    <span
+                    <div
                         className={`filter ${activeTag === null ? 'active' : ''}`}
                         onClick={() => handleFilterClick(null)}
-                        style={{ cursor: 'pointer' }}
                     >
                         <img src="/sparks.webp" alt="All" />
                         <p>All</p>
-                    </span>
+                    </div>
                     {tags.slice(0, 6).map(tag => (
-                        <span
+                        <div
                             key={tag.id}
                             className={`filter ${activeTag === tag.slug ? 'active' : ''}`}
                             onClick={() => handleFilterClick(tag.slug)}
-                            style={{ cursor: 'pointer' }}
                         >
                             {FILTER_ICONS[tag.slug] && <img src={FILTER_ICONS[tag.slug]} alt={tag.name} />}
                             <p>{tag.name}</p>
-                        </span>
+                        </div>
                     ))}
                 </section>
             </div>

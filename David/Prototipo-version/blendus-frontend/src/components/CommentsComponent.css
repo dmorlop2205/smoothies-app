@@ -21,7 +21,7 @@
         width: 100%;
         gap: 1rem;
         .profile-picture {
-            background-color: var(--emerald-100);
+            background-color: #FEF3C7;
             border-radius: 100%;
             height: 55px;
             aspect-ratio: 1 / 1;
@@ -40,24 +40,32 @@
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
         }
         .comment:focus {
-            border: 1px solid var(--emerald-400);
-            outline: 1px solid var(--emerald-400);
+            border: 1px solid #F59E0B;
+            outline: 1px solid #F59E0B;
         }
         .comment-button {
-            background-color: var(--emerald-600);
+            background: linear-gradient(135deg, #F59E0B, #b45309);
             outline: none;
             border: none;
             border-radius: 50%;
             height: 55px;
-            aspect-ratio: 1 / 1;
+            width: 55px;
+            flex-shrink: 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor:pointer;
-            transition: .2s ease;          
+            cursor: pointer;
+            transition: .2s ease;
+            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.35);
         }
         .comment-button:hover {
-            background-color: var(--emerald-400);
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px rgba(180, 83, 9, 0.5);
+        }
+        .comment-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
         }
     }
     
@@ -73,12 +81,19 @@
                 cursor: pointer;
                 display: flex;
                 justify-content: center;
-                align-items: start;
+                align-items: center;
+                width: 55px;
+                height: 55px;
+                border-radius: 50%;
+                background: var(--gradient-profile);
+                flex-shrink: 0;
                 img {
                     width: 55px;
                     height: 55px;
                     object-fit: cover;
                     border-radius: 50%;
+                    position: relative;
+                    z-index: 1;
                 }
             }
             .user-info {

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 import type { Post, PostComment } from '../lib/api';
 import { $isLoggedIn, $user } from '../stores/authStore';
+import { getDefaultAvatar, getInitials } from '../lib/utils';
 import './PostCard.css';
 
 interface Props {
@@ -17,6 +18,7 @@ function formatDate(dateStr: string) {
 export default function PostCard({ post, onLikeToggle, showComments = false }: Props) {
     const [liked, setLiked] = useState(post.has_liked ?? false);
     const [likesCount, setLikesCount] = useState(post.likes_count ?? 0);
+    const [commentsCount, setCommentsCount] = useState(post.comments_count ?? 0);
     const [comment, setComment] = useState('');
     const [comments, setComments] = useState<PostComment[]>(post.comments ?? []);
     const [commentsOpen, setCommentsOpen] = useState(showComments);
@@ -68,6 +70,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
         try {
             const newComment = await api.createComment(post.id, comment);
             setComments((prev: PostComment[]) => [...prev, newComment]);
+            setCommentsCount(prev => prev + 1);
             setComment('');
         } catch { } finally {
             setSubmitting(false);
@@ -84,6 +87,17 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
         }
     };
 
+    const handleToggleSave = async () => {
+        if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
+        const prev = saved;
+        setSaved(!prev);
+        try {
+            await api.toggleSavePost(post.id);
+        } catch {
+            setSaved(prev);
+        }
+    };
+
     const isAuthor = $user.get()?.id === post.author?.id;
 
     // Nico's API v2: image_url is a direct string, author is the user
@@ -95,12 +109,12 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
         <section className="post">
             <div className="post-header">
                 <a href={`/profile/${post.author?.id}`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div className="circle" style={{
-                        background: 'var(--gradient-profile, linear-gradient(135deg,#00D492,#9AE600))',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'white', fontWeight: 'bold', fontSize: '1rem'
-                    }}>
-                        {initials}
+                    <div className="pfp-circle" style={{ width: 64, height: 64 }}>
+                        {post.author?.avatar ? (
+                            <img src={post.author.avatar} alt={authorName} />
+                        ) : (
+                            <img src={getDefaultAvatar(post.author?.id)} alt={authorName} />
+                        )}
                     </div>
                     <div className="user-info">
                         <p className="name">{authorName}</p>
@@ -142,7 +156,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                                         </svg>
                                         User Info
                                     </button>
-                                    <button onClick={() => setSaved(!saved)}>
+                                    <button onClick={handleToggleSave}>
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                         </svg>
@@ -177,7 +191,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                             <path d="M16 4C9.373 4 4 8.373 4 14c0 3.314 1.657 6.248 4.224 8.12L8 28l6.4-3.2c.53.08 1.06.12 1.6.12 6.627 0 12-4.373 12-10S22.627 4 16 4z"
                                 stroke="#364153" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        {post.comments_count > 0 && <span style={{ fontSize: '0.88rem', color: '#666' }}>{post.comments_count}</span>}
+                        {commentsCount > 0 && <span style={{ fontSize: '0.88rem', color: '#666' }}>{commentsCount}</span>}
                     </div>
 
                     <div style={{ cursor: 'pointer' }} onClick={() => navigator.clipboard?.writeText(window.location.origin)}>
@@ -187,7 +201,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                     </div>
                 </div>
 
-                <div className="save" style={{ cursor: 'pointer' }} onClick={() => setSaved(!saved)}>
+                <div className="save" style={{ cursor: 'pointer' }} onClick={handleToggleSave}>
                     <svg className={`save-icon ${saved ? 'active' : ''}`} width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         {saved ? (
                             <path d="M6.75 6L7.5 5.25H16.5L17.25 6V19.3162L12 16.2051L6.75 19.3162V6Z" fill="#FBBF24"/>
@@ -222,18 +236,27 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                 <div style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem', padding: '1rem 1rem 1rem' }}>
                     {comments.map(c => (
                         <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                            <div style={{
-                                width: 28, height: 28, borderRadius: '50%', background: '#007A55',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '.7rem', fontWeight: 700, color: 'white', flexShrink: 0
-                            }}>{c.author?.name?.[0] ?? '?'}</div>
+                            <a href={`/profile/${c.author?.id}`} className="pfp-circle" style={{ width: 28, height: 28 }}>
+                                {c.author?.avatar ? (
+                                    <img src={c.author.avatar} alt={c.author?.name} />
+                                ) : (
+                                    <img src={getDefaultAvatar(c.author?.id)} alt={c.author?.name} />
+                                )}
+                            </a>
                             <div>
                                 <strong style={{ fontSize: '0.88rem' }}>{c.author?.name}</strong>
                                 <span style={{ fontSize: '0.88rem', color: '#666', marginLeft: 6 }}>{c.body}</span>
                             </div>
                         </div>
                     ))}
-                    <form onSubmit={handleComment} style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    <form onSubmit={handleComment} style={{ display: 'flex', gap: '8px', marginTop: '10px', alignItems: 'center' }}>
+                        <div className="pfp-circle" style={{ width: 30, height: 30 }}>
+                            {$user.get()?.avatar ? (
+                                <img src={$user.get()?.avatar as string} alt="Me" />
+                            ) : (
+                                <img src={getDefaultAvatar($user.get()?.id)} alt="Me" />
+                            )}
+                        </div>
                         <input
                             style={{ flex: 1, padding: '8px 12px', border: '1px solid #ddd', borderRadius: '15px', outline: 'none' }}
                             placeholder="Add a comment..."
