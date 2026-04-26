@@ -23,7 +23,7 @@
         justify-content: center;
         align-items: center;
         gap: 1rem;
-        font-size: 1.5rem;
+        font-size: clamp(1.25rem, 1.184rem + 0.263vw, 1.5rem);
         box-shadow: 0 2px 5px 0 var(--amber-100);
         transition: .2s ease;
         background: linear-gradient(
@@ -52,7 +52,7 @@
         justify-content: center;
         align-items: center;
         gap: 1rem;
-        font-size: 1.5rem;
+        font-size: clamp(1.25rem, 1.184rem + 0.263vw, 1.5rem);
         box-shadow: 0 2px 5px 0 var(--amber-100);
         transition: .2s ease;
         border: 2px solid var(--amber-500);

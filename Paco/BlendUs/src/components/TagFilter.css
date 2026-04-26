@@ -1,5 +1,9 @@
 .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     .tag {
+        font-size: clamp(0.7rem, 0.621rem + 0.316vw, 1rem) !important;
         background: var(--amber-50) !important;
     }
     .tag:hover {

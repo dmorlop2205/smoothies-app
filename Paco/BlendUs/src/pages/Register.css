@@ -1,6 +1,6 @@
 .register-wrapper {
     margin-top: -4rem;
-    padding: 0 24rem;
+    padding: 0 clamp(0rem, -6.316rem + 25.263vw, 24rem);
 }
 .back-button {
     display: flex;
@@ -44,7 +44,7 @@
     flex-direction: column;
     gap: .5rem;
     .title {
-        font-size: 2.5rem;
+        font-size: clamp(2rem, 1.868rem + 0.526vw, 2.5rem);
         color: var(--gray-700);
         font-weight: 700;
     }

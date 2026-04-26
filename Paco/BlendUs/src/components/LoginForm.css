@@ -16,21 +16,21 @@
         text-align: center;
         color: var(--gray-700);
         text-decoration: none;
-        font-size: 1.25rem;
+        font-size: clamp(1rem, 0.934rem + 0.263vw, 1.25rem);
         font-weight: 600;
         &:hover {
             color: var(--gray-900);
         }
     }
     .register-btn {
-        margin-top: 1.5rem;
+        margin-top: clamp(0.5rem, 0.237rem + 1.053vw, 1.5rem);
         width: 100%;
         padding: .8rem;
         border-radius: 20px;
         background-color: transparent;
         border: 2px solid var(--amber-500);
         color: var(--amber-500);
-        font-size: 1.5rem;
+        font-size: clamp(1.25rem, 1.184rem + 0.263vw, 1.5rem);
         transition: .2s ease-in-out;
     }
 

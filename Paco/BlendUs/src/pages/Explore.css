@@ -17,21 +17,20 @@
         position: absolute;
         left: 0;
         transform: translateY(-50%);
-        width: 39px;
-        height: 39px;
+        width: clamp(1.813rem, 1.648rem + 0.658vw, 2.438rem);
+        height: clamp(1.813rem, 1.648rem + 0.658vw, 2.438rem);
         z-index: 9;
     }
 
     .search-input {
         position: absolute;
         inset: 0;
-        height: 80px;
         background-color: white;
         border: 1px solid var(--gray-200);
         padding: 0 4rem;
         font-family: Alexandria;
         border-radius: 20px;
-        font-size: 1.25rem;
+        font-size: clamp(1rem, 0.934rem + 0.263vw, 1.25rem);
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
         width: 100%;
     }
@@ -52,8 +51,8 @@
         right: 0;
         transform: translateY(-50%) rotate(90deg);
         margin-right: 1rem;
-        width: 39px;
-        height: 39px;
+        width: clamp(1.813rem, 1.648rem + 0.658vw, 2.438rem);
+        height: clamp(1.813rem, 1.648rem + 0.658vw, 2.438rem);
         z-index: 9;
         cursor: pointer;
         transition: .2s ease;
@@ -70,7 +69,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     .grid {
-        border-radius: 40px;
+        border-radius: clamp(0.938rem, 0.526rem + 1.645vw, 2.5rem);
         cursor: pointer;
         overflow:hidden;
         position: relative;
@@ -115,5 +114,11 @@
         .overlay {
             opacity: 1;
         }
+    }
+}
+
+@media(max-width: 1000px) {
+    .posts-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
