@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { User, Post } from '../lib/api';
-import { $user as $authUser, $isLoggedIn } from '../stores/authStore';
+import { $user as $authUser, $isLoggedIn, clearAuth } from '../stores/authStore';
 import { getDefaultAvatar } from '../lib/utils';
 import './ProfilePage.css';
 
@@ -231,6 +231,19 @@ export default function ProfilePage({ userId }: Props) {
                                     navigator.clipboard.writeText(window.location.href);
                                     alert('Profile link copied!');
                                 }}>Share Profile</button>
+                                {isOwn && (
+                                    <button 
+                                        className="btn-action-outline" 
+                                        style={{ color: 'red' }}
+                                        onClick={async () => {
+                                            try { await api.logout(); } catch {}
+                                            clearAuth();
+                                            window.location.href = '/login';
+                                        }}
+                                    >
+                                        Logout
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -312,7 +325,7 @@ export default function ProfilePage({ userId }: Props) {
                                     <div className="empty-message">
                                         <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
                                         {isOwn && activeTab === 'recipes' && (
-                                            <a href="/create" className="btn-ghost">Share First Recipe</a>
+                                            <a href="/create" className="btn-profile-promo">Share First Recipe</a>
                                         )}
                                     </div>
                                 )}

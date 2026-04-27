@@ -87,13 +87,7 @@ const { title = 'BlendUs', activePage } = Astro.props;
                 </div>
                 <span style="font-weight:600;">${user.name.split(' ')[0]}</span>
               </a>
-              <button id="logout-btn" class="btn btn-ghost" style="font-size:.85rem;padding:.4rem .9rem">Logout</button>
             `;
-            document.getElementById('logout-btn')?.addEventListener('click', async () => {
-              try { await api.logout(); } catch {}
-              clearAuth();
-              window.location.href = '/login';
-            });
           } else {
             slot.innerHTML = `<a href="/login" class="btn" style="border-radius:100px;font-size:.9rem">Sign In</a>`;
           }

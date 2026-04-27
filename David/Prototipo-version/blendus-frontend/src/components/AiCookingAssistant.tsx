@@ -19,6 +19,13 @@ export default function AiCookingAssistant({ post, onClose }: Props) {
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    useEffect(() => {
         const loadSteps = async () => {
             try {
                 const res = await api.generateCookingSteps(post.title, post.ingredients ?? [], post.preparation_steps);

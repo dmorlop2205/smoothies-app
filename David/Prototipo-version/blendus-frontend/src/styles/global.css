@@ -603,7 +603,7 @@ nav {
   .page-aside { display: none; }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1150px) {
   nav { padding: .8rem 1.2rem; }
   .nav-logo h1 { font-size: 1.8rem; }
   .nav-hamburger { display: flex; }
