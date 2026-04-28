@@ -7,6 +7,8 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AiController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->group(function () {
@@ -58,6 +60,21 @@ Route::get('tags', [TagController::class, 'index']);
 Route::get('tags/{tag}/posts', [PostController::class, 'byTag']);
 
 Route::middleware('auth:sanctum')->post('likes', [LikeController::class, 'toggle']);
+
+Route::middleware('auth:sanctum')->prefix('conversations')->group(function () {
+    Route::get('/', [ConversationController::class, 'index']);
+    Route::post('/', [ConversationController::class, 'store']);
+    Route::get('{conversation}', [ConversationController::class, 'show']);
+    Route::put('{conversation}', [ConversationController::class, 'update']);
+    Route::delete('{conversation}', [ConversationController::class, 'destroy']);
+
+    Route::post('{conversation}/members', [ConversationController::class, 'addMember']);
+    Route::delete('{conversation}/members/{user}', [ConversationController::class, 'removeMember']);
+
+    Route::get('{conversation}/messages', [MessageController::class, 'index']);
+    Route::post('{conversation}/messages', [MessageController::class, 'store']);
+    Route::delete('{conversation}/messages/{message}', [MessageController::class, 'destroy']);
+});
 
 Route::middleware('auth:sanctum')->post('ai/generate-smoothie', [AiController::class, 'generateSmoothie']);
 Route::middleware('auth:sanctum')->post('ai/sommelier', [AiController::class, 'sommelier']);

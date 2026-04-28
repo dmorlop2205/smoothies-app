@@ -3,6 +3,7 @@ import { api } from '../lib/api';
 import type { User, Post } from '../lib/api';
 import { $user as $authUser, $isLoggedIn, clearAuth } from '../stores/authStore';
 import { getDefaultAvatar } from '../lib/utils';
+import { openChat } from '../stores/chatStore';
 import './ProfilePage.css';
 
 interface Props {
@@ -219,13 +220,33 @@ export default function ProfilePage({ userId }: Props) {
                                 {isOwn ? (
                                     <button className="btn-action-outline" onClick={() => setModal('edit')}>Edit Profile</button>
                                 ) : (
-                                    <button
-                                        className={`btn-action-primary ${isFollowing ? 'following' : ''}`}
-                                        onClick={handleFollow}
-                                        disabled={followLoading}
-                                    >
-                                        {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
-                                    </button>
+                                    <>
+                                        <button
+                                            className={`btn-action-primary ${isFollowing ? 'following' : ''}`}
+                                            onClick={handleFollow}
+                                            disabled={followLoading}
+                                        >
+                                            {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+                                        </button>
+                                        <button className="btn-action-outline" onClick={async () => {
+                                            try {
+                                                const res = await api.createConversation([user.id]);
+                                                openChat({
+                                                    id: res.id,
+                                                    name: user.name,
+                                                    avatar_url: user.avatar || getDefaultAvatar(user.id),
+                                                    is_group: false,
+                                                    last_message: "",
+                                                    unread_count: 0,
+                                                    other_user_id: user.id
+                                                });
+                                            } catch (err) {
+                                                console.error("Could not start conversation", err);
+                                            }
+                                        }}>
+                                            Message
+                                        </button>
+                                    </>
                                 )}
                                 <button className="btn-action-outline" onClick={() => {
                                     navigator.clipboard.writeText(window.location.href);

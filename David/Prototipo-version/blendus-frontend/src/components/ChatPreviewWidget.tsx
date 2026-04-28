@@ -1,0 +1,83 @@
+import { useState, useEffect } from 'react';
+import './ChatPreviewWidget.css';
+import { openChat, type ChatData } from '../stores/chatStore';
+import { api } from '../lib/api';
+import { $user as $authUser } from '../stores/authStore';
+import { getDefaultAvatar } from '../lib/utils';
+
+export default function ChatPreviewWidget() {
+    const [chats, setChats] = useState<ChatData[]>([]);
+    
+    useEffect(() => {
+        const fetchChats = async () => {
+            try {
+                const res = await api.getConversations();
+                const authUser = $authUser.get();
+                
+                const mappedChats = res.map((conv: any) => {
+                    const isGroup = conv.type === 'group';
+                    let name = conv.name || 'Conversation';
+                    let avatar = conv.avatar || '/assets/avatars/no-user-pfp.svg';
+
+                    if (!isGroup && conv.participants) {
+                        const otherUser = conv.participants.find((p: any) => p.id !== authUser?.id);
+                        if (otherUser) {
+                            name = otherUser.name;
+                            avatar = otherUser.avatar || getDefaultAvatar(otherUser.id);
+                        }
+                    }
+
+                    return {
+                        id: conv.id,
+                        name: name,
+                        avatar_url: avatar,
+                        is_group: isGroup,
+                        last_message: conv.last_message?.body || '',
+                        unread_count: conv.unread_count || 0,
+                        other_user_id: !isGroup && conv.participants ? conv.participants.find((p: any) => p.id !== authUser?.id)?.id : undefined
+                    };
+                });
+                
+                setChats(mappedChats);
+            } catch (err) {
+                console.error("Failed to load chats", err);
+            }
+        };
+
+        // If user is logged in, fetch chats
+        if ($authUser.get()) {
+            fetchChats();
+        }
+    }, []);
+
+    return (
+        <div className="trending-card chat-preview-card">
+            <div className="trending-title" style={{ paddingLeft: '8px' }}>
+                <h2>Messages</h2>
+            </div>
+            
+            <div className="chat-list">
+                {chats.length === 0 && (
+                    <p className="no-chats-msg">No messages yet.</p>
+                )}
+                {chats.map(chat => (
+                    <div className="hashtag-row chat-row" key={chat.id} onClick={() => openChat(chat)}>
+                        <div className="hashtag-info">
+                            <div className="chat-avatar">
+                                <img src={chat.avatar_url} alt={chat.name} />
+                                {chat.is_group && <div className="group-badge">👥</div>}
+                            </div>
+                            <div className="chat-content">
+                                <div className="hashtag-tag-name">{chat.name}</div>
+                                <div className="hashtag-count chat-preview-text">{chat.last_message}</div>
+                            </div>
+                        </div>
+                        {chat.unread_count > 0 && (
+                            <div className="unread-badge">{chat.unread_count}</div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}

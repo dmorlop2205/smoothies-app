@@ -151,6 +151,40 @@ export const api = {
 
     getSuggestedUsers: () =>
         request<{data: User[]}>('/users/suggested').then(res => res.data),
+
+    // Chat & Direct Messages
+    getConversations: () =>
+        request<{data: Conversation[]}>('/conversations').then(res => res.data),
+
+    getMessages: (conversationId: number) =>
+        request<{data: Message[]}>(`/conversations/${conversationId}/messages`).then(res => res.data),
+
+    sendMessage: (conversationId: number, body: string) =>
+        request<{data: Message}>(`/conversations/${conversationId}/messages`, {
+            method: 'POST',
+            body: JSON.stringify({ body })
+        }).then(res => res.data),
+
+    createConversation: (userIds: number[], name?: string, isGroup: boolean = false) => {
+        if (!isGroup && userIds.length === 1) {
+            return request<{data: Conversation}>('/conversations', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'dm',
+                    user_id: userIds[0]
+                })
+            }).then(res => res.data);
+        } else {
+            return request<{data: Conversation}>('/conversations', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'group',
+                    name: name,
+                    user_ids: userIds
+                })
+            }).then(res => res.data);
+        }
+    },
 };
 
 // ────────── Types (aligned to Nico's API Resources) ──────────
@@ -212,4 +246,21 @@ export interface PaginatedResponse<T> {
         last_page: number;
         total: number;
     };
+}
+
+export interface Conversation {
+    id: number;
+    name: string | null;
+    is_group: boolean;
+    last_message: string;
+    unread_count: number;
+    avatar_url: string;
+    members?: User[];
+}
+
+export interface Message {
+    id: number;
+    body: string;
+    created_at: string;
+    sender?: User;
 }

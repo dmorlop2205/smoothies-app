@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import ChatDrawer from '../components/ChatDrawer';
 
 interface Props {
   title?: string;
@@ -64,6 +65,8 @@ const { title = 'BlendUs', activePage } = Astro.props;
     </nav>
 
     <slot />
+
+    <ChatDrawer client:load />
 
     <script>
       import { initAuth, $isLoggedIn, $user, clearAuth } from '../stores/authStore';

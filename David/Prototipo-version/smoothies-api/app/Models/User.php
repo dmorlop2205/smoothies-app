@@ -89,6 +89,18 @@ class User extends Authenticatable
         )->withTimestamps();
     }
 
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(Conversation::class)
+            ->withPivot(['role', 'last_read_at'])
+            ->withTimestamps();
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+
     public function followers(): BelongsToMany
     {
         return $this->belongsToMany(
