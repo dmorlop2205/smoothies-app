@@ -4,8 +4,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\LikeController;
+use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AiController;
@@ -82,3 +84,12 @@ Route::middleware('auth:sanctum')->post('ai/generate-smoothie', [AiController::c
 Route::middleware('auth:sanctum')->post('ai/sommelier', [AiController::class, 'sommelier']);
 Route::middleware('auth:sanctum')->post('ai/extract-steps', [AiController::class, 'extractSteps']);
 Route::middleware('auth:sanctum')->post('ai/cooking-help', [AiController::class, 'cookingHelp']);
+
+Route::prefix('marketplace')->group(function () {
+    Route::get('products', [MarketplaceController::class, 'index']);
+    Route::get('products/{product}', [MarketplaceController::class, 'show']);
+
+    Route::middleware('auth:sanctum')->post('products/{product}/checkout', [MarketplaceController::class, 'checkout']);
+});
+
+Route::post('stripe/webhook', [StripeWebhookController::class, 'handle']);

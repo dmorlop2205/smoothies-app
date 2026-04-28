@@ -15,16 +15,22 @@ export default function ChatDrawer() {
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (chat) {
-            api.getMessages(chat.id).then((msgs: any[]) => {
-                const authUser = $authUser.get();
-                setMessages(msgs.reverse().map(m => ({
-                    sender: m.sender?.id === authUser?.id ? 'me' : 'them',
-                    text: m.body
-                })));
-            }).catch(console.error);
+        if (chat && isOpen) {
+            const fetch = () => {
+                api.getMessages(chat.id).then((msgs: any[]) => {
+                    const authUser = $authUser.get();
+                    setMessages(msgs.reverse().map(m => ({
+                        sender: m.sender?.id === authUser?.id ? 'me' : 'them',
+                        text: m.body
+                    })));
+                }).catch(console.error);
+            };
+
+            fetch();
+            const interval = setInterval(fetch, 5000);
+            return () => clearInterval(interval);
         }
-    }, [chat]);
+    }, [chat, isOpen]);
 
     // Prevent body scrolling when the drawer is open
     useEffect(() => {
@@ -83,9 +89,16 @@ export default function ChatDrawer() {
                             </div>
                         )}
                     </div>
-                    <button className="chat-drawer-close" onClick={closeChat} title="Close">
-                        &times;
-                    </button>
+                    <div className="chat-drawer-header-actions">
+                        <a href="/messages" className="expand-chat-btn" title="Open Full Chat" onClick={() => closeChat()}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
+                            </svg>
+                        </a>
+                        <button className="chat-drawer-close" onClick={closeChat} title="Close">
+                            &times;
+                        </button>
+                    </div>
                 </div>
                 
                 <div className="chat-drawer-messages">

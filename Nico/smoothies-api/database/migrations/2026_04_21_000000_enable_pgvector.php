@@ -7,11 +7,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
+        try {
+            DB::statement('CREATE EXTENSION IF NOT EXISTS vector');
+        } catch (\Exception $e) {
+            // pgvector not installed on this system — skip silently
+        }
     }
 
     public function down(): void
     {
-        DB::statement('DROP EXTENSION IF EXISTS vector');
+        try {
+            DB::statement('DROP EXTENSION IF EXISTS vector');
+        } catch (\Exception $e) {
+            //
+        }
     }
 };

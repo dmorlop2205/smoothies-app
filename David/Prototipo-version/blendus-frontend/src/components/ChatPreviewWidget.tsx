@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './ChatPreviewWidget.css';
-import { openChat, type ChatData } from '../stores/chatStore';
+import { openChat, closeChat, type ChatData } from '../stores/chatStore';
 import { api } from '../lib/api';
 import { $user as $authUser } from '../stores/authStore';
 import { getDefaultAvatar } from '../lib/utils';
@@ -17,7 +17,7 @@ export default function ChatPreviewWidget() {
                 const mappedChats = res.map((conv: any) => {
                     const isGroup = conv.type === 'group';
                     let name = conv.name || 'Conversation';
-                    let avatar = conv.avatar || '/assets/avatars/no-user-pfp.svg';
+                    let avatar = isGroup ? '/assets/avatars/group-avatar.svg' : (conv.avatar || '/assets/avatars/no-user-pfp.svg');
 
                     if (!isGroup && conv.participants) {
                         const otherUser = conv.participants.find((p: any) => p.id !== authUser?.id);
@@ -34,19 +34,26 @@ export default function ChatPreviewWidget() {
                         is_group: isGroup,
                         last_message: conv.last_message?.body || '',
                         unread_count: conv.unread_count || 0,
-                        other_user_id: !isGroup && conv.participants ? conv.participants.find((p: any) => p.id !== authUser?.id)?.id : undefined
+                        other_user_id: !isGroup && conv.participants ? conv.participants.find((p: any) => p.id !== authUser?.id)?.id : undefined,
+                        last_activity: conv.last_message?.created_at || conv.created_at
                     };
                 });
                 
+                // Sort by latest message/creation
+                mappedChats.sort((a, b) => 
+                    new Date(b.last_activity || 0).getTime() - new Date(a.last_activity || 0).getTime()
+                );
+
                 setChats(mappedChats);
             } catch (err) {
                 console.error("Failed to load chats", err);
             }
         };
 
-        // If user is logged in, fetch chats
         if ($authUser.get()) {
             fetchChats();
+            const interval = setInterval(fetchChats, 10000); // 10s poll
+            return () => clearInterval(interval);
         }
     }, []);
 
@@ -65,7 +72,6 @@ export default function ChatPreviewWidget() {
                         <div className="hashtag-info">
                             <div className="chat-avatar">
                                 <img src={chat.avatar_url} alt={chat.name} />
-                                {chat.is_group && <div className="group-badge">👥</div>}
                             </div>
                             <div className="chat-content">
                                 <div className="hashtag-tag-name">{chat.name}</div>
@@ -78,6 +84,13 @@ export default function ChatPreviewWidget() {
                     </div>
                 ))}
             </div>
+
+            <a href="/messages" className="view-all-chats" onClick={() => closeChat()}>
+                See all messages
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
         </div>
     );
 }

@@ -9,15 +9,21 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
+        try {
             DB::statement('ALTER TABLE users ADD COLUMN preference_embedding vector(768)');
-        });
+        } catch (\Exception $e) {
+            // pgvector not available — skip
+        }
     }
 
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('preference_embedding');
-        });
+        try {
+            Schema::table('users', function (Blueprint $table) {
+                $table->dropColumn('preference_embedding');
+            });
+        } catch (\Exception $e) {
+            //
+        }
     }
 };

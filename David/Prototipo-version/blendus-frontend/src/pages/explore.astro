@@ -6,6 +6,13 @@ import SuggestedUsers from '../components/SuggestedUsers';
 <Layout title="Explore" activePage="explore">
   <div class="page-wrapper">
     <main class="page-main">
+      <div style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; border: 1px solid #BBF7D0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <div>
+           <h2 style="margin: 0; color: #166534; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;"><span style="font-size: 1.5rem;">✨</span> AI Sommelier</h2>
+           <p style="margin: 0.25rem 0 0 0; color: #15803D; font-size: 0.95rem;">Not sure what you're craving? Let Chef Enrique pick the perfect smoothie for you.</p>
+        </div>
+        <a href="/sommelier" style="background: #16A34A; color: white; text-decoration: none; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 600; transition: transform 0.2s; white-space: nowrap;">Ask Sommelier</a>
+      </div>
       <ExplorePage client:load />
     </main>
     <aside class="page-aside">

@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MessagesPage from '../components/MessagesPage';
+import { initAuth } from '../stores/authStore';
+---
+
+<Layout title="Messages" activePage="messages">
+  <main class="full-page-messages">
+    <MessagesPage client:load />
+  </main>
+</Layout>
+
+<style>
+  .full-page-messages {
+    height: calc(100vh - 72px); /* Flush against nav */
+    margin-top: 72px; 
+    overflow: hidden;
+  }
+
+  /* Global scroll fix for this page */
+  :global(html), :global(body) {
+    overflow: hidden !important;
+    height: 100%;
+  }
+</style>

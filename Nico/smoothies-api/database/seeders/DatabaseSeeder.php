@@ -114,5 +114,6 @@ class DatabaseSeeder extends Seeder
             }
         }
         $this->call(SampleDataSeeder::class);
+        $this->call(ProductSeeder::class);
     }
 }

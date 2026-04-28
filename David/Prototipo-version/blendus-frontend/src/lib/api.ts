@@ -152,6 +152,9 @@ export const api = {
     getSuggestedUsers: () =>
         request<{data: User[]}>('/users/suggested').then(res => res.data),
 
+    getUsers: () =>
+        request<{data: User[]}>('/users').then(res => res.data),
+
     // Chat & Direct Messages
     getConversations: () =>
         request<{data: Conversation[]}>('/conversations').then(res => res.data),
@@ -185,6 +188,9 @@ export const api = {
             }).then(res => res.data);
         }
     },
+
+    deleteConversation: (conversationId: number) =>
+        request<void>(`/conversations/${conversationId}`, { method: 'DELETE' }),
 };
 
 // ────────── Types (aligned to Nico's API Resources) ──────────
@@ -207,6 +213,7 @@ export interface Ingredient {
     quantity: number;
     unit: string;
 }
+
 
 export interface Tag {
     id: number;
@@ -250,12 +257,15 @@ export interface PaginatedResponse<T> {
 
 export interface Conversation {
     id: number;
+    type: 'dm' | 'group';
     name: string | null;
-    is_group: boolean;
-    last_message: string;
-    unread_count: number;
-    avatar_url: string;
-    members?: User[];
+    description?: string | null;
+    avatar?: string | null;
+    owner_id?: number;
+    participants?: User[];
+    last_message?: Message | null;
+    unread_count?: number;
+    created_at: string;
 }
 
 export interface Message {

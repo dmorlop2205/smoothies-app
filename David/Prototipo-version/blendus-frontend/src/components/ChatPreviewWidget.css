@@ -79,16 +79,44 @@
 }
 
 .chat-preview-text {
-    white-space: nowrap;
+    max-width: 140px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
     color: #6B7280;
     font-size: 0.9rem;
     margin-top: 2px;
 }
 
+.view-all-chats {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--amber-600);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-top: 1px solid #f1f5f9;
+    transition: background 0.2s;
+}
+
+.view-all-chats:hover {
+    background: var(--amber-50);
+}
+
+.view-all-chats svg {
+    transition: transform 0.2s;
+}
+
+.view-all-chats:hover svg {
+    transform: translateX(4px);
+}
+
 .unread-badge {
-    background: #059669;
+    background: var(--amber-600);
     color: white;
     font-size: 0.75rem;
     font-weight: bold;

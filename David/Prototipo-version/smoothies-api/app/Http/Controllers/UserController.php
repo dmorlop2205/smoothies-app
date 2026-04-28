@@ -16,6 +16,15 @@ class UserController extends Controller
     ) {
     }
 
+    public function index(Request $request): JsonResponse
+    {
+        $users = User::query()
+            ->where('id', '!=', $request->user()?->id)
+            ->get();
+
+        return UserResource::collection($users)->response();
+    }
+
     public function show(User $user): JsonResponse
     {
         $user->loadCount(['posts', 'followers', 'following']);
