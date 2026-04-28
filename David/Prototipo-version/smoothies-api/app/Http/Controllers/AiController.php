@@ -56,22 +56,16 @@ class AiController extends Controller
 You are an expert smoothie chef AI. Your ONLY purpose is to create smoothie recipes.
 
 # Constraints & Security
-1. You must ONLY generate smoothies. Do NOT generate recipes for other foods, and do NOT engage in general conversation.
-2. If the user's prompt is completely unrelated to smoothies (e.g. asking to write code, solve math, or political questions), you MUST ignore it and generate a random creative smoothie instead. DO NOT refuse or apologize via text, because your output MUST strictly be the JSON format for a smoothie.
+1. You must ONLY generate smoothie recipes. If the prompt is weird or short (like "3£ smoothie"), invent a clever, realistic smoothie that fits it.
+2. DO NOT include meta-instructions in the output values. Generate REAL food ingredients.
 
-# Output Format
-Return ONLY valid JSON with this exact structure:
-{
-  "name": "Creative Smoothie Name",
-  "description": "A short, appetizing description (2-3 sentences)",
-  "ingredients": [
-    { "name": "Ingredient name", "amount": "quantity with unit, e.g. 200 g" }
-  ],
-  "tags": ["tag1", "tag2"],
-  "category": "one of: green, tropical, berry, protein, detox, dessert",
-  "preparation_steps": "Step-by-step instructions for making the smoothie"
-}
-Use between 4 and 8 ingredients. Use between 2 and 4 tags (single words, no #). Be creative and detailed.
+# Fields to Generate
+- name: The smoothie's name
+- description: A short, appetizing description (2-3 sentences)
+- ingredients: Array of objects with "name" (e.g. "Mango") and "amount" (e.g. "1 piece")
+- tags: Array of 2-4 single-word tags (no #)
+- category: MUST be exactly one of: green, tropical, berry, protein, detox, dessert
+- preparation_steps: Step-by-step paragraphs
 EOT;
 
         // Add user context if available
@@ -131,6 +125,18 @@ EOT;
                 return response()->json([
                     'error' => 'AI returned an invalid response. Please try again.',
                 ], 500);
+            }
+
+            // Fallback: Strip out hallucinated ingredients if the 1B model gets confused
+            if (isset($recipe['ingredients']) && is_array($recipe['ingredients'])) {
+                $badWords = ['preparation steps', 'category', 'tags', 'creative smoothie', 'ingredient name'];
+                $recipe['ingredients'] = array_values(array_filter($recipe['ingredients'], function($ing) use ($badWords) {
+                    $name = strtolower($ing['name'] ?? '');
+                    foreach ($badWords as $bw) {
+                        if (str_contains($name, $bw)) return false;
+                    }
+                    return true;
+                }));
             }
 
             return response()->json($recipe);
@@ -270,19 +276,14 @@ You are an expert AI Cooking Assistant for the BlendUs app.
 # Instructions
 1. You will receive the raw 'preparation_steps' and 'ingredients' of a smoothie named "{$title}".
 2. Break the preparation down into a logical, sequential array of distinct cooking steps. 
-3. For EACH step, you MUST invent a creative, helpful tip about doing that step. Append the tip to the end of the text, starting with "💡 Tip: ".
-4. Do NOT include step numbers at the beginning of the text (e.g. write "Chop the kiwi" not "1. Chop the kiwi").
+3. For EACH step, you MUST invent a creative, helpful tip about doing that step.
+4. You MUST base your steps ONLY on the provided Ingredients and Raw Instructions. DO NOT hallucinate or copy placeholder text.
+5. Do NOT include step numbers at the beginning of the text.
 
-# Output Format
-Return ONLY valid JSON with this exact structure:
-{
-  "steps": [
-    {
-      "instruction": "Chop the kiwi.",
-      "tip": "Use a serrated knife for an easier cut."
-    }
-  ]
-}
+# Fields to Generate
+- steps: An array of objects.
+  - instruction: The actual cooking step.
+  - tip: A useful tip starting with "💡 Tip: ".
 EOT;
 
         $userPrompt = "Ingredients: {$ingredients}\nRaw Instructions: {$prep}";
