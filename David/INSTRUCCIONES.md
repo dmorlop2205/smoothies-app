@@ -13,11 +13,15 @@ docker compose up -d
 ```
 
 **Configuración Inicial (Solo la primera vez):**
-Si es la primera vez que lo lanzas o quieres resetear los datos, ejecuta esto dentro del contenedor:
+Si es la primera vez que lo lanzas o quieres resetear los datos, ejecuta esto:
 
 ```bash
 # Migrar y sembrar datos
 docker exec blendus-backend php artisan migrate:fresh --seed
+
+# Descargar los modelos de IA (puede tardar unos minutos según tu internet)
+docker exec ollama ollama pull llama3.2:1b
+docker exec ollama ollama pull nomic-embed-text
 
 # Generar vectores para el sistema de recomendación
 docker exec blendus-backend php artisan smoothies:generate-embeddings
@@ -26,6 +30,18 @@ docker exec blendus-backend php artisan smoothies:generate-embeddings
 ## Entrada al sitio
 *   **Frontend:** [http://localhost:4321](http://localhost:4321)
 *   **API / Backend:** [http://localhost:8000](http://localhost:8000)
+
+---
+
+## ⚠️ Si cambias de PC
+
+El **código** viaja contigo via Git. Lo que **no** viene:
+
+| Qué | Dónde vive | Cómo recuperarlo |
+|-----|-----------|-----------------|
+| Datos de la BD | Docker volume `postgres_data` | `migrate:fresh --seed` (datos de prueba) o exportar con `pg_dump` |
+| Modelos de IA | Docker volume `ollama_data` | `ollama pull llama3.2:1b` y `ollama pull nomic-embed-text` |
+| Dependencias | `node_modules`, `vendor/` | Se instalan automáticamente al hacer `docker compose up` |
 
 ---
 
@@ -42,12 +58,17 @@ Para que no tengas que crear una desde cero (aunque puedes hacerlo en `/register
 
 ## ¿Qué puedes hacer en BlendUs? (Features)
 
-Hemos puesto mucho cariño en los detalles. Esto es lo que ya puedes esta programado:
+Hemos puesto mucho cariño en los detalles. Esto es lo que ya está programado:
 
 *   **Comunidad de Smoothies:** Explora un feed infinito con fotos espectaculares y recetas reales.
 *   **Interacción Total:** Dale a "Like" a tus favoritos, guarda recetas para verlas luego y comenta para compartir tu opinión.
 *   **Perfil Personalizado:** Gestiona tus propias creaciones, mira tus posts guardados y las fotos que te han gustado, todo organizado por pestañas.
+*   **Explorar (Explore):** Grid estilo Instagram con buscador de recetas y panel de filtros por etiquetas.
 *   **Descubrimiento Inteligente:** Filtra por categorías (Verde, Tropical, Proteico...) y recibe sugerencias de usuarios a los que seguir.
 *   **Modo Invitado:** Cualquiera puede navegar y ver las recetas sin necesidad de registrarse.
 *   **Edición Avanzada:** Sube tus fotos, añade ingredientes detallados, pasos de preparación y etiquetas. ¡Y si te equivocas, tienes un botón para revertir los cambios!
-*   **Ranking Personalizado (IA):** Tu feed se adapta a tus gustos. Cuanto más interactúes (likes/guardados), mejor entenderá la IA qué smoothies te gustan y los pondrá arriba.
+*   **Ranking Personalizado (IA):** Tu feed "For You" se adapta a tus gustos. Cuanto más interactúes (likes/guardados), mejor entenderá la IA qué smoothies te gustan.
+*   **AI Sommelier 🍷:** Describe tu estado de ánimo y Chef Enrique te recomendará el smoothie perfecto del catálogo. Accesible desde la página Explore.
+*   **AI Recipe Generator ✨:** Al crear un post, puedes escribir una idea y la IA genera la receta completa automáticamente (nombre, ingredientes, pasos, etiquetas).
+*   **AI Cooking Assistant 👨‍🍳:** En la vista de un post, abre el asistente paso a paso para cocinar con ayuda de Chef Enrique en tiempo real.
+*   **Hub de Mensajería 💬:** Chats directos y grupos. Actualizaciones en tiempo real mediante polling automático. Accesible desde cualquier página con el widget lateral.

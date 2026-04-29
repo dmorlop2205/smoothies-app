@@ -11,23 +11,6 @@
     flex-direction: column;
     gap: 1rem;
     margin-top: 1rem;
-    max-height: 236px; /* Approximately 3 chat items */
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-/* Custom scrollbar for chat list */
-.chat-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.chat-list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.chat-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 4px;
 }
 
 .chat-row {

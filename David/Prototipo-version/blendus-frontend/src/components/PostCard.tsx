@@ -45,7 +45,10 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
         if (commentsOpen && !fetchedComments && comments.length === 0 && post.comments_count > 0) {
             api.getComments(post.id)
                 .then(res => {
-                    setComments(res);
+                    const sorted = res.sort((a: any, b: any) =>
+                        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+                    );
+                    setComments(sorted.slice(-4)); // only keep the 4 most recent
                     setFetchedComments(true);
                 })
                 .catch(console.error);
@@ -179,11 +182,13 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                 <div className="like-comment-share">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={handleLike}>
                         <svg className="like" width="24px" height="24px" viewBox="0 0 24 24" fill="none">
-                            <path fillRule="evenodd" clipRule="evenodd"
-                                d="M12 6.00019C10.2006 3.90317 7.19377 3.2551 4.93923 5.17534C2.68468 7.09558 2.36727 10.3061 4.13778 12.5772C5.60984 14.4654 10.0648 18.4479 11.5249 19.7369C11.6882 19.8811 11.7699 19.9532 11.8652 19.9815C11.9483 20.0062 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z"
-                                stroke={liked ? 'none' : '#364153'} fill={liked ? '#FF2056' : 'none'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            {liked ? (
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#FF2056" />
+                            ) : (
+                                <path d="M12.1 18.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z" fill="none" stroke="#364153" strokeWidth="2"/>
+                            )}
                         </svg>
-                        {likesCount > 0 && <span style={{ fontSize: '0.88rem', color: '#666' }}>{likesCount}</span>}
+                        <span style={{ fontSize: '0.88rem', color: '#666' }}>{likesCount}</span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }} onClick={() => setCommentsOpen(o => !o)}>
@@ -191,7 +196,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                             <path d="M16 4C9.373 4 4 8.373 4 14c0 3.314 1.657 6.248 4.224 8.12L8 28l6.4-3.2c.53.08 1.06.12 1.6.12 6.627 0 12-4.373 12-10S22.627 4 16 4z"
                                 stroke="#364153" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        {commentsCount > 0 && <span style={{ fontSize: '0.88rem', color: '#666' }}>{commentsCount}</span>}
+                        <span style={{ fontSize: '0.88rem', color: '#666' }}>{commentsCount}</span>
                     </div>
 
                     <div style={{ cursor: 'pointer' }} onClick={() => navigator.clipboard?.writeText(window.location.origin)}>
@@ -234,7 +239,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
 
             {commentsOpen && (
                 <div style={{ marginTop: '1rem', borderTop: '1px solid #eee', paddingTop: '1rem', padding: '1rem 1rem 1rem' }}>
-                    {comments.map(c => (
+                    {comments.slice(-4).map(c => (
                         <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                             <a href={`/profile/${c.author?.id}`} className="pfp-circle" style={{ width: 28, height: 28 }}>
                                 {c.author?.avatar ? (
@@ -265,7 +270,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                             disabled={submitting}
                         />
                         <button type="submit" disabled={submitting || !comment.trim()}
-                            style={{ background: 'none', border: 'none', color: '#007A55', fontWeight: 'bold', cursor: 'pointer' }}>
+                            style={{ background: 'none', border: 'none', color: 'var(--amber-600)', fontWeight: 'bold', cursor: 'pointer' }}>
                             Post
                         </button>
                     </form>

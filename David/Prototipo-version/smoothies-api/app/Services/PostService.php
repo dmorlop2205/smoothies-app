@@ -159,7 +159,7 @@ class PostService
 
         if ($user->preference_embedding) {
             // Rank by similarity using pgvector distance operator <=> (cosine distance)
-            $query->select('*')
+            $query->addSelect('*')
                 ->selectRaw('embedding <=> ? AS distance', [$user->preference_embedding])
                 ->orderBy('distance', 'asc');
         } else {

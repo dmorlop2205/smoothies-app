@@ -92,7 +92,6 @@ export default function Feed() {
                         onClick={() => handleFeedTypeChange('personalized')}
                     >
                         <span>For You</span>
-                        <span className="ai-badge">WORK IN PROGRESS</span>
                     </button>
                 </div>
             </div>

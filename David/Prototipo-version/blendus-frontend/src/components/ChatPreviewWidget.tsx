@@ -67,7 +67,7 @@ export default function ChatPreviewWidget() {
                 {chats.length === 0 && (
                     <p className="no-chats-msg">No messages yet.</p>
                 )}
-                {chats.map(chat => (
+                {chats.slice(0, 3).map(chat => (
                     <div className="hashtag-row chat-row" key={chat.id} onClick={() => openChat(chat)}>
                         <div className="hashtag-info">
                             <div className="chat-avatar">
