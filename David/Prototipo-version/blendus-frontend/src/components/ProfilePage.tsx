@@ -158,7 +158,9 @@ export default function ProfilePage({ userId }: Props) {
                 avatar: editAvatarFile ? undefined : editAvatar, // Use editAvatar ('' if removed) if no file is selected
                 avatar_file: editAvatarFile || undefined,
             });
-            setUser(updated);
+            // Merge to preserve counts (followers_count, following_count, posts_count)
+            // that the update endpoint may not return
+            setUser(prev => prev ? { ...prev, ...updated } : updated);
             setModal(null);
             setEditAvatarFile(null);
             // Sync local auth store if editing own profile
@@ -212,7 +214,7 @@ export default function ProfilePage({ userId }: Props) {
                     </div>
                     <div className="user-info">
                         <h3 className="username">@{user.username}</h3>
-                        <p className="email">@{user.email}</p>
+                        {user.email && <p className="email">{user.email}</p>}
                         
                     </div>
                 </div>
@@ -242,7 +244,7 @@ export default function ProfilePage({ userId }: Props) {
                     ) : (
                         <>
                             <button
-                                className={isFollowing ? 'btn-primary' : 'btn-notfollow'}
+                                className={isFollowing ? 'btn-notfollow' : 'btn-primary'}
                                 onClick={handleFollow}
                                 disabled={followLoading}
                             >

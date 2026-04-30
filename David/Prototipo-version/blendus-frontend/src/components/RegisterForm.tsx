@@ -4,11 +4,11 @@ import { setAuth } from '../stores/authStore';
 import './RegisterForm.css';
 
 export default function RegisterForm() {
-    const [form, setForm] = useState({ name: '', username: '', email: '', password: '', password_confirmation: '', phone: '' });
+    const [form, setForm] = useState({ name: '', username: '', email: '', password: '', password_confirmation: '' });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
         setForm(f => ({ ...f, [e.target.id]: e.target.value }));
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -20,9 +20,8 @@ export default function RegisterForm() {
         }
         setLoading(true);
         try {
-            // Note: phone and birthdate might be ignored by the backend initially
             const res = await api.register({
-                name: form.username, // Paco didn't put a "Name" field, we'll use username
+                name: form.username,
                 username: form.username,
                 email: form.email,
                 password: form.password,
@@ -50,13 +49,13 @@ export default function RegisterForm() {
             <div className="birthdate">
                 <label className="label" htmlFor="birthdate">Date of birth</label>
                 <div className="day-month-year">
-                    <select className="text-input birthdate-input" id="day" defaultValue="">
+                    <select className="text-input birthdate-input" id="day" defaultValue="" onChange={handleChange}>
                         <option value="" disabled>Day</option>
                         {[...Array(31)].map((_, i) => (
                             <option key={i} value={i + 1}>{i + 1}</option>
                         ))}
                     </select>
-                    <select className="text-input birthdate-input" id="month" defaultValue="">
+                    <select className="text-input birthdate-input" id="month" defaultValue="" onChange={handleChange}>
                         <option value="" disabled>Month</option>
                         <option value="1">January</option>
                         <option value="2">February</option>
@@ -71,17 +70,13 @@ export default function RegisterForm() {
                         <option value="11">November</option>
                         <option value="12">December</option>
                     </select>
-                    <select className="text-input birthdate-input" id="year" defaultValue="">
+                    <select className="text-input birthdate-input" id="year" defaultValue="" onChange={handleChange}>
                         <option value="" disabled>Year</option>
                         {[...Array(100)].map((_, i) => (
                             <option key={i} value={2026 - i}>{2026 - i}</option>
                         ))}
                     </select>
                 </div>
-            </div>
-            <div className="phone">
-                <label className="label" htmlFor="phone">Phone number</label>
-                <input className="text-input" type="tel" id="phone" placeholder='+34 123 456 789' value={form.phone} onChange={handleChange} />
             </div>
             <div className="password">
                 <label className="label" htmlFor="password">Password</label>
@@ -91,18 +86,18 @@ export default function RegisterForm() {
                 <label className="label" htmlFor="password_confirmation">Repeat Password</label>
                 <input className="text-input" type="password" id="password_confirmation" placeholder='Repeat password' required minLength={8} value={form.password_confirmation} onChange={handleChange} />
             </div>
-            
-            {error && <p style={{ color: 'var(--pink)', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
 
-            <button className="btn register-btn" type="submit" disabled={loading}>
+            {error && <p className="form-error-inline">{error}</p>}
+
+            <button className="register-btn" type="submit" disabled={loading}>
                 {loading ? 'Creating...' : 'Register'}
             </button>
-            <button type="button" className="btn secondary-btn" onClick={() => window.location.href = '/login'}> 
+            <button type="button" className="secondary-btn-alt" onClick={() => window.location.href = '/login'}>
                 I already have an account
             </button>
-            <a href="/" style={{ textAlign: 'center', color: 'var(--gray-500)', fontSize: '0.9rem', textDecoration: 'none', fontWeight: 500 }}>
-                Continue as Guest
-            </a>
+            <div className="guest-divider">
+                <a href="/" className="guest-link">Continue as Guest</a>
+            </div>
         </form>
     );
 }
