@@ -289,7 +289,9 @@ export default function MessagesPage() {
                                 className={`chat-item ${$activeChat?.id === chat.id ? 'active' : ''}`}
                                 onClick={() => openChat(chat)}
                             >
-                                <img src={chat.avatar_url} alt={chat.name} className="chat-item-avatar" />
+                                <div className="circle">
+                                    <img src={chat.avatar_url} alt={chat.name} className="chat-item-avatar" />
+                                </div>
                                 <div className="chat-item-info">
                                     <div className="chat-item-name">
                                         {chat.name}
@@ -315,7 +317,10 @@ export default function MessagesPage() {
                                 className="header-user-info"
                                 style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none', color: 'inherit' }}
                             >
-                                <img src={$activeChat.avatar_url} alt={$activeChat.name} />
+                                <div className="circle">
+                                    <img src={$activeChat.avatar_url} alt={$activeChat.name} />
+
+                                </div>
                                 <div>
                                     <h3>{$activeChat.name}</h3>
                                     <span>{$activeChat.is_group ? 'Group Chat' : 'Direct Message'}</span>

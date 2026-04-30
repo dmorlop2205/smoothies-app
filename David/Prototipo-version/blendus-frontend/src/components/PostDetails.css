@@ -207,7 +207,7 @@
     .tag {
         font-size: .88rem;
         color: var(--amber-600);
-        background-color: #ecfdf58e;
+        background-color: oklch(92.444% 0.12025 95.855 / 0.308);
         border: 1px solid var(--amber-500);
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.1);
         padding: .5rem 1rem;
@@ -264,5 +264,22 @@
     .number {
         color: var(--gray-700);
         font-weight: 600;
+    }
+}
+
+.cook-with-ai {
+    background: linear-gradient(90deg, #F59E0B, #EA580C);
+    color: white;
+    border: none;
+    padding: .6rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: 'Alexandria';
+    cursor: pointer;
+    transition: .2s ease;
+    font-size: clamp(0.9rem, 0.847rem + 0.211vw, 1.1rem);
+
+    &:hover {
+        background: linear-gradient(90deg, #EA580C, #F59E0B);
     }
 }

@@ -125,7 +125,7 @@ export default function Feed() {
                 {loading && page === 1 ? (
                     <div style={{ textAlign: 'center', padding: '3rem' }}>
                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="#00BC7D" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
+                            <circle cx="12" cy="12" r="10" stroke="#e17100" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
                                 <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
                             </circle>
                         </svg>
@@ -146,7 +146,7 @@ export default function Feed() {
                     <button
                         onClick={() => setPage(p => p + 1)}
                         disabled={loading}
-                        style={{ background: '#007A55', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '20px', cursor: 'pointer', fontWeight: 600 }}
+                        style={{ background: '#e17100', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '20px', cursor: 'pointer', fontWeight: 600 }}
                     >
                         {loading ? 'Loading...' : 'Load More'}
                     </button>
