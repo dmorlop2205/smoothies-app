@@ -181,7 +181,7 @@ export default function ProfilePage({ userId }: Props) {
     if (loading) return (
         <div className="profile-loading">
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="#00BC7D" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
+                <circle cx="12" cy="12" r="10" stroke="#e17100" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
                     <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
                 </circle>
             </svg>
@@ -198,96 +198,94 @@ export default function ProfilePage({ userId }: Props) {
     const initials = user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
 
     return (
-        <div className="profile-dashboard">
+        <div className="profile">
             <div className="user-container">
-                <div className="profile-header-side">
-                    <div className="avatar-side">
-                        <div className="pfp-circle" style={{ width: 120, height: 120 }}>
-                            {user.avatar ? (
-                                <img src={user.avatar} alt={user.name} />
-                            ) : user.avatar === '' ? (
-                                <img src="/assets/avatars/no-user-pfp.svg" alt="No profile" style={{ padding: '20%' }} />
-                            ) : (
-                                <img src={getDefaultAvatar(user.id)} alt={user.name} />
-                            )}
-                        </div>
+                <div className="user-header">
+                    <div className="user-pic">
+                        {user.avatar ? (
+                            <img src={user.avatar} alt={user.name} />
+                        ) : user.avatar === '' ? (
+                            <img src="/assets/avatars/no-user-pfp.svg" alt="No profile" style={{ padding: '20%' }} />
+                        ) : (
+                            <img src={getDefaultAvatar(user.id)} alt={user.name} />
+                        )}
                     </div>
-                    
-                    <div className="info-side">
-                        <div className="info-top">
-                            <h3 className="username">@{user.username}</h3>
-                            <div className="action-buttons">
-                                {isOwn ? (
-                                    <button className="btn-action-outline" onClick={() => setModal('edit')}>Edit Profile</button>
-                                ) : (
-                                    <>
-                                        <button
-                                            className={`btn-action-primary ${isFollowing ? 'following' : ''}`}
-                                            onClick={handleFollow}
-                                            disabled={followLoading}
-                                        >
-                                            {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
-                                        </button>
-                                        <button className="btn-action-outline" onClick={async () => {
-                                            try {
-                                                const res = await api.createConversation([user.id]);
-                                                openChat({
-                                                    id: res.id,
-                                                    name: user.name,
-                                                    avatar_url: user.avatar || getDefaultAvatar(user.id),
-                                                    is_group: false,
-                                                    last_message: "",
-                                                    unread_count: 0,
-                                                    other_user_id: user.id
-                                                });
-                                            } catch (err) {
-                                                console.error("Could not start conversation", err);
-                                            }
-                                        }}>
-                                            Message
-                                        </button>
-                                    </>
-                                )}
-                                <button className="btn-action-outline" onClick={() => {
-                                    navigator.clipboard.writeText(window.location.href);
-                                    alert('Profile link copied!');
-                                }}>Share Profile</button>
-                                {isOwn && (
-                                    <button 
-                                        className="btn-action-outline" 
-                                        style={{ color: 'red' }}
-                                        onClick={async () => {
-                                            try { await api.logout(); } catch {}
-                                            clearAuth();
-                                            window.location.href = '/login';
-                                        }}
-                                    >
-                                        Logout
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="stats-row">
-                            <div className="stat-item">
-                                <span className="stat-value">{user.posts_count ?? posts.length}</span>
-                                <span className="stat-text">posts</span>
-                            </div>
-                            <div className="stat-item" onClick={() => openModal('followers')} style={{ cursor: 'pointer' }}>
-                                <span className="stat-value">{user.followers_count ?? 0}</span>
-                                <span className="stat-text">followers</span>
-                            </div>
-                            <div className="stat-item" onClick={() => openModal('following')} style={{ cursor: 'pointer' }}>
-                                <span className="stat-value">{user.following_count ?? 0}</span>
-                                <span className="stat-text">following</span>
-                            </div>
-                        </div>
-
-                        <div className="info-bio">
-                            <p className="full-name">{user.name}</p>
-                            {user.bio && <p className="bio-text">{user.bio}</p>}
-                        </div>
+                    <div className="user-info">
+                        <h3 className="username">@{user.username}</h3>
+                        <p className="email">@{user.email}</p>
+                        
                     </div>
+                </div>
+                <div className="bio">
+                    <p className="full-name">{user.name}</p>
+                    {user.bio && <p className="description">{user.bio}</p>}
+                </div>
+                <div className="user-stats">
+                    <div className="stat">
+                        <span className="stat-number">{user.posts_count ?? posts.length}</span>
+                        <span className="stat-label">posts</span>
+                    </div>
+                    <div className="stat" onClick={() => openModal('followers')} style={{ cursor: 'pointer' }}>
+                        <span className="stat-number">{user.followers_count ?? 0}</span>
+                        <span className="stat-label">followers</span>
+                    </div>
+                    <div className="stat" onClick={() => openModal('following')} style={{ cursor: 'pointer' }}>
+                        <span className="stat-number">{user.following_count ?? 0}</span>
+                        <span className="stat-label">following</span>
+                    </div>
+                </div>
+
+                
+                <div className="user-buttons">
+                    {isOwn ? (
+                        <button className="btn btn-primary" onClick={() => setModal('edit')}>Edit Profile</button>
+                    ) : (
+                        <>
+                            <button
+                                className={isFollowing ? 'btn-primary' : 'btn-notfollow'}
+                                onClick={handleFollow}
+                                disabled={followLoading}
+                            >
+                                {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+                            </button>
+                            <button className="btn-message" onClick={async () => {
+                                try {
+                                    const res = await api.createConversation([user.id]);
+                                    openChat({
+                                        id: res.id,
+                                        name: user.name,
+                                        avatar_url: user.avatar || getDefaultAvatar(user.id),
+                                        is_group: false,
+                                        last_message: "",
+                                        unread_count: 0,
+                                        other_user_id: user.id
+                                    });
+                                } catch (err) {
+                                    console.error("Could not start conversation", err);
+                                }
+                            }}>
+                                Message
+                            </button>
+                        </>
+                    )}
+                    {isOwn && (
+                        <button 
+                            className="btn-logout" 
+                            onClick={async () => {
+                                try { await api.logout(); } catch {}
+                                clearAuth();
+                                window.location.href = '/login';
+                            }}
+                        >
+                            Logout
+                        </button>
+                    )}
+                    <button className="btn-share" onClick={() => {
+                        navigator.clipboard.writeText(window.location.href);
+                        alert('Profile link copied!');
+                    }}><svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 -960 960 960" width="48px" fill="#6B7282">
+                        <path d="M686-80q-47.5 0-80.75-33.25T572-194q0-8 5-34L278-403q-16.28 17.34-37.64 27.17Q219-366 194-366q-47.5 0-80.75-33T80-480q0-48 33.25-81T194-594q24 0 45 9.3 21 9.29 37 25.7l301-173q-2-8-3.5-16.5T572-766q0-47.5 33.25-80.75T686-880q47.5 0 80.75 33.25T800-766q0 47.5-33.25 80.75T686-652q-23.27 0-43.64-9Q622-670 606-685L302-516q3 8 4.5 17.5t1.5 18q0 8.5-1 16t-3 15.5l303 173q16-15 36.09-23.5 20.1-8.5 43.07-8.5Q734-308 767-274.75T800-194q0 47.5-33.25 80.75T686-80Zm.04-60q22.96 0 38.46-15.54 15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5Zm-492-286q22.96 0 38.46-15.54 15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5ZM724.5-727.54q15.5-15.53 15.5-38.5 0-22.96-15.54-38.46-15.53-15.5-38.5-15.5-22.96 0-38.46 15.54-15.5 15.53-15.5 38.5 0 22.96 15.54 38.46 15.53 15.5 38.5 15.5 22.96 0 38.46-15.54ZM686-194ZM194-480Zm492-286Z"/></svg>
+                    </button>
                 </div>
             </div>
 
@@ -329,49 +327,71 @@ export default function ProfilePage({ userId }: Props) {
             </div>
 
             {/* ── POSTS GRID ── */}
-            <div className="profile-section">
+            <div className={`user-grid ${!postsLoading && posts.length === 0 ? 'ghost' : ''}`}>
                 {postsLoading ? (
                     <div className="profile-loading">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="#00BC7D" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
-                                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="#e17100"
+                                strokeWidth="2"
+                                strokeDasharray="50"
+                                strokeDashoffset="20"
+                            >
+                                <animateTransform
+                                    attributeName="transform"
+                                    type="rotate"
+                                    from="0 12 12"
+                                    to="360 12 12"
+                                    dur="1s"
+                                    repeatCount="indefinite"
+                                />
                             </circle>
                         </svg>
                     </div>
                 ) : posts.length === 0 ? (
-                    <div className="user-grid ghost">
-                        {[...Array(9)].map((_, i) => (
-                            <div key={i} className="grid skeleton">
-                                {i === 4 && (
-                                    <div className="empty-message">
-                                        <p>{activeTab === 'recipes' ? 'No recipes shared yet.' : activeTab === 'saved' ? 'No saved posts.' : 'No liked posts.'}</p>
-                                        {isOwn && activeTab === 'recipes' && (
-                                            <a href="/create" className="btn-profile-promo">Share First Recipe</a>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="user-grid">
-                        {posts.map(post => (
-                            <a href={`/post/${post.id}`} key={post.id} className="grid">
-                                {post.image_url ? (
-                                    <img src={post.image_url} alt={post.title} />
-                                ) : (
-                                    <div className="post-grid-placeholder">🍹</div>
-                                )}
-                                <div className="overlay">
-                                    <h4 className="title">{post.title}</h4>
-                                    <div className="likes-comments">
-                                        <span className="likes">{post.likes_count} ❤️</span>
-                                        <div className="comments">{post.comments_count} 💬</div>
-                                    </div>
+                    [...Array(9)].map((_, i) => (
+                        <div key={i} className="grid skeleton">
+                            {i === 4 && (
+                                <div className="empty-message">
+                                    <p>
+                                        {activeTab === 'recipes'
+                                            ? 'No recipes shared yet.'
+                                            : activeTab === 'saved'
+                                                ? 'No saved posts.'
+                                                : 'No liked posts.'}
+                                    </p>
+
+                                    {isOwn && activeTab === 'recipes' && (
+                                        <a href="/create" className="btn-profile-promo">
+                                            Share First Recipe
+                                        </a>
+                                    )}
                                 </div>
-                            </a>
-                        ))}
-                    </div>
+                            )}
+                        </div>
+                    ))
+                ) : (
+                    posts.map(post => (
+                        <a href={`/post/${post.id}`} key={post.id} className="grid">
+                            {post.image_url ? (
+                                <img src={post.image_url} alt={post.title} />
+                            ) : (
+                                <div className="post-grid-placeholder">🍹</div>
+                            )}
+
+                            <div className="overlay">
+                                <h4 className="title">{post.title}</h4>
+
+                                <div className="likes-comments">
+                                    <span className="likes">{post.likes_count} ❤️</span>
+                                    <div className="comments">{post.comments_count} 💬</div>
+                                </div>
+                            </div>
+                        </a>
+                    ))
                 )}
             </div>
 

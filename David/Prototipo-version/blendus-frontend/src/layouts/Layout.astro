@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import ChatDrawer from '../components/ChatDrawer';
+import '../components/NavComponent.css';
 
 interface Props {
   title?: string;
@@ -92,7 +93,7 @@ const { title = 'BlendUs', activePage } = Astro.props;
               </a>
             `;
           } else {
-            slot.innerHTML = `<a href="/login" class="btn" style="border-radius:100px;font-size:.9rem">Sign In</a>`;
+            slot.innerHTML = `<a href="/login" class="btn btn-login">Sign In</a>`;
           }
         };
         render();

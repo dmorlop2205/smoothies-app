@@ -112,3 +112,12 @@ nav {
         }
     }
 }
+
+.btn-login {
+    color: white !important;
+    padding: .5rem 2rem !important;
+}
+
+.btn-login:hover {
+    background: white !important;
+}
