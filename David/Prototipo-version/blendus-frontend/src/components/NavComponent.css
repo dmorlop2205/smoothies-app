@@ -7,7 +7,7 @@ nav {
     display:flex;
     justify-content: space-between;
     align-items: center;
-    padding: .8rem 6.5rem;
+    padding: .3rem 6.5rem;
     background-color: rgba(255, 255, 255, 0.8);
     .logo {
         a {
@@ -15,7 +15,6 @@ nav {
             display: flex;
             align-items: center;
             gap: .6rem;
-            
             
             .brand {
                 background: var(--gradient-logo);
@@ -46,14 +45,14 @@ nav {
         }
     }
 
-    .menu {
+    .nav-menu {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: .5rem;
         a {
             padding: .5rem 1rem;
             border-radius: 15px;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             color: var(--gray-500);
             text-decoration: none;
             display: flex;
@@ -62,8 +61,8 @@ nav {
             transition: .2s ease;
             svg {
                 
-                width: 30px;
-                height: 30px;
+                width: 20px;
+                height: 20px;
                 path {
                     transition: .2s ease;
                 }
@@ -71,6 +70,15 @@ nav {
                     transition: .2s ease;
                 }
             }
+            .unread {
+                color: var(--amber-600);
+                border: 1px solid red;
+                filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.15));
+                circle {
+                    animation: pulseNotification 1.8s infinite;
+                }
+            }
+    
         }
 
         a:hover {
@@ -112,7 +120,23 @@ nav {
         }
     }
 }
-
+.pfp-circle {
+    background: var(--gradient-profile);
+    border-radius: 50%;
+    width: 33px;
+    height: 33px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .avatar-img {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        object-fit: cover;
+        outline: 2px solid white;
+        aspect-ratio: 1/1;
+    }
+}
 .btn-login {
     color: white !important;
     padding: .5rem 2rem !important;
@@ -120,4 +144,35 @@ nav {
 
 .btn-login:hover {
     background: white !important;
+}
+
+.message-icon {
+    width: 24px;
+    height: 24px;
+
+    transition:
+        transform .2s ease,
+        color .2s ease,
+        opacity .2s ease;
+
+    color: var(--gray-500);
+}
+
+
+
+@keyframes pulseNotification {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: .85;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }

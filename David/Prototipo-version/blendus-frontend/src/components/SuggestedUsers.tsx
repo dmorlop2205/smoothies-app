@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import type { User } from '../lib/api';
 import { getDefaultAvatar } from '../lib/utils';
+import './SuggestedComponent.css';
 
 export default function SuggestedUsers() {
     const [users, setUsers] = useState<User[]>([]);
@@ -28,26 +29,29 @@ export default function SuggestedUsers() {
     return (
         <div className="suggested-card">
             <h2>Suggested for you</h2>
-            {users.map((user) => (
-                <div className="suggested-user-row" key={user.id}>
-                    <div className="suggested-user-info">
-                        <a href={`/profile/${user.id}`} className="pfp-circle" style={{ width: 44, height: 44 }}>
-                            {user.avatar ? (
-                                <img src={user.avatar} alt={user.name} />
-                            ) : (
-                                <img src={getDefaultAvatar(user.id)} alt={user.name} />
-                            )}
-                        </a>
-                        <div>
-                            <div className="suggested-name">{user.name}</div>
-                            <div className="suggested-desc">{descriptions[user.id] ?? `${user.posts_count ?? 0} posts`}</div>
+            <div className="suggested-users">
+
+                {users.map((user) => (
+                    <div className="suggested-user-row" key={user.id}>
+                        <div className="suggested-user-info">
+                            <a href={`/profile/${user.id}`} className="user-circle">
+                                {user.avatar ? (
+                                    <img src={user.avatar} alt={user.name} />
+                                ) : (
+                                    <img src={getDefaultAvatar(user.id)} alt={user.name} />
+                                )}
+                            </a>
+                            <div className="suggested-user-text">
+                                <div className="suggested-name">{user.name}</div>
+                                <div className="suggested-desc">{descriptions[user.id] ?? `${user.posts_count ?? 0} posts`}</div>
+                            </div>
                         </div>
+                        <a href={`/profile/${user.id}`} className="btn" style={{ fontSize: '.8rem', padding: '.35rem .9rem' }}>
+                            View
+                        </a>
                     </div>
-                    <a href={`/profile/${user.id}`} className="btn" style={{ fontSize: '.8rem', padding: '.35rem .9rem' }}>
-                        View
-                    </a>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 }

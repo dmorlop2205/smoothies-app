@@ -10,6 +10,7 @@ import Show from './pages/Show'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
+import Marketplace from './pages/Marketplace'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -27,6 +28,7 @@ function App() {
           <Route path="/show" element={<Show></Show>}></Route>
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/login" element={<Login></Login>}></Route>
+          <Route path="/marketplace" element={<Marketplace></Marketplace>}></Route>
         </Routes>
       </BrowserRouter>
     </>
