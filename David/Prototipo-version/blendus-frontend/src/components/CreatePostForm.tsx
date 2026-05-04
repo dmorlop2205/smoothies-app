@@ -20,6 +20,10 @@ export default function CreatePostForm() {
     const [aiLoading, setAiLoading] = useState(false);
     const [aiError, setAiError] = useState('');
     const [aiOpen, setAiOpen] = useState(false);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [instructions, setInstructions] = useState('');
+    const [category, setCategory] = useState('');
 
     useEffect(() => {
         if (!$isLoggedIn.get()) {
@@ -66,22 +70,21 @@ export default function CreatePostForm() {
                 throw new Error(data.error || 'Failed to generate smoothie');
             }
 
-            // Auto-fill form fields
-            const nameInput = document.querySelector('#name') as HTMLInputElement;
-            const captionInput = document.querySelector('#caption') as HTMLTextAreaElement;
-            const instructionsInput = document.querySelector('#instructions') as HTMLTextAreaElement;
-            const categorySelect = document.querySelector('#category') as HTMLSelectElement;
-
-            if (nameInput && data.name) nameInput.value = data.name;
-            if (captionInput && data.description) captionInput.value = data.description;
-            if (instructionsInput && data.preparation_steps) instructionsInput.value = data.preparation_steps;
+            if (data.name) setTitle(data.name);
+            if (data.description) setDescription(data.description);
+            if (data.preparation_steps) {
+                const formattedSteps = Array.isArray(data.preparation_steps) 
+                    ? data.preparation_steps.join('\n\n') 
+                    : data.preparation_steps;
+                setInstructions(formattedSteps);
+            }
 
             // Set category if it matches one of the options
-            if (categorySelect && data.category) {
+            if (data.category) {
                 const validCategories = ['green', 'tropical', 'berry', 'protein', 'detox', 'dessert'];
                 const cat = data.category.toLowerCase();
                 if (validCategories.includes(cat)) {
-                    categorySelect.value = cat;
+                    setCategory(cat);
                 }
             }
 
@@ -168,13 +171,7 @@ export default function CreatePostForm() {
         e.preventDefault();
         if (!$isLoggedIn.get()) { window.location.href = '/login'; return; }
 
-        const form = e.currentTarget;
-        const title = (form.querySelector('#name') as HTMLInputElement)?.value.trim();
-        const category = (form.querySelector('#category') as HTMLSelectElement)?.value;
-        const description = (form.querySelector('#caption') as HTMLTextAreaElement)?.value.trim();
-        const preparation_steps = (form.querySelector('#instructions') as HTMLTextAreaElement)?.value.trim();
-
-        if (!title || !description || !preparation_steps) {
+        if (!title || !description || !instructions) {
             setError('Please fill in the name, caption and instructions.');
             return;
         }
@@ -200,7 +197,7 @@ export default function CreatePostForm() {
         const fd = new FormData();
         fd.append('title', title);
         fd.append('description', description);
-        fd.append('preparation_steps', preparation_steps);
+        fd.append('preparation_steps', instructions);
         if (file) fd.append('image', file);
         if (category) fd.append('tags[]', category);
         tags.forEach(t => fd.append('tags[]', t.replace('#', '')));
@@ -315,14 +312,26 @@ export default function CreatePostForm() {
             {/* Smoothie Name */}
             <div className="name">
                 <label className="label" htmlFor="name">Smoothie Name</label>
-                <input className="text-input" type="text" id="name" placeholder="Tropical Fruits Smoothie" />
+                <input 
+                    className="text-input" 
+                    type="text" 
+                    id="name" 
+                    placeholder="Tropical Fruits Smoothie" 
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                />
             </div>
 
             {/* Category */}
             <div className="category">
                 <label className="label" htmlFor="category">Category</label>
-                <select className="text-input" id="category">
-                    <option value="" disabled defaultValue="">Choose a category</option>
+                <select 
+                    className="text-input" 
+                    id="category"
+                    value={category}
+                    onChange={e => setCategory(e.target.value)}
+                >
+                    <option value="" disabled>Choose a category</option>
                     <option value="green">🥬 Green</option>
                     <option value="tropical">🍍 Tropical</option>
                     <option value="berry">🫐 Berry</option>
@@ -335,7 +344,13 @@ export default function CreatePostForm() {
             {/* Caption */}
             <div className="caption">
                 <label className="label" htmlFor="caption">Caption</label>
-                <textarea className="textarea" id="caption" placeholder="Share your smoothie story..." />
+                <textarea 
+                    className="textarea" 
+                    id="caption" 
+                    placeholder="Share your smoothie story..." 
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
+                />
             </div>
 
             {/* Ingredients */}
@@ -423,7 +438,13 @@ export default function CreatePostForm() {
             {/* Instructions */}
             <div className="instructions">
                 <label className="label" htmlFor="instructions">Instructions</label>
-                <textarea className="textarea" id="instructions" placeholder="How to make this smoothie..." />
+                <textarea 
+                    className="textarea" 
+                    id="instructions" 
+                    placeholder="How to make this smoothie..." 
+                    value={instructions}
+                    onChange={e => setInstructions(e.target.value)}
+                />
             </div>
 
             {error && <p style={{ color: '#E7000B', marginTop: '0.5rem', fontSize: '0.9rem' }}>{error}</p>}

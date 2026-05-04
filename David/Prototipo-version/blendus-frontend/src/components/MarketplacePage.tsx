@@ -54,10 +54,22 @@ export default function MarketplacePage() {
                         <div className="empty-state">No products found.</div>
                     ) : (
                         products.map(product => (
-                            <div key={product.id} className="grid" style={{ flexDirection: 'column', gap: '1rem', padding: '1.5rem', height: 'auto', alignItems: 'flex-start' }}>
-                                <h3 style={{ fontSize: '1.2rem', color: 'var(--gray-900)' }}>{product.name}</h3>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-600)', flex: 1 }}>{product.description}</p>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '1rem' }}>
+                            <div key={product.id} className="grid" style={{ flexDirection: 'column', gap: '1rem', padding: '1rem', height: 'auto', alignItems: 'flex-start', overflow: 'hidden' }}>
+                                <div className="product-image-container" style={{ width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'var(--gray-50)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <img 
+                                        src={product.image_url} 
+                                        alt={product.name} 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = '/assets/smoothie2.jpg'; // Fallback
+                                        }}
+                                    />
+                                </div>
+                                <h3 style={{ fontSize: '1.2rem', color: 'var(--gray-900)', marginTop: '0.5rem' }}>{product.name}</h3>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-600)', flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {product.description}
+                                </p>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '0.5rem' }}>
                                     <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--amber-700)' }}>
                                         €{(product.price_cents / 100).toFixed(2)}
                                     </span>

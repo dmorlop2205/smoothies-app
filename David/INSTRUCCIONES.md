@@ -54,6 +54,8 @@ Para que no tengas que crear una desde cero (aunque puedes hacerlo en `/register
 | Nico | nico | nico@test.com | password123 |
 | Paco | paco | paco@test.com | password123 |
 
+> **Nota:** La base de datos también cuenta con otros 12 usuarios adicionales generados aleatoriamente (con nombres y correos ficticios) que interactúan con las publicaciones dando likes y dejando comentarios, pero sus credenciales cambian cada vez que se reinicia la base de datos, por lo que te recomendamos usar siempre estas 3 cuentas principales.
+
 ---
 
 ## ¿Qué puedes hacer en BlendUs? (Features)
