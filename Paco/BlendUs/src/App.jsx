@@ -12,6 +12,7 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import Marketplace from './pages/Marketplace'
 import Product from './pages/Product'
+import Payment from './pages/Payment'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -31,6 +32,7 @@ function App() {
           <Route path="/login" element={<Login></Login>}></Route>
           <Route path="/marketplace" element={<Marketplace></Marketplace>}></Route>
           <Route path="/product" element={<Product></Product>}></Route>
+          <Route path="/payment" element={<Payment></Payment>}></Route>
         </Routes>
       </BrowserRouter>
     </>
