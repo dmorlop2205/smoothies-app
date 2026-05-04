@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'stripe' => [
+        'secret'          => env('STRIPE_SECRET'),
+        'webhook_secret'  => env('STRIPE_WEBHOOK_SECRET'),
+        'success_url'     => env('FRONTEND_URL', 'http://localhost:3000') . '/marketplace/success',
+        'cancel_url'      => env('FRONTEND_URL', 'http://localhost:3000') . '/marketplace',
+    ],
+
 ];

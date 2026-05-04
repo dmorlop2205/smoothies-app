@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Services\EmbeddingService;
+use App\Http\Resources\PostResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class AiController extends Controller
 {
+    public function __construct(
+        protected EmbeddingService $embeddingService
+    ) {
+    }
     /**
      * Generate a smoothie recipe using Ollama AI.
      * Enriches the prompt with the user's latest and liked posts for context.
@@ -30,11 +36,11 @@ class AiController extends Controller
             ->latest()
             ->take(3)
             ->get()
-            ->map(fn (Post $p) => [
-                'title'       => $p->title,
+            ->map(fn(Post $p) => [
+                'title' => $p->title,
                 'description' => $p->description,
                 'ingredients' => $p->ingredients->pluck('name')->toArray(),
-                'tags'        => $p->tags->pluck('name')->toArray(),
+                'tags' => $p->tags->pluck('name')->toArray(),
             ]);
 
         // Posts the user has liked (last 5)
@@ -43,40 +49,41 @@ class AiController extends Controller
             ->latest('likes.created_at')
             ->take(3)
             ->get()
-            ->map(fn (Post $p) => [
-                'title'       => $p->title,
+            ->map(fn(Post $p) => [
+                'title' => $p->title,
                 'description' => $p->description,
                 'ingredients' => $p->ingredients->pluck('name')->toArray(),
-                'tags'        => $p->tags->pluck('name')->toArray(),
+                'tags' => $p->tags->pluck('name')->toArray(),
             ]);
 
         // ── Build the system prompt ──
         $systemPrompt = <<<EOT
 # Role
-You are an expert smoothie chef AI. Your ONLY purpose is to create smoothie recipes.
+You are a specialized smoothie recipe generator. 
 
-# Constraints & Security
-1. You must ONLY generate smoothie recipes. If the prompt is weird or short (like "3£ smoothie"), invent a clever, realistic smoothie that fits it.
-2. DO NOT include meta-instructions in the output values. Generate REAL food ingredients.
+# Task
+Create a complete smoothie recipe based on the user's prompt. 
 
-# Fields to Generate
-- name: The smoothie's name
-- description: A short, appetizing description (2-3 sentences)
-- ingredients: Array of objects with "name" (e.g. "Mango") and "amount" (e.g. "1 piece")
-- tags: Array of 2-4 single-word tags (no #)
-- category: MUST be exactly one of: green, tropical, berry, protein, detox, dessert
-- preparation_steps: Step-by-step paragraphs
+# Formatting Rules
+- You MUST output VALID JSON.
+- DO NOT include comments or extra text.
+- 'ingredients' MUST be an array of objects with "name" and "amount".
+- 'preparation_steps' MUST be a simple array of strings.
+- 'tags' MUST be a simple array of single-word strings.
+
+# Content Rules
+- 'name': Creative name for the smoothie.
+- 'description': Appetizing description (2 sentences).
+- 'category': Must be one of: green, tropical, berry, protein, detox, dessert.
 EOT;
 
         // Add user context if available
         if ($latestPosts->isNotEmpty()) {
-            $systemPrompt .= "\n\nHere are smoothies this user has recently created (use as inspiration for their style and preferences):\n"
-                . json_encode($latestPosts->toArray(), JSON_PRETTY_PRINT);
+            $systemPrompt .= "\n\nUser History (Latest): " . json_encode($latestPosts->toArray());
         }
 
         if ($likedPosts->isNotEmpty()) {
-            $systemPrompt .= "\n\nHere are smoothies this user has liked (they enjoy these flavors and styles):\n"
-                . json_encode($likedPosts->toArray(), JSON_PRETTY_PRINT);
+            $systemPrompt .= "\n\nUser Favorites: " . json_encode($likedPosts->toArray());
         }
 
         // ── Call Ollama ──
@@ -84,33 +91,37 @@ EOT;
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
-                'model'  => 'llama3.2:1b',
+                'model' => 'llama3.2:1b',
                 'system' => $systemPrompt,
                 'prompt' => $userPrompt,
                 'format' => [
-                    'type'       => 'object',
+                    'type' => 'object',
                     'properties' => [
-                        'name'              => ['type' => 'string'],
-                        'description'       => ['type' => 'string'],
-                        'ingredients'       => [
-                            'type'  => 'array',
+                        'name' => ['type' => 'string'],
+                        'description' => ['type' => 'string'],
+                        'ingredients' => [
+                            'type' => 'array',
                             'items' => [
-                                'type'       => 'object',
+                                'type' => 'object',
                                 'properties' => [
-                                    'name'   => ['type' => 'string'],
+                                    'name' => ['type' => 'string'],
                                     'amount' => ['type' => 'string'],
                                 ],
                                 'required' => ['name', 'amount'],
                             ],
                         ],
-                        'tags'              => ['type' => 'array', 'items' => ['type' => 'string']],
-                        'category'          => ['type' => 'string'],
-                        'preparation_steps' => ['type' => 'string'],
+                        'tags' => ['type' => 'array', 'items' => ['type' => 'string']],
+                        'category' => ['type' => 'string'],
+                        'preparation_steps' => ['type' => 'array', 'items' => ['type' => 'string']],
                     ],
                     'required' => ['name', 'description', 'ingredients', 'tags', 'category', 'preparation_steps'],
                 ],
-                'stream'  => false,
-                'options' => ['num_ctx' => 2048],
+                'stream' => false,
+                'options' => [
+                    'num_ctx' => 2048,
+                    'temperature' => 0.2, // Lower temperature for more stable JSON
+                    'num_predict' => 600,
+                ],
             ]);
 
             if (!$response->successful()) {
@@ -127,13 +138,19 @@ EOT;
                 ], 500);
             }
 
+            // Ensure preparation_steps is an array for consistency
+            if (isset($recipe['preparation_steps']) && is_string($recipe['preparation_steps'])) {
+                $recipe['preparation_steps'] = explode('. ', $recipe['preparation_steps']);
+            }
+
             // Fallback: Strip out hallucinated ingredients if the 1B model gets confused
             if (isset($recipe['ingredients']) && is_array($recipe['ingredients'])) {
                 $badWords = ['preparation steps', 'category', 'tags', 'creative smoothie', 'ingredient name'];
-                $recipe['ingredients'] = array_values(array_filter($recipe['ingredients'], function($ing) use ($badWords) {
+                $recipe['ingredients'] = array_values(array_filter($recipe['ingredients'], function ($ing) use ($badWords) {
                     $name = strtolower($ing['name'] ?? '');
                     foreach ($badWords as $bw) {
-                        if (str_contains($name, $bw)) return false;
+                        if (str_contains($name, $bw))
+                            return false;
                     }
                     return true;
                 }));
@@ -162,16 +179,50 @@ EOT;
 
         $mood = $request->input('mood');
 
-        // Fetch 20 recent posts as inventory
-        $inventory = Post::with('tags')
-            ->latest()
-            ->take(20)
-            ->get()
-            ->map(fn (Post $p) => [
-                'id'          => $p->id,
-                'title'       => $p->title,
+        // 1. Hybrid Search: Keyword Search + Vector Search
+
+        // A. Keyword Search (for specific ingredients or terms)
+        $keywords = explode(' ', strtolower($mood));
+        $keywordResults = Post::query()
+            ->with('tags')
+            ->where(function ($q) use ($mood, $keywords) {
+                $q->where('title', 'ILIKE', "%$mood%")
+                    ->orWhere('description', 'ILIKE', "%$mood%")
+                    ->orWhereHas('ingredients', fn($iq) => $iq->where('name', 'ILIKE', "%$mood%"))
+                    ->orWhereHas('tags', fn($tq) => $tq->where('name', 'ILIKE', "%$mood%"));
+
+                foreach ($keywords as $word) {
+                    if (strlen($word) >= 3) {
+                        $q->orWhere('title', 'ILIKE', "%$word%")
+                            ->orWhereHas('ingredients', fn($iq) => $iq->where('name', 'ILIKE', "%$word%"));
+                    }
+                }
+            })
+            ->take(6)
+            ->get();
+
+        // B. Vector Search
+        $moodEmbedding = $this->embeddingService->generateEmbedding($mood);
+        $vectorResults = collect();
+        if ($moodEmbedding) {
+            $vectorResults = Post::query()
+                ->select(['id', 'title', 'description', 'embedding'])
+                ->with('tags')
+                ->selectRaw('embedding <=> ? AS distance', [json_encode($moodEmbedding)])
+                ->orderBy('distance', 'asc')
+                ->take(10)
+                ->get();
+        }
+
+        // C. Merge and Prioritize
+        $inventory = $keywordResults->merge($vectorResults)
+            ->unique('id')
+            ->take(10)
+            ->map(fn(Post $p) => [
+                'id' => $p->id,
+                'title' => $p->title,
                 'description' => $p->description,
-                'tags'        => $p->tags->pluck('name')->toArray(),
+                'tags' => $p->tags->pluck('name')->toArray(),
             ]);
 
         if ($inventory->isEmpty()) {
@@ -180,42 +231,46 @@ EOT;
 
         $systemPrompt = <<<EOT
 # Role
-You are the BlendUs AI Sommelier. Your job is to match a user's mood with the perfect smoothies from our available inventory.
+You are the BlendUs AI Sommelier. Match the user's mood with the perfect smoothies.
 
 # Instructions
-1. You will receive the user's mood and a JSON array of available smoothies (each has an 'id', 'title', 'description', and 'tags').
-2. Select EXACTLY 4 smoothies from the inventory array that best match the user's mood. You must ONLY select smoothies that exist in the inventory.
-3. Write a friendly, 2-to-3 sentence explanation directly addressing the user about why these 4 smoothies are perfect for their current mood.
+1. Select EXACTLY 3-4 smoothies from the provided list.
+2. Be extremely concise. Write a VERY short explanation (max 2 sentences).
+3. If the user mentions a specific ingredient (e.g. "kiwi"), PRIORITIZE smoothies containing it.
 
 # Output Format
-Return ONLY valid JSON with this exact structure:
+JSON ONLY:
 {
-  "explanation": "Your personalized message explaining the choices...",
-  "recommended_ids": [12, 45, 8]
+  "explanation": "Short friendly message...",
+  "recommended_ids": [ids]
 }
 EOT;
 
-        $userPrompt = "My mood is: {$mood}\n\nInventory:\n" . json_encode($inventory->toArray(), JSON_PRETTY_PRINT);
+        $userPrompt = "Mood: {$mood}\nInventory: " . json_encode($inventory->toArray());
         $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
 
         try {
-            $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
-                'model'  => 'llama3.2:1b',
+            $response = Http::connectTimeout(5)->timeout(60)->post("{$ollamaHost}/api/generate", [
+                'model' => 'llama3.2:1b',
                 'system' => $systemPrompt,
                 'prompt' => $userPrompt,
                 'format' => [
-                    'type'       => 'object',
+                    'type' => 'object',
                     'properties' => [
-                        'explanation'     => ['type' => 'string'],
+                        'explanation' => ['type' => 'string'],
                         'recommended_ids' => [
-                            'type'  => 'array',
+                            'type' => 'array',
                             'items' => ['type' => 'integer']
                         ],
                     ],
                     'required' => ['explanation', 'recommended_ids'],
                 ],
-                'stream'  => false,
-                'options' => ['num_ctx' => 2048],
+                'stream' => false,
+                'options' => [
+                    'num_ctx' => 2048,
+                    'temperature' => 0.4,
+                    'num_predict' => 256
+                ],
             ]);
 
             if (!$response->successful()) {
@@ -232,9 +287,9 @@ EOT;
             $userId = auth('sanctum')->id();
             $posts = Post::with(['user', 'ingredients', 'tags'])
                 ->withCount(['likes', 'comments'])
-                ->when($userId, fn ($q) => $q->with([
-                    'likes'   => fn ($lq) => $lq->where('user_id', $userId),
-                    'savedBy' => fn ($sq) => $sq->where('user_id', $userId),
+                ->when($userId, fn($q) => $q->with([
+                    'likes' => fn($lq) => $lq->where('user_id', $userId),
+                    'savedBy' => fn($sq) => $sq->where('user_id', $userId),
                 ]))
                 ->whereIn('id', $aiResult['recommended_ids'])
                 ->get();
@@ -246,7 +301,7 @@ EOT;
 
             return response()->json([
                 'explanation' => $aiResult['explanation'],
-                'posts'       => \App\Http\Resources\PostResource::collection($sortedPosts),
+                'posts' => PostResource::collection($sortedPosts),
             ]);
 
         } catch (\Exception $e) {
@@ -260,8 +315,8 @@ EOT;
     public function extractSteps(Request $request): JsonResponse
     {
         $request->validate([
-            'title'             => 'required|string|max:255',
-            'ingredients'       => 'required|array',
+            'title' => 'required|string|max:255',
+            'ingredients' => 'required|array',
             'preparation_steps' => 'required|string',
         ]);
 
@@ -291,19 +346,19 @@ EOT;
 
         try {
             $response = Http::connectTimeout(10)->timeout(120)->post("{$ollamaHost}/api/generate", [
-                'model'  => 'llama3.2:1b',
+                'model' => 'llama3.2:1b',
                 'system' => $systemPrompt,
                 'prompt' => $userPrompt,
                 'format' => [
-                    'type'       => 'object',
+                    'type' => 'object',
                     'properties' => [
                         'steps' => [
-                            'type'  => 'array',
+                            'type' => 'array',
                             'items' => [
                                 'type' => 'object',
                                 'properties' => [
                                     'instruction' => ['type' => 'string'],
-                                    'tip'         => ['type' => 'string']
+                                    'tip' => ['type' => 'string']
                                 ],
                                 'required' => ['instruction', 'tip']
                             ]
@@ -311,7 +366,7 @@ EOT;
                     ],
                     'required' => ['steps'],
                 ],
-                'stream'  => false,
+                'stream' => false,
                 'options' => ['num_ctx' => 2048],
             ]);
 
@@ -327,9 +382,9 @@ EOT;
     public function cookingHelp(Request $request): JsonResponse
     {
         $request->validate([
-            'title'        => 'required|string|max:255',
+            'title' => 'required|string|max:255',
             'current_step' => 'required|string',
-            'question'     => 'required|string|max:500',
+            'question' => 'required|string|max:500',
         ]);
 
         $title = $request->input('title');
@@ -357,17 +412,17 @@ EOT;
 
         try {
             $response = Http::connectTimeout(5)->timeout(30)->post("{$ollamaHost}/api/generate", [
-                'model'  => 'llama3.2:1b',
+                'model' => 'llama3.2:1b',
                 'system' => $systemPrompt,
                 'prompt' => $question,
                 'format' => [
-                    'type'       => 'object',
+                    'type' => 'object',
                     'properties' => [
                         'answer' => ['type' => 'string'],
                     ],
                     'required' => ['answer'],
                 ],
-                'stream'  => false,
+                'stream' => false,
                 'options' => ['num_ctx' => 1024],
             ]);
 

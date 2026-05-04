@@ -104,6 +104,17 @@ export const api = {
             body: JSON.stringify({ title, current_step: currentStep, question })
         }),
 
+    // Marketplace
+    getProducts: () =>
+        request<{data: Product[]}>('/marketplace/products').then(res => res.data),
+
+    getProduct: (id: number) =>
+        request<{data: Product}>(`/marketplace/products/${id}`).then(res => res.data),
+
+    checkoutProduct: (id: number) =>
+        request<{checkout_url: string}>(`/marketplace/products/${id}/checkout`, { method: 'POST' }),
+
+
     // Users
     getUser: (id: number) =>
         request<{data: User}>(`/users/${id}`).then(res => res.data),
@@ -273,4 +284,13 @@ export interface Message {
     body: string;
     created_at: string;
     sender?: User;
+}
+
+export interface Product {
+    id: number;
+    name: string;
+    description: string;
+    price_cents: number;
+    active: boolean;
+    created_at: string;
 }

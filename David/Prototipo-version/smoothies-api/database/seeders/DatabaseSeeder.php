@@ -6,12 +6,17 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\Ingredient;
+use App\Services\EmbeddingService;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
+
+    public function __construct(
+        protected EmbeddingService $embeddingService
+    ) {}
 
     public function run(): void
     {
@@ -112,7 +117,13 @@ class DatabaseSeeder extends Seeder
             foreach ($postData['ingredients'] as $ing) {
                 $post->ingredients()->create($ing);
             }
+
+            // Generate AI Embedding
+            $this->embeddingService->updatePostEmbedding($post);
         }
-        $this->call(SampleDataSeeder::class);
+        $this->call([
+            SampleDataSeeder::class,
+            MarketplaceSeeder::class,
+        ]);
     }
 }

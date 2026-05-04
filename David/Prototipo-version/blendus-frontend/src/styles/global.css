@@ -139,11 +139,10 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: .6rem 1rem;
+  padding: .6rem 1.5rem;
   background-color: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0, 0, 0, .04);
-  flex-wrap: wrap;
 }
 
 .nav-logo a {
@@ -1151,6 +1150,7 @@ nav {
 @media (max-width: 1150px) {
   nav {
     padding: .8rem 1.2rem;
+    flex-wrap: wrap;
   }
 
   .nav-logo h1 {
