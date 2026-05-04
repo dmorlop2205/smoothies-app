@@ -67,14 +67,15 @@ Create a complete smoothie recipe based on the user's prompt.
 # Formatting Rules
 - You MUST output VALID JSON.
 - DO NOT include comments or extra text.
-- 'ingredients' MUST be an array of objects with "name" and "amount".
+- 'ingredients' MUST be a balanced array of objects with "name" and "amount" (e.g. Include liquids, main fruits/veg, and boosters).
 - 'preparation_steps' MUST be a simple array of strings.
 - 'tags' MUST be a simple array of single-word strings.
 
 # Content Rules
-- 'name': Creative name for the smoothie.
-- 'description': Appetizing description (2 sentences).
+- 'name': A unique, creative, and catchy name for the smoothie (Avoid generic names like 'X Smoothie' or just repeating the user's ingredients).
+- 'description': An appetizing, detailed description (2-3 sentences).
 - 'category': Must be one of: green, tropical, berry, protein, detox, dessert.
+- 'preparation_steps': A detailed, sequential list of natural instructions. Use an efficient flow (e.g., combine main ingredients and liquids first, then blend once until smooth). Avoid repetitive "add and blend" steps for every single ingredient. Provide at least 3-4 clear steps.
 EOT;
 
         // Add user context if available
@@ -119,8 +120,8 @@ EOT;
                 'stream' => false,
                 'options' => [
                     'num_ctx' => 2048,
-                    'temperature' => 0.2, // Lower temperature for more stable JSON
-                    'num_predict' => 600,
+                    'temperature' => 0.4, // Slightly higher for more creative names
+                    'num_predict' => 800, // More tokens for detailed steps
                 ],
             ]);
 
@@ -184,7 +185,7 @@ EOT;
         // A. Keyword Search (for specific ingredients or terms)
         $keywords = explode(' ', strtolower($mood));
         $keywordResults = Post::query()
-            ->with('tags')
+            ->with(['tags', 'ingredients'])
             ->where(function ($q) use ($mood, $keywords) {
                 $q->where('title', 'ILIKE', "%$mood%")
                     ->orWhere('description', 'ILIKE', "%$mood%")
@@ -207,7 +208,7 @@ EOT;
         if ($moodEmbedding) {
             $vectorResults = Post::query()
                 ->select(['id', 'title', 'description', 'embedding'])
-                ->with('tags')
+                ->with(['tags', 'ingredients'])
                 ->selectRaw('embedding <=> ? AS distance', [json_encode($moodEmbedding)])
                 ->orderBy('distance', 'asc')
                 ->take(10)
@@ -219,10 +220,10 @@ EOT;
             ->unique('id')
             ->take(10)
             ->map(fn(Post $p) => [
-                'id' => $p->id,
-                'title' => $p->title,
-                'description' => $p->description,
-                'tags' => $p->tags->pluck('name')->toArray(),
+                'POST_ID' => $p->id, // Make ID more prominent
+                'TITLE' => $p->title,
+                'DESCRIPTION' => $p->description,
+                'INGREDIENTS' => $p->ingredients->pluck('name')->toArray(),
             ]);
 
         if ($inventory->isEmpty()) {
@@ -239,14 +240,14 @@ You are the BlendUs AI Sommelier. Match the user's mood with the perfect smoothi
 3. If the user mentions a specific ingredient (e.g. "kiwi"), PRIORITIZE smoothies containing it.
 
 # Output Format
-JSON ONLY:
+JSON ONLY. The 'recommended_ids' MUST be a list of numeric IDs from the 'Inventory' provided:
 {
   "explanation": "Short friendly message...",
-  "recommended_ids": [ids]
+  "recommended_ids": [integer_id1, integer_id2, ...]
 }
 EOT;
 
-        $userPrompt = "Mood: {$mood}\nInventory: " . json_encode($inventory->toArray());
+        $userPrompt = "USER_MOOD: {$mood}\n\nINVENTORY:\n" . json_encode($inventory->toArray());
         $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
 
         try {

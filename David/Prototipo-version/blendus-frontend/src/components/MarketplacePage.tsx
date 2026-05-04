@@ -42,7 +42,6 @@ export default function MarketplacePage() {
                     </a>
                     <h2 className='title'>Marketplace</h2>
                 </div>
-                <p className="subtitle">Discover amazing smoothie tools and ingredients from creators around the world.</p>
             </div>
             
             {loading && <div className="loading-spinner">Loading products...</div>}
@@ -55,18 +54,29 @@ export default function MarketplacePage() {
                     ) : (
                         products.map(product => (
                             <div key={product.id} className="grid" style={{ flexDirection: 'column', gap: '1rem', padding: '1rem', height: 'auto', alignItems: 'flex-start', overflow: 'hidden' }}>
-                                <div className="product-image-container" style={{ width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'var(--gray-50)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <img 
-                                        src={product.image_url} 
-                                        alt={product.name} 
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = '/assets/smoothie2.jpg'; // Fallback
-                                        }}
-                                    />
-                                </div>
-                                <h3 style={{ fontSize: '1.2rem', color: 'var(--gray-900)', marginTop: '0.5rem' }}>{product.name}</h3>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--gray-600)', flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                <a href={`/marketplace/product/${product.id}`} style={{ width: '100%', textDecoration: 'none', color: 'inherit' }}>
+                                    <div className="product-image-container" style={{ width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'var(--gray-50)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <img 
+                                            src={product.image_url} 
+                                            alt={product.name} 
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = '/assets/smoothie2.jpg'; // Fallback
+                                            }}
+                                        />
+                                    </div>
+                                    <h3 style={{ fontSize: '1.2rem', color: 'var(--gray-900)', marginTop: '0.5rem' }}>{product.name}</h3>
+                                </a>
+                                <p style={{ 
+                                    fontSize: '0.9rem', 
+                                    color: 'var(--gray-600)', 
+                                    display: '-webkit-box', 
+                                    WebkitLineClamp: 3, 
+                                    WebkitBoxOrient: 'vertical', 
+                                    overflow: 'hidden',
+                                    lineHeight: '1.5rem',
+                                    margin: '0.5rem 0'
+                                }}>
                                     {product.description}
                                 </p>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center', marginTop: '0.5rem' }}>
