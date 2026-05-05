@@ -112,7 +112,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
         <section className="post">
             <div className="post-header">
                 <a href={`/profile/${post.author?.id}`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <div className="pfp-circle" style={{ width: 64, height: 64 }}>
+                    <div className="pfp-circle">
                         {post.author?.avatar ? (
                             <img src={post.author.avatar} alt={authorName} />
                         ) : (

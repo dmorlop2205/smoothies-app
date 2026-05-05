@@ -40,8 +40,8 @@
 
 .chat-avatar img {
     border: 2px solid white;
-    width: 48px;
-    height: 48px;
+    width: 49px;
+    height: 49px;
     border-radius: 50%;
     object-fit: cover;
 }

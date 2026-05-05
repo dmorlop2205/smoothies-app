@@ -14,23 +14,23 @@
             display: flex;
             align-items: center;
             gap: 1rem;
-            .circle {
+            .pfp-circle {
                 position: relative;
                 cursor: pointer;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: clamp(4.063rem, 3.898rem + 0.658vw, 4.688rem);
-                height: clamp(4.063rem, 3.898rem + 0.658vw, 4.688rem);
+                background: var(--gradient-profile);
+                width: 73px;
+                height: 73px;
                 border-radius: 50%;
                 img, span {
                     position: relative;
                     z-index: 1;
                 }
                 img {
-                    position: relative;
-                    width: clamp(3.688rem, 3.523rem + 0.658vw, 4.313rem);
-                    height: clamp(3.688rem, 3.523rem + 0.658vw, 4.313rem);
+                    width: 65px;
+                    height: 65px;
                     border: 2px solid var(--white);
                     object-fit: cover;
                     border-radius: 50%;

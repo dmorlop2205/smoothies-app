@@ -203,14 +203,16 @@ export default function ProfilePage({ userId }: Props) {
         <div className="profile">
             <div className="user-container">
                 <div className="user-header">
-                    <div className="user-pic">
-                        {user.avatar ? (
-                            <img src={user.avatar} alt={user.name} />
-                        ) : user.avatar === '' ? (
-                            <img src="/assets/avatars/no-user-pfp.svg" alt="No profile" style={{ padding: '20%' }} />
-                        ) : (
-                            <img src={getDefaultAvatar(user.id)} alt={user.name} />
-                        )}
+                    <div className="pfp-circle">
+                        <div className="user-pic">
+                            {user.avatar ? (
+                                <img src={user.avatar} alt={user.name} />
+                            ) : user.avatar === '' ? (
+                                <img src="/assets/avatars/no-user-pfp.svg" alt="No profile" style={{ padding: '20%' }} />
+                            ) : (
+                                <img src={getDefaultAvatar(user.id)} alt={user.name} />
+                            )}
+                        </div>
                     </div>
                     <div className="user-info">
                         <h3 className="username">@{user.username}</h3>

@@ -18,17 +18,23 @@
         .user-header {
             display: flex;
             gap: 1rem;
-            .user-pic {
-                height: clamp(5rem, 4.671rem + 1.316vw, 6.25rem);
-                aspect-ratio: 1 / 1;
-                border-radius: 50%;
-                overflow: hidden;
-                flex-shrink: 0;
-                img {
-                    width: 100%;
-                    height: 100%;
+            .pfp-circle {
+                height: 89px;
+                width: 89px;
+                background: var(--gradient-profile);
+                .user-pic {
+                    height: 81px;
+                    border: 2px solid white;
+                    aspect-ratio: 1 / 1;
                     border-radius: 50%;
-                    object-fit: cover;
+                    overflow: hidden;
+                    flex-shrink: 0;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                        object-fit: cover;
+                    }
                 }
             }
             .user-info {

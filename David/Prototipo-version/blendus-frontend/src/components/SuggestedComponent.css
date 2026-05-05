@@ -3,8 +3,8 @@
     border:1px solid #f3f4f69d;
     box-shadow: -2px 2px 3px #dadada44;
     background-color: var(--white);
-    border-radius: 40px;
-    padding: 1.5rem clamp(1.5rem, -2.538rem + 4.615vw, 3rem);
+    border-radius: 20px;
+    padding: 1.5rem 1.5rem;
 
     h2 { 
         margin-bottom: 1rem;
@@ -43,7 +43,7 @@
                         width: clamp(2.5rem, 0.817rem + 1.923vw, 3.125rem);
                         height: clamp(2.5rem, 0.817rem + 1.923vw, 3.125rem);
 
-                        outline: 1px solid var(--white);
+                        border: 2px solid var(--white);
                         object-fit: cover;
                         object-position: center;
                         flex-shrink: 0;
@@ -56,7 +56,7 @@
                     flex-direction: column;
                     gap: .3rem;
                     .suggested-name {
-                        font-size: clamp(0.8rem, -0.075rem + 1vw, 1.125rem);
+                        font-size: clamp(0.8rem, 0.747rem + 0.211vw, 1rem);
                         color: var(--gray-800);
                         font-weight: 600;
                     }

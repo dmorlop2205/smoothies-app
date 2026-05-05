@@ -1,7 +1,6 @@
 .wrapper {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    gap: 2rem;
 
 }
 
@@ -19,7 +18,7 @@
         flex-direction: column;
         justify-content: start;
         align-items: start;
-        gap: 1.5rem;
+        gap: 1rem;
         z-index: 0;
     }
 }
