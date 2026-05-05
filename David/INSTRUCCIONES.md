@@ -74,3 +74,31 @@ Hemos puesto mucho cariño en los detalles. Esto es lo que ya está programado:
 *   **AI Recipe Generator ✨:** Al crear un post, puedes escribir una idea y la IA genera la receta completa automáticamente (nombre, ingredientes, pasos, etiquetas).
 *   **AI Cooking Assistant 👨‍🍳:** En la vista de un post, abre el asistente paso a paso para cocinar con ayuda de Chef Enrique en tiempo real.
 *   **Hub de Mensajería 💬:** Chats directos y grupos. Actualizaciones en tiempo real mediante polling automático. Accesible desde cualquier página con el widget lateral.
+
+---
+
+## Activación de Pagos con Stripe 💳
+
+Para que las compras del **Marketplace** funcionen en tu entorno local (y así poder procesar y verificar los pagos correctamente), necesitas enlazar tu ordenador con Stripe siguiendo estos 3 rápidos pasos:
+
+1. **Inicia sesión en Stripe CLI:**
+   Abre una terminal y ejecuta:
+   ```bash
+   stripe login
+   ```
+   *(Sigue el enlace que aparece en pantalla para autorizar tu cuenta).*
+
+2. **Abre el túnel (Listener):**
+   En esa misma terminal, conecta Stripe con tu backend local ejecutando:
+   ```bash
+   stripe listen --forward-to localhost:8000/api/stripe/webhook
+   ```
+
+3. **Configura tu Secreto:**
+   El comando anterior te imprimirá un mensaje diciendo: `Ready! Your webhook signing secret is whsec_...`
+   Copia ese código `whsec_...` y pégalo en tu archivo `.env` (dentro de `smoothies-api/`):
+   ```dotenv
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   ```
+
+> **Importante:** Debes dejar la terminal del Listener (paso 2) abierta mientras estés probando la tienda. Si la cierras, los pagos se procesarán en Stripe pero tu base de datos local nunca se enterará.
