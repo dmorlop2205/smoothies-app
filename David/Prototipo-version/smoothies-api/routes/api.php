@@ -21,6 +21,7 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('users')->group(function () {
+    Route::get('/', [UserController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('suggested', [UserController::class, 'suggested']);
     });
