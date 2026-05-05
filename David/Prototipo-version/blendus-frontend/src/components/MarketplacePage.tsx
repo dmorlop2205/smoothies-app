@@ -20,16 +20,7 @@ export default function MarketplacePage() {
             });
     }, []);
 
-    const handleCheckout = async (productId: number) => {
-        try {
-            const { checkout_url } = await api.checkoutProduct(productId);
-            if (checkout_url) {
-                window.location.href = checkout_url;
-            }
-        } catch (err: any) {
-            alert(err.message || 'Checkout failed. Please ensure you are logged in.');
-        }
-    };
+
 
     return (
         <section className="marketplace-wrapper">
@@ -53,8 +44,13 @@ export default function MarketplacePage() {
                         <div className="empty-state">No products found.</div>
                     ) : (
                         products.map(product => (
-                            <div key={product.id} className="grid" style={{ flexDirection: 'column', gap: '1rem', padding: '1rem', height: 'auto', alignItems: 'flex-start', overflow: 'hidden' }}>
-                                <a href={`/marketplace/product/${product.id}`} style={{ width: '100%', textDecoration: 'none', color: 'inherit' }}>
+                            <div key={product.id} className="grid" style={{ position: 'relative', flexDirection: 'column', gap: '1rem', padding: '1rem', height: 'auto', alignItems: 'flex-start', overflow: 'hidden' }}>
+                                {/* Invisible link covering the entire card to make it clickable */}
+                                <a href={`/marketplace/product/${product.id}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 5, cursor: 'pointer' }}>
+                                    <span style={{ display: 'none' }}>View {product.name}</span>
+                                </a>
+
+                                <div style={{ width: '100%', color: 'inherit' }}>
                                     <div className="product-image-container" style={{ width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', backgroundColor: 'var(--gray-50)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <img 
                                             src={product.image_url} 
@@ -66,7 +62,7 @@ export default function MarketplacePage() {
                                         />
                                     </div>
                                     <h3 style={{ fontSize: '1.2rem', color: 'var(--gray-900)', marginTop: '0.5rem' }}>{product.name}</h3>
-                                </a>
+                                </div>
                                 <p style={{ 
                                     fontSize: '0.9rem', 
                                     color: 'var(--gray-600)', 
@@ -83,13 +79,13 @@ export default function MarketplacePage() {
                                     <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--amber-700)' }}>
                                         €{(product.price_cents / 100).toFixed(2)}
                                     </span>
-                                    <button 
+                                    <a 
+                                        href={`/marketplace/product/${product.id}/payment`}
                                         className="btn" 
-                                        style={{ padding: '0.5rem 1.5rem', borderRadius: '10px' }}
-                                        onClick={() => handleCheckout(product.id)}
+                                        style={{ padding: '0.5rem 1.5rem', borderRadius: '10px', textDecoration: 'none', display: 'inline-block', position: 'relative', zIndex: 10 }}
                                     >
                                         Buy Now
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                         ))
