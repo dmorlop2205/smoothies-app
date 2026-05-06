@@ -102,13 +102,25 @@ class PostService
         $post->delete();
     }
 
-    public function getFeed(int $perPage = 15): LengthAwarePaginator
+    public function getFeed(int $perPage = 15, bool $excludeOwn = true, ?string $search = null, ?string $tag = null): LengthAwarePaginator
     {
         $userId = auth('sanctum')->id();
         
         $query = Post::query()
             ->with(['user', 'ingredients', 'tags'])
             ->withCount(['likes', 'comments'])
+            ->when($userId && $excludeOwn, fn($q) => $q->where('user_id', '!=', $userId))
+            ->when($tag, function ($q) use ($tag) {
+                $q->whereHas('tags', function ($sq) use ($tag) {
+                    $sq->whereRaw('LOWER(name) = ?', [strtolower($tag)]);
+                });
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($sq) use ($search) {
+                    $sq->where('title', 'ilike', '%' . $search . '%')
+                       ->orWhere('description', 'ilike', '%' . $search . '%');
+                });
+            })
             ->latest('created_at');
 
         if ($userId) {
@@ -120,6 +132,8 @@ class PostService
 
         return $query->paginate($perPage);
     }
+
+
 
     public function getByTag(string $tagName, int $perPage = 15): LengthAwarePaginator
     {

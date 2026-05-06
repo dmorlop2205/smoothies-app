@@ -159,12 +159,22 @@
         to { opacity: 1; transform: translateY(0) scale(1); }
     }
     .post-image {
-        background-image: url('assets/Alexelcapo.webp');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         height: 46.125rem;
     }
+
+    .post-placeholder {
+        width: 100%;
+        height: 46.125rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 8rem;
+        background: #f9fafb;
+    }
+
 
     .interactions {
         display: flex;

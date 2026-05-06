@@ -172,11 +172,16 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                 </div>
             </div>
 
-            {imageUrl && (
+            {post.image_url ? (
                 <a href={`/post/${post.id}`} style={{ display: 'block', textDecoration: 'none' }}>
-                    <div className="post-image" style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', height: '550px', borderRadius: '12px', marginTop: '1rem' }} />
+                    <div className="post-image" style={{ backgroundImage: `url(${post.image_url})`, borderRadius: '12px', marginTop: '1rem' }} />
+                </a>
+            ) : (
+                <a href={`/post/${post.id}`} style={{ display: 'block', textDecoration: 'none' }}>
+                    <div className="post-placeholder" style={{ borderRadius: '12px', marginTop: '1rem' }}>🍹</div>
                 </a>
             )}
+
 
             <div className="interactions">
                 <div className="like-comment-share">

@@ -14,6 +14,12 @@ const FILTER_ICONS: Record<string, string> = {
     dessert: '/ice-cream.webp',
 };
 
+const FeedSkeleton = () => (
+    <div className="skeleton-post">
+        <div className="shimmer"></div>
+    </div>
+);
+
 export default function Feed() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [tags, setTags] = useState<Tag[]>([]);
@@ -31,10 +37,10 @@ export default function Feed() {
         setLoading(true);
 
         const fetcher = activeTag
-            ? api.getPostsByTag(activeTag, page)
+            ? api.getPosts({ tag: activeTag, page, per_page: 5, exclude_own: true })
             : feedType === 'personalized'
                 ? api.getPersonalizedPosts(page)
-                : api.getPosts({ page, per_page: 7 });
+                : api.getPosts({ page, per_page: 5, exclude_own: true });
 
         fetcher
             .then(res => {
@@ -44,6 +50,7 @@ export default function Feed() {
             .catch(() => { })
             .finally(() => setLoading(false));
     }, [activeTag, page, feedType]);
+
 
     const handleFilterClick = (slug: string | null) => {
         if (activeTag === slug) return;
@@ -122,32 +129,32 @@ export default function Feed() {
             {/* Posts */}
             <div className="posts-list">
                 {loading && page === 1 ? (
-                    <div style={{ textAlign: 'center', padding: '3rem' }}>
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-                            <circle cx="12" cy="12" r="10" stroke="#e17100" strokeWidth="2" strokeDasharray="50" strokeDashoffset="20">
-                                <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite" />
-                            </circle>
-                        </svg>
-                    </div>
+                    // Initial load: show 2 big skeletons
+                    <>
+                        <FeedSkeleton />
+                        <FeedSkeleton />
+                    </>
                 ) : posts.length === 0 ? (
                     <div style={{ textAlign: 'center', color: '#888', padding: '3rem 0' }}>
                         <p>No smoothies yet. Be the first to post! 🍹</p>
                     </div>
                 ) : (
-                    posts.map(post => (
-                        <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
-                    ))
+                    <>
+                        {posts.map(post => (
+                            <PostCard key={post.id} post={post} onLikeToggle={handleLikeToggle} />
+                        ))}
+                        {loading && <FeedSkeleton />}
+                    </>
                 )}
             </div>
 
-            {page < lastPage && (
+            {page < lastPage && !loading && (
                 <div style={{ textAlign: 'center', padding: '1rem' }}>
                     <button
                         onClick={() => setPage(p => p + 1)}
-                        disabled={loading}
                         style={{ background: '#e17100', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '20px', cursor: 'pointer', fontWeight: 600 }}
                     >
-                        {loading ? 'Loading...' : 'Load More'}
+                        Load More
                     </button>
                 </div>
             )}

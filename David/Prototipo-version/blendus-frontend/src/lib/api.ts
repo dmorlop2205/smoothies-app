@@ -47,13 +47,16 @@ export const api = {
         request<void>('/auth/logout', { method: 'POST' }),
 
     // Posts — GET /api/posts, POST /api/posts, PUT /api/posts/{id}, DELETE /api/posts/{id}
-    getPosts: (params?: { tag?: string; page?: number; per_page?: number }) => {
+    getPosts: (params?: { tag?: string; page?: number; per_page?: number; search?: string; exclude_own?: boolean }) => {
         const qs = new URLSearchParams();
         if (params?.tag) qs.set('tag', params.tag);
         if (params?.page) qs.set('page', String(params.page));
         if (params?.per_page) qs.set('per_page', String(params.per_page));
+        if (params?.search) qs.set('search', params.search);
+        if (params?.exclude_own) qs.set('exclude_own', '1');
         return request<PaginatedResponse<Post>>(`/posts?${qs.toString()}`);
     },
+
 
     getPersonalizedPosts: (page = 1) =>
         request<PaginatedResponse<Post>>(`/posts/personalized?page=${page}`),

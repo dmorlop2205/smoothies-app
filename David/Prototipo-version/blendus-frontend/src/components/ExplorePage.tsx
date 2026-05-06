@@ -6,6 +6,12 @@ import '../styles/Explore.css';
 
 const PER_PAGE = 12;
 
+const PostSkeleton = () => (
+  <div className="grid skeleton-card skeleton">
+    <div className="shimmer"></div>
+  </div>
+);
+
 export default function ExplorePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<string[]>([]);
@@ -22,39 +28,52 @@ export default function ExplorePage() {
     api.getTags().then(tagsRes => setTags(tagsRes.map(t => t.name))).catch(console.error);
   }, []);
 
-  // Load posts when page / tag changes (reset on tag change)
+  // Debounced search effect
   useEffect(() => {
-    const isFirst = page === 1;
+    const timer = setTimeout(() => {
+      setPage(1);
+      fetchPosts(1, search, activeTag);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Tag change effect
+  useEffect(() => {
+    setPage(1);
+    fetchPosts(1, search, activeTag);
+  }, [activeTag]);
+
+  // Load more effect
+  useEffect(() => {
+    if (page > 1) {
+      fetchPosts(page, search, activeTag);
+    }
+  }, [page]);
+
+  const fetchPosts = (targetPage: number, currentSearch: string, currentTag: string | null) => {
+    const isFirst = targetPage === 1;
     if (isFirst) setLoading(true); else setLoadingMore(true);
 
-    const fetcher = activeTag
-      ? api.getPostsByTag(activeTag, page)
-      : api.getPosts({ page, per_page: PER_PAGE });
-
-    fetcher
+    api.getPosts({ 
+      page: targetPage, 
+      per_page: PER_PAGE, 
+      search: currentSearch,
+      tag: currentTag || undefined
+    })
       .then(res => {
         setPosts(prev => isFirst ? res.data : [...prev, ...res.data]);
         setLastPage(res.meta.last_page);
       })
       .catch(console.error)
       .finally(() => { setLoading(false); setLoadingMore(false); });
-  }, [page, activeTag]);
+  };
+
 
   const handleTagClick = (tag: string) => {
     const next = tag === '' ? null : tag;
     if (next === activeTag) return;
     setActiveTag(next);
-    setPage(1);
-    setPosts([]);
   };
-
-  // Client-side search only filters what's already loaded
-  const filteredPosts = search
-    ? posts.filter(p =>
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.description.toLowerCase().includes(search.toLowerCase())
-      )
-    : posts;
 
   return (
     <section className="explore-wrapper" style={{ marginTop: '0', paddingBottom: '4rem' }}>
@@ -82,20 +101,24 @@ export default function ExplorePage() {
 
       {showTags && <TagFilter tags={tags} activeTag={activeTag} onTagClick={handleTagClick} />}
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>Loading posts...</div>
-      ) : (
-        <>
-          <section className="posts-grid">
-            {filteredPosts.map(post => (
+      <section className="posts-grid">
+        {loading ? (
+          // Show 6 skeletons while initial loading
+          Array.from({ length: 6 }).map((_, i) => <PostSkeleton key={i} />)
+        ) : (
+          <>
+            {posts.map(post => (
               <a href={`/post/${post.id}`} className="grid" key={post.id} style={{ textDecoration: 'none', minHeight: '300px' }}>
-                <img 
-                  src={post.image_url || '/assets/smoothie2.webp'} 
-                  alt={post.title} 
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => { e.currentTarget.src = '/assets/smoothie2.webp' }}
-                />
+                {post.image_url ? (
+                  <img 
+                    src={post.image_url} 
+                    alt={post.title} 
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div className="post-placeholder">🍹</div>
+                )}
                 <div className="overlay">
                   <h4 className="title">{post.title}</h4>
                   <div className="likes-comments" style={{ display: 'flex', gap: '1rem' }}>
@@ -106,36 +129,38 @@ export default function ExplorePage() {
               </a>
             ))}
             
-            {filteredPosts.length === 0 && (
+            {loadingMore && Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={`more-${i}`} />)}
+
+            {posts.length === 0 && !loadingMore && (
               <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--gray-500)' }}>
                 No smoothies found matching your search.
               </div>
             )}
-          </section>
+          </>
+        )}
+      </section>
 
-          {page < lastPage && !search && (
-            <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-              <button
-                onClick={() => setPage(p => p + 1)}
-                disabled={loadingMore}
-                style={{
-                  background: 'var(--amber-600)',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 32px',
-                  borderRadius: '100px',
-                  cursor: loadingMore ? 'not-allowed' : 'pointer',
-                  fontWeight: 600,
-                  fontSize: '0.95rem',
-                  opacity: loadingMore ? 0.7 : 1,
-                  transition: '0.2s ease',
-                }}
-              >
-                {loadingMore ? 'Loading...' : 'Load More'}
-              </button>
-            </div>
-          )}
-        </>
+      {page < lastPage && !loading && (
+        <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            disabled={loadingMore}
+            style={{
+              background: 'var(--amber-600)',
+              color: 'white',
+              border: 'none',
+              padding: '12px 32px',
+              borderRadius: '100px',
+              cursor: loadingMore ? 'not-allowed' : 'pointer',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              opacity: loadingMore ? 0.7 : 1,
+              transition: '0.2s ease',
+            }}
+          >
+            {loadingMore ? 'Loading...' : 'Load More'}
+          </button>
+        </div>
       )}
     </section>
   );
