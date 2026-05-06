@@ -25,6 +25,9 @@ class PostController extends Controller
         $perPage = (int) $request->query('per_page', 15);
         $page    = (int) $request->query('page', 1);
         $userId  = $request->query('user_id');
+        $search  = $request->query('search');
+        $tag     = $request->query('tag');
+        $excludeOwn = $request->boolean('exclude_own', false);
 
         if ($userId) {
             $posts = Post::query()
@@ -34,11 +37,13 @@ class PostController extends Controller
                 ->latest('created_at')
                 ->paginate($perPage, ['*'], 'page', $page);
         } else {
-            $posts = $this->postService->getFeed($perPage);
+            $posts = $this->postService->getFeed($perPage, $excludeOwn, $search, $tag);
         }
 
         return (new PostCollection($posts))->response();
     }
+
+
 
     public function personalized(Request $request): JsonResponse
     {

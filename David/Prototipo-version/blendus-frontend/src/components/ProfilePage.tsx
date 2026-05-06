@@ -383,8 +383,9 @@ export default function ProfilePage({ userId }: Props) {
                             {post.image_url ? (
                                 <img src={post.image_url} alt={post.title} />
                             ) : (
-                                <div className="post-grid-placeholder">🍹</div>
+                                <div className="post-placeholder">🍹</div>
                             )}
+
 
                             <div className="overlay">
                                 <h4 className="title">{post.title}</h4>
@@ -432,7 +433,8 @@ export default function ProfilePage({ userId }: Props) {
                                                 </div>
                                             </a>
 
-                                            {modal === 'following' && !isMe && (
+                                            {/* Show Follow/Unfollow only on OWN profile following list */}
+                                            {isOwn && modal === 'following' && !isMe && (
                                                 <button
                                                     className="modal-btn-action"
                                                     onClick={() => handleFollowFromModal(u)}
@@ -441,7 +443,8 @@ export default function ProfilePage({ userId }: Props) {
                                                 </button>
                                             )}
 
-                                            {modal === 'followers' && (
+                                            {/* Show View button in all other cases (followers list, or someone else's following list) */}
+                                            {((!isOwn && (modal === 'followers' || modal === 'following')) || (isOwn && modal === 'followers')) && (
                                                 <a
                                                     href={`/profile/${u.id}`}
                                                     className="modal-btn-action"
