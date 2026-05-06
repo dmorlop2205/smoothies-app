@@ -109,7 +109,6 @@ class PostService
         $query = Post::query()
             ->with(['user', 'ingredients', 'tags'])
             ->withCount(['likes', 'comments'])
-            ->when($userId, fn($q) => $q->where('user_id', '!=', $userId))
             ->latest('created_at');
 
         if ($userId) {
@@ -132,7 +131,6 @@ class PostService
             })
             ->with(['user', 'ingredients', 'tags'])
             ->withCount(['likes', 'comments'])
-            ->when($userId, fn($q) => $q->where('user_id', '!=', $userId))
             ->latest('created_at');
 
         if ($userId) {

@@ -6,7 +6,7 @@ import './Feed.css';
 import './FiltersComponent.css';
 
 const FILTER_ICONS: Record<string, string> = {
-    green: '/greensmoothies.png',
+    green: '/greensmoothies.webp',
     tropical: '/pineaple.webp',
     berry: '/berry.webp',
     protein: '/proteinshake.webp',
@@ -34,7 +34,7 @@ export default function Feed() {
             ? api.getPostsByTag(activeTag, page)
             : feedType === 'personalized'
                 ? api.getPersonalizedPosts(page)
-                : api.getPosts({ page });
+                : api.getPosts({ page, per_page: 7 });
 
         fetcher
             .then(res => {
@@ -104,7 +104,6 @@ export default function Feed() {
                         className={`filter ${activeTag === null ? 'active' : ''}`}
                         onClick={() => handleFilterClick(null)}
                     >
-                        <img src="/fire.webp" alt="All" />
                         <p>All</p>
                     </div>
                     {tags.slice(0, 6).map(tag => (

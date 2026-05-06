@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 
@@ -13,7 +14,9 @@ class MarketplaceController extends Controller
 {
     public function index(): JsonResponse
     {
-        $products = Product::where('active', true)->get();
+        $products = Cache::remember('marketplace_products', 600, function () {
+            return Product::where('active', true)->get();
+        });
 
         return response()->json(['data' => $products]);
     }

@@ -6,21 +6,29 @@ use App\Http\Resources\TagResource;
 use App\Models\Tag;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class TagController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Tag::query();
+        $search = $request->query('search');
 
-        if ($search = $request->query('search')) {
-            $query->where('name', 'like', '%'.$search.'%');
+        // Cache for 5 minutes when no search filter is active
+        if (!$search) {
+            $tags = Cache::remember('tags_all', 300, function () {
+                return Tag::query()
+                    ->withCount('posts')
+                    ->orderByDesc('posts_count')
+                    ->get();
+            });
+        } else {
+            $tags = Tag::query()
+                ->where('name', 'like', '%'.$search.'%')
+                ->withCount('posts')
+                ->orderByDesc('posts_count')
+                ->get();
         }
-
-        $tags = $query
-            ->withCount('posts')
-            ->orderByDesc('posts_count')
-            ->get();
 
         return TagResource::collection($tags)->response();
     }

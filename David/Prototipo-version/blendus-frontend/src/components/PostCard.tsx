@@ -104,7 +104,7 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
     const isAuthor = $user.get()?.id === post.author?.id;
 
     // Nico's API v2: image_url is a direct string, author is the user
-    const imageUrl = post.image_url || '/assets/smoothie.avif';
+    const imageUrl = post.image_url || '/assets/smoothie2.webp';
     const authorName = post.author?.name ?? 'Unknown';
     const initials = authorName.split(' ').map(n => n[0]).join('').slice(0, 2);
 
@@ -114,9 +114,9 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                 <a href={`/profile/${post.author?.id}`} className="post-user" style={{ textDecoration: 'none', color: 'inherit' }}>
                     <div className="pfp-circle">
                         {post.author?.avatar ? (
-                            <img src={post.author.avatar} alt={authorName} />
+                            <img src={post.author.avatar} alt={authorName} loading="lazy" decoding="async" />
                         ) : (
-                            <img src={getDefaultAvatar(post.author?.id)} alt={authorName} />
+                            <img src={getDefaultAvatar(post.author?.id)} alt={authorName} loading="lazy" decoding="async" />
                         )}
                     </div>
                     <div className="user-info">
@@ -243,9 +243,9 @@ export default function PostCard({ post, onLikeToggle, showComments = false }: P
                         <div key={c.id} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                             <a href={`/profile/${c.author?.id}`} className="pfp-circle" style={{ width: 28, height: 28 }}>
                                 {c.author?.avatar ? (
-                                    <img src={c.author.avatar} alt={c.author?.name} />
+                                    <img src={c.author.avatar} alt={c.author?.name} loading="lazy" decoding="async" />
                                 ) : (
-                                    <img src={getDefaultAvatar(c.author?.id)} alt={c.author?.name} />
+                                    <img src={getDefaultAvatar(c.author?.id)} alt={c.author?.name} loading="lazy" decoding="async" />
                                 )}
                             </a>
                             <div>

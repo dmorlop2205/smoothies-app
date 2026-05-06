@@ -1,8 +1,8 @@
 const DEFAULT_AVATARS = [
-  '/assets/avatars/strawberry.png',
-  '/assets/avatars/mango.png',
-  '/assets/avatars/blueberry.png',
-  '/assets/avatars/kiwi.png'
+  '/assets/avatars/strawberry.webp',
+  '/assets/avatars/mango.webp',
+  '/assets/avatars/blueberry.webp',
+  '/assets/avatars/kiwi.webp'
 ];
 
 /**

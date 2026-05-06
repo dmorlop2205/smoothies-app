@@ -70,7 +70,7 @@ export default function ProductDetailsPage({ productId }: Props) {
                     src={product.image_url} 
                     alt={product.name} 
                     onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/smoothie2.jpg';
+                        (e.target as HTMLImageElement).src = '/assets/smoothie2.webp';
                     }}
                 />
 

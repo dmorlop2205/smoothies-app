@@ -18,7 +18,7 @@ class SampleDataSeeder extends Seeder
 
     public function run(): void
     {
-        $fruitAvatars = ['blueberry.png', 'kiwi.png', 'mango.png', 'strawberry.png'];
+        $fruitAvatars = ['blueberry.webp', 'kiwi.webp', 'mango.webp', 'strawberry.webp'];
         // 1. Create a set of diverse users
         $users = User::factory()->count(12)->create()->each(function ($u) use ($fruitAvatars) {
             $u->update([
@@ -41,61 +41,61 @@ class SampleDataSeeder extends Seeder
             [
                 'title' => 'Midnight Berry Bliss',
                 'desc' => 'A deep, antioxidant-rich blend of wild berries and greek yogurt.',
-                'img' => '/assets/smoothie2.jpg',
+                'img' => '/assets/smoothie2.webp',
                 'tags' => ['berry', 'dessert']
             ],
             [
                 'title' => 'Emerald Energy Boost',
                 'desc' => 'Kickstart your day with fresh kiwi, spinach, and a touch of ginger.',
-                'img' => '/assets/smoothie3.jpg',
+                'img' => '/assets/smoothie3.webp',
                 'tags' => ['green', 'detox']
             ],
             [
                 'title' => 'Tropical Sunset Swirl',
                 'desc' => 'Mango, pineapple, and coconut water for that vacation feeling 🏝️',
-                'img' => '/assets/smoothie4.jpg',
+                'img' => '/assets/smoothie4.webp',
                 'tags' => ['tropical']
             ],
             [
                 'title' => 'Matcha Zen Morning',
                 'desc' => 'Ceremonial grade matcha blended with oat milk and a hint of honey.',
-                'img' => '/assets/smoothie5.jpg',
+                'img' => '/assets/smoothie5.webp',
                 'tags' => ['green', 'detox']
             ],
             [
                 'title' => 'Protein Power Pack',
                 'desc' => 'Thick and creamy base topped with seeds and fresh fruit.',
-                'img' => '/assets/smoothie6.jpg',
+                'img' => '/assets/smoothie6.webp',
                 'tags' => ['protein', 'detox']
             ],
             [
                 'title' => 'Vibrant Detox',
                 'desc' => 'Orange, ginger, and turmeric for a vibrant immune boost.',
-                'img' => '/assets/smoothie2.jpg',
+                'img' => '/assets/smoothie2.webp',
                 'tags' => ['detox', 'green']
             ],
             [
                 'title' => 'Island Paradise',
                 'desc' => 'Fresh tropical vibes in a glass!',
-                'img' => '/assets/smoothie3.jpg',
+                'img' => '/assets/smoothie3.webp',
                 'tags' => ['tropical']
             ],
             [
                 'title' => 'Mango Dragonfruit Dream',
                 'desc' => 'Vibrant two-layered tropical blend.',
-                'img' => '/assets/aismoothie1.jpg',
+                'img' => '/assets/aismoothie1.webp',
                 'tags' => ['tropical']
             ],
             [
                 'title' => 'Chocolate Peanut Butter Bowl',
                 'desc' => 'Rich chocolate smoothie bowl topped with superfoods.',
-                'img' => '/assets/aismoothie2.jpg',
+                'img' => '/assets/aismoothie2.webp',
                 'tags' => ['protein', 'dessert']
             ],
             [
                 'title' => 'Morning Green Detox',
                 'desc' => 'Refreshing cucumber and mint juice.',
-                'img' => '/assets/aismoothie3.jpg',
+                'img' => '/assets/aismoothie3.webp',
                 'tags' => ['green', 'detox']
             ],
             [
@@ -107,19 +107,19 @@ class SampleDataSeeder extends Seeder
             [
                 'title' => 'Super Green Glow',
                 'desc' => 'Spinach, kale, and apple for a natural glow.',
-                'img' => '/assets/img2.jpg',
+                'img' => '/assets/img2.webp',
                 'tags' => ['green']
             ],
             [
                 'title' => 'Sunshine Citrus',
                 'desc' => 'Orange, pineapple, and mango packed with vitamin C.',
-                'img' => '/assets/img3.jpg',
+                'img' => '/assets/img3.webp',
                 'tags' => ['tropical']
             ],
             [
                 'title' => 'Icy Dessert Mix',
                 'desc' => 'Cool down with this sweet and healthy dessert substitute.',
-                'img' => '/assets/smoothie4.jpg',
+                'img' => '/assets/smoothie4.webp',
                 'tags' => ['dessert']
             ],
             [

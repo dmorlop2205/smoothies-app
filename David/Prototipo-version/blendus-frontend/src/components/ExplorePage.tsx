@@ -4,38 +4,57 @@ import type { Post } from '../lib/api';
 import TagFilter from './TagFilter';
 import '../styles/Explore.css';
 
+const PER_PAGE = 12;
+
 export default function ExplorePage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [search, setSearch] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [showTags, setShowTags] = useState(false);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
 
+  // Load tags once
   useEffect(() => {
-    // Fetch posts and tags in parallel
-    Promise.all([
-      api.getPosts().then(res => res.data),
-      api.getTags().then(tagsRes => tagsRes.map(t => t.name))
-    ])
-    .then(([postsData, tagsData]) => {
-      setPosts(postsData);
-      setTags(tagsData);
-    })
-    .catch(console.error)
-    .finally(() => setLoading(false));
+    api.getTags().then(tagsRes => setTags(tagsRes.map(t => t.name))).catch(console.error);
   }, []);
 
+  // Load posts when page / tag changes (reset on tag change)
+  useEffect(() => {
+    const isFirst = page === 1;
+    if (isFirst) setLoading(true); else setLoadingMore(true);
+
+    const fetcher = activeTag
+      ? api.getPostsByTag(activeTag, page)
+      : api.getPosts({ page, per_page: PER_PAGE });
+
+    fetcher
+      .then(res => {
+        setPosts(prev => isFirst ? res.data : [...prev, ...res.data]);
+        setLastPage(res.meta.last_page);
+      })
+      .catch(console.error)
+      .finally(() => { setLoading(false); setLoadingMore(false); });
+  }, [page, activeTag]);
+
   const handleTagClick = (tag: string) => {
-    setActiveTag(tag === '' ? null : tag);
+    const next = tag === '' ? null : tag;
+    if (next === activeTag) return;
+    setActiveTag(next);
+    setPage(1);
+    setPosts([]);
   };
 
-  const filteredPosts = posts.filter(p => {
-    if (activeTag && !p.tags?.some(t => t.name.toLowerCase() === activeTag.toLowerCase())) return false;
-    if (search && !p.title.toLowerCase().includes(search.toLowerCase()) && 
-        !p.description.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+  // Client-side search only filters what's already loaded
+  const filteredPosts = search
+    ? posts.filter(p =>
+        p.title.toLowerCase().includes(search.toLowerCase()) ||
+        p.description.toLowerCase().includes(search.toLowerCase())
+      )
+    : posts;
 
   return (
     <section className="explore-wrapper" style={{ marginTop: '0', paddingBottom: '4rem' }}>
@@ -66,31 +85,59 @@ export default function ExplorePage() {
       {loading ? (
         <div style={{ textAlign: 'center', padding: '2rem' }}>Loading posts...</div>
       ) : (
-        <section className="posts-grid">
-          {filteredPosts.map(post => (
-            <a href={`/post/${post.id}`} className="grid" key={post.id} style={{ textDecoration: 'none', minHeight: '300px' }}>
-              <img 
-                src={post.image_url || '/assets/smoothie2.jpg'} 
-                alt={post.title} 
-                onError={(e) => { e.currentTarget.src = '/assets/smoothie2.jpg' }}
-              />
-              <div className="overlay">
-                <h4 className="title">{post.title}</h4>
-                <div className="likes-comments" style={{ display: 'flex', gap: '1rem' }}>
-                  <span className="likes">{post.likes_count ?? 0} ❤️</span>
-                  <div className="comments">{post.comments_count ?? 0} 💬</div>
+        <>
+          <section className="posts-grid">
+            {filteredPosts.map(post => (
+              <a href={`/post/${post.id}`} className="grid" key={post.id} style={{ textDecoration: 'none', minHeight: '300px' }}>
+                <img 
+                  src={post.image_url || '/assets/smoothie2.webp'} 
+                  alt={post.title} 
+                  loading="lazy"
+                  decoding="async"
+                  onError={(e) => { e.currentTarget.src = '/assets/smoothie2.webp' }}
+                />
+                <div className="overlay">
+                  <h4 className="title">{post.title}</h4>
+                  <div className="likes-comments" style={{ display: 'flex', gap: '1rem' }}>
+                    <span className="likes">{post.likes_count ?? 0} ❤️</span>
+                    <div className="comments">{post.comments_count ?? 0} 💬</div>
+                  </div>
                 </div>
+              </a>
+            ))}
+            
+            {filteredPosts.length === 0 && (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--gray-500)' }}>
+                No smoothies found matching your search.
               </div>
-            </a>
-          ))}
-          
-          {filteredPosts.length === 0 && (
-            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem', color: 'var(--gray-500)' }}>
-              No smoothies found matching your search.
+            )}
+          </section>
+
+          {page < lastPage && !search && (
+            <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={loadingMore}
+                style={{
+                  background: 'var(--amber-600)',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 32px',
+                  borderRadius: '100px',
+                  cursor: loadingMore ? 'not-allowed' : 'pointer',
+                  fontWeight: 600,
+                  fontSize: '0.95rem',
+                  opacity: loadingMore ? 0.7 : 1,
+                  transition: '0.2s ease',
+                }}
+              >
+                {loadingMore ? 'Loading...' : 'Load More'}
+              </button>
             </div>
           )}
-        </section>
+        </>
       )}
     </section>
   );
 }
+

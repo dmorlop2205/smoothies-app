@@ -85,7 +85,7 @@ const { title = 'BlendUs', activePage } = Astro.props;
         const render = () => {
           const loggedIn = $isLoggedIn.get();
           const user = $user.get();
-          const fruitAvatars = ['strawberry.png', 'mango.png', 'blueberry.png', 'kiwi.png'];
+          const fruitAvatars = ['strawberry.webp', 'mango.webp', 'blueberry.webp', 'kiwi.webp'];
           if (loggedIn && user) {
             const defaultAvatar = `/assets/avatars/${fruitAvatars[user.id % fruitAvatars.length]}`;
             // If avatar is explicitly empty string, it was "removed", show silhouette
