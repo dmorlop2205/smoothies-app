@@ -2,19 +2,19 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    .circle {
+    .pfp-circle {
         position: relative;
         cursor: pointer;
         display: flex;
         justify-content: center;
         align-items: center;
-        width: clamp(4.063rem, 3.898rem + 0.658vw, 4.688rem);
-        height: clamp(4.063rem, 3.898rem + 0.658vw, 4.688rem);
+        background: var(--gradient-profile);
+        width: 85px;
+        height: 85px;
         border-radius: 50%;
         img {
-            position: relative;
-            width: clamp(3.688rem, 3.523rem + 0.658vw, 4.313rem);
-            height: clamp(3.688rem, 3.523rem + 0.658vw, 4.313rem);
+            width: 90%;
+            height: 90%;
             border: 2px solid var(--white);
             object-fit: cover;
             border-radius: 50%;

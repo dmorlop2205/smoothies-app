@@ -5,6 +5,7 @@
     background-color: var(--white);
     border-radius: 20px;
     padding: 1.5rem 1.5rem;
+    height: fit-content;
 
     h2 { 
         margin-bottom: 1rem;
@@ -40,9 +41,8 @@
                     
                     img {
                         border-radius: 50%;
-                        width: clamp(2.5rem, 0.817rem + 1.923vw, 3.125rem);
-                        height: clamp(2.5rem, 0.817rem + 1.923vw, 3.125rem);
-
+                        width: 90%;
+                        height: 90%;
                         border: 2px solid var(--white);
                         object-fit: cover;
                         object-position: center;

@@ -20,14 +20,21 @@
         justify-content: space-between;
         width: 100%;
         gap: 1rem;
-        .profile-picture {
-            background-color: #FEF3C7;
-            border-radius: 100%;
+        .profile-circle {
+            background: var(--gradient-profile);
+            border-radius: 50%;
             height: clamp(2.813rem, 2.648rem + 0.658vw, 3.438rem);
+            width: clamp(2.813rem, 2.648rem + 0.658vw, 3.438rem);
             aspect-ratio: 1 / 1;
             display: flex;
             justify-content: center;
             align-items: center;
+            img {
+                border-radius: 50%;
+                height: 90%;
+                width: 90%;
+                border: 2px solid white;
+            }
             svg {
                 width: clamp(1.25rem, 1.086rem + 0.658vw, 1.875rem);
                 height: clamp(1.25rem, 1.086rem + 0.658vw, 1.875rem);
@@ -86,7 +93,7 @@
             display: flex;
             align-items: start;
             gap: 1rem;
-            .circle {
+            .pfp-circle {
                 cursor: pointer;
                 display: flex;
                 justify-content: center;
@@ -97,12 +104,13 @@
                 background: var(--gradient-profile);
                 flex-shrink: 0;
                 img {
-                    width: clamp(2.813rem, 2.648rem + 0.658vw, 3.438rem);
-                    height: clamp(2.813rem, 2.648rem + 0.658vw, 3.438rem);
+                    width: 90%;
+                    height: 90%;
                     object-fit: cover;
                     border-radius: 50%;
                     position: relative;
                     z-index: 1;
+                    border: 2px solid white;
                 }
             }
             .user-info {

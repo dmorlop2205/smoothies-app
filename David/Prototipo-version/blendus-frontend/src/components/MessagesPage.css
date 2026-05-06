@@ -97,8 +97,8 @@
     justify-content: center;
     img {
         z-index: 1;
-        width: 59px;
-        height: 59px;
+        width: 90%;
+        height: 90%;
         object-fit: cover;
         border: 3px solid var(--white);
         border-radius: 50%;
@@ -237,8 +237,8 @@ p {
 }
 
 .chat-header img {
-    width: 59px;
-    height: 59px;
+    width: 90%;
+    height: 90%;
     border-radius: 50%;
     object-fit: cover;
 }

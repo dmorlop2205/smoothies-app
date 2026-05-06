@@ -325,7 +325,7 @@ export default function PostDetails({ postId }: Props) {
             <section className="comments-wrapper">
                 <h3>Comments</h3>
                 <form className="comments" onSubmit={handleCommentSubmit}>
-                    <div className="pfp-circle" style={{ width: 34, height: 34 }}>
+                    <div className="profile-circle">
                         {$user.get()?.avatar ? (
                             <img src={$user.get()?.avatar as string} alt="Me" />
                         ) : (
@@ -343,7 +343,7 @@ export default function PostDetails({ postId }: Props) {
                 <div className="comments-section">
                     {(post.comments || []).map(comment => (
                         <div className="public-comment" key={comment.id}>
-                            <a href={`/profile/${comment.author.id}`} className="pfp-circle" style={{ width: 32, height: 32 }}>
+                            <a href={`/profile/${comment.author.id}`} className="pfp-circle">
                                 {comment.author.avatar ? (
                                     <img src={comment.author.avatar} alt={comment.author.name} />
                                 ) : (

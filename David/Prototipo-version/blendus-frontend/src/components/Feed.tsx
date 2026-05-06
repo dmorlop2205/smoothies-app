@@ -104,7 +104,7 @@ export default function Feed() {
                         className={`filter ${activeTag === null ? 'active' : ''}`}
                         onClick={() => handleFilterClick(null)}
                     >
-                        <img src="/sparks.webp" alt="All" />
+                        <img src="/fire.webp" alt="All" />
                         <p>All</p>
                     </div>
                     {tags.slice(0, 6).map(tag => (
