@@ -10,6 +10,15 @@ import { initAuth } from '../stores/authStore';
   </main>
 </Layout>
 
+<script>
+  import { $isLoggedIn } from '../stores/authStore';
+  // If not logged in, redirect to login
+  if (!$isLoggedIn.get()) {
+    window.location.href = '/login';
+  }
+</script>
+
+
 <style>
   .full-page-messages {
     height: calc(100vh - 72px); /* Flush against nav */

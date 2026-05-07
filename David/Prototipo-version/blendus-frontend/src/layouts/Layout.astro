@@ -15,7 +15,7 @@ const { title = 'BlendUs', activePage } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="description" content="BlendUs — The social network for smoothie lovers. Share recipes, discover new blends and connect with the community.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <title>{title} — BlendUs</title>
   </head>
   <body>
@@ -108,16 +108,20 @@ const { title = 'BlendUs', activePage } = Astro.props;
 
         // Debug: Log user state to console to trace avatar sync
         $user.listen((u) => console.log('Navbar User Update:', u));
-        // Guard the Create link for guests
-        const createLink = document.querySelector('a[href="/create"]');
-        if (createLink) {
-          createLink.addEventListener('click', (e) => {
-            if (!$isLoggedIn.get()) {
-              e.preventDefault();
-              window.location.href = '/login';
-            }
-          });
-        }
+        // Guard private links for guests
+        const guardedPaths = ['/create', '/messages'];
+        guardedPaths.forEach(path => {
+          const link = document.querySelector(`a[href="${path}"]`);
+          if (link) {
+            link.addEventListener('click', (e) => {
+              if (!$isLoggedIn.get()) {
+                e.preventDefault();
+                window.location.href = '/login';
+              }
+            });
+          }
+        });
+
 
         // Mobile Menu Toggle
         const hamburger = document.getElementById('nav-hamburger');

@@ -29,15 +29,36 @@ services:
       - "8000:8000"
     volumes:
       - ./Prototipo-version/smoothies-api:/var/www/html
+      - backend_vendor:/var/www/html/vendor
     environment:
       - DB_HOST=postgres
       - DB_CONNECTION=pgsql
       - DB_DATABASE=blendus
       - DB_USERNAME=blendus
       - DB_PASSWORD=password
+      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_URL=http://ollama:11434
+      - OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+      - FRONTEND_URL=http://localhost:4321
+      - SANCTUM_STATEFUL_DOMAINS=localhost:4321
     depends_on:
       - postgres
+    command: >
+      sh -c "
+        composer install &&
+        if [ ! -f .env ]; then cp .env.example .env; fi &&
+        php artisan key:generate --force &&
+        php artisan migrate --force &&
+        php artisan db:seed --force &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"nomic-embed-text\"}' &&
+        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}' &&
+
+        php artisan serve --host=0.0.0.0 --port=8000
+      "
+
+
     restart: unless-stopped
+
 
   frontend:
     build:
@@ -57,3 +78,5 @@ services:
 volumes:
   ollama_data:
   postgres_data:
+  backend_vendor:
+

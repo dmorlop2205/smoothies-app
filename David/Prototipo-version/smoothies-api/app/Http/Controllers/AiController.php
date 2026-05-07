@@ -75,7 +75,7 @@ Create a complete smoothie recipe based on the user's prompt.
 - 'name': A unique, creative, and catchy name for the smoothie (Avoid generic names like 'X Smoothie' or just repeating the user's ingredients).
 - 'description': An appetizing, detailed description (2-3 sentences).
 - 'category': Must be one of: green, tropical, berry, protein, detox, dessert.
-- 'preparation_steps': A detailed, sequential list of natural instructions. Use an efficient flow (e.g., combine main ingredients and liquids first, then blend once until smooth). Avoid repetitive "add and blend" steps for every single ingredient. Provide at least 3-4 clear steps.
+- 'preparation_steps': A detailed, sequential list of natural instructions. Use an efficient flow (e.g., combine main ingredients and liquids first, then blend once until smooth). Avoid repetitive "add and blend" steps for every single ingredient. Provide MAXIMUM 3-4 clear steps.
 EOT;
 
         // Add user context if available
@@ -331,7 +331,7 @@ You are an expert AI Cooking Assistant for the BlendUs app.
 
 # Instructions
 1. You will receive the raw 'preparation_steps' and 'ingredients' of a smoothie named "{$title}".
-2. Break the preparation down into a logical, sequential array of distinct cooking steps. 
+2. Break the preparation down into EXACTLY 4 logical, sequential cooking steps. 
 3. For EACH step, you MUST invent a creative, helpful tip about doing that step.
 4. You MUST base your steps ONLY on the provided Ingredients and Raw Instructions. DO NOT hallucinate or copy placeholder text.
 5. Do NOT include step numbers at the beginning of the text.

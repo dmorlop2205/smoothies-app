@@ -22,11 +22,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const res = await fetch(`${API_URL}/api${path}`, { ...options, headers });
 
     if (!res.ok) {
-        if (res.status === 401 && typeof window !== 'undefined') {
+        if (res.status === 401 && typeof window !== 'undefined' && token) {
             localStorage.removeItem('blendus_token');
             localStorage.removeItem('blendus_user');
             window.location.href = '/login?expired=1';
         }
+
         const err = await res.json().catch(() => ({ message: res.statusText }));
         throw new Error(err.message ?? 'API Error');
     }
