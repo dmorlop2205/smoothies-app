@@ -222,8 +222,21 @@ export default function CreatePostForm() {
 
     if (success) {
         return (
-            <div className="form" style={{ textAlign: 'center', padding: '3rem' }}>
-                <p style={{ color: '#007A55', fontSize: '1.5rem', fontWeight: 700 }}>✅ Smoothie shared! Redirecting…</p>
+            <div className="form success-container">
+                <div className="success-card">
+                    <div className="success-icon-wrapper">
+                        <div className="success-ring"></div>
+                        <svg className="success-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                            <polyline points="20 6 9 17 4 12" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </div>
+                    <h2>Smoothie Shared!</h2>
+                    <p>Your recipe is now available for the entire BlendUs community.</p>
+                    <div className="success-loader">
+                        <div className="success-progress"></div>
+                    </div>
+                    <span className="success-redirect-text">Redirecting to home...</span>
+                </div>
             </div>
         );
     }

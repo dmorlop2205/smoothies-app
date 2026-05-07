@@ -33,7 +33,7 @@ export default function MessagesPage() {
         try {
             const res = await api.getConversations();
             const authUser = $authUser.get();
-            
+
             const mappedChats = res.map((conv: any) => {
                 const isGroup = conv.type === 'group';
                 let name = conv.name || 'Conversation';
@@ -61,9 +61,9 @@ export default function MessagesPage() {
                     last_activity: conv.last_message?.created_at || conv.created_at
                 };
             });
-            
+
             // Sort by latest message/creation
-            mappedChats.sort((a: any, b: any) => 
+            mappedChats.sort((a: any, b: any) =>
                 new Date(b.last_activity || 0).getTime() - new Date(a.last_activity || 0).getTime()
             );
 
@@ -106,12 +106,12 @@ export default function MessagesPage() {
     useEffect(() => {
         if ($activeChat) {
             fetchMessages($activeChat.id);
-            
+
             // Poll messages every 5 seconds when active
             const interval = setInterval(() => {
                 fetchMessages($activeChat.id);
             }, 5000);
-            
+
             return () => clearInterval(interval);
         }
     }, [$activeChat]);
@@ -144,14 +144,14 @@ export default function MessagesPage() {
 
     const handleDeleteChat = async () => {
         if (!$activeChat) return;
-        
+
         const authUser = $authUser.get();
         const isOwner = $activeChat.is_group && authUser && $activeChat.owner_id === authUser.id;
-        
+
         let confirmMsg = "¿Estás seguro de que quieres eliminar este chat?";
         if ($activeChat.is_group) {
-            confirmMsg = isOwner 
-                ? "¿Estás seguro de que quieres ELIMINAR este grupo? Se borrará para todos." 
+            confirmMsg = isOwner
+                ? "¿Estás seguro de que quieres ELIMINAR este grupo? Se borrará para todos."
                 : "¿Estás seguro de que quieres SALIR de este grupo?";
         }
 
@@ -194,7 +194,7 @@ export default function MessagesPage() {
     };
 
     const toggleUserSelection = (id: number) => {
-        setSelectedUserIds(prev => 
+        setSelectedUserIds(prev =>
             prev.includes(id) ? prev.filter(uid => uid !== id) : [...prev, id]
         );
     };
@@ -216,10 +216,10 @@ export default function MessagesPage() {
             const newChat = await api.createConversation([userId], undefined, false);
             setIsNewDmOpen(false);
             fetchChats();
-            
+
             const authUser = $authUser.get();
             const otherUser = allUsers.find(u => u.id === userId);
-            
+
             openChat({
                 id: newChat.id,
                 name: otherUser?.name || 'Conversation',
@@ -242,29 +242,29 @@ export default function MessagesPage() {
         }
     }, [isCreateGroupOpen, isNewDmOpen]);
 
-    const filteredUsers = allUsers.filter(u => 
-        u.name.toLowerCase().includes(userSearchTerm.toLowerCase()) || 
+    const filteredUsers = allUsers.filter(u =>
+        u.name.toLowerCase().includes(userSearchTerm.toLowerCase()) ||
         u.username.toLowerCase().includes(userSearchTerm.toLowerCase())
     );
 
     return (
-        <div className="messages-layout">
+        <div className={`messages-layout ${$activeChat ? 'chat-active' : ''}`}>
             {/* Sidebar */}
             <div className="messages-sidebar">
                 <div className="sidebar-header">
                     <h2>Messages</h2>
                     <div className="header-actions">
-                        <button 
-                            className="header-action-btn" 
+                        <button
+                            className="header-action-btn"
                             title="New Message"
                             onClick={() => setIsNewDmOpen(true)}
                         >
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <path d="M12 5v14M5 12h14" strokeLinecap="round"/>
+                                <path d="M12 5v14M5 12h14" strokeLinecap="round" />
                             </svg>
                         </button>
-                        <button 
-                            className="header-action-btn" 
+                        <button
+                            className="header-action-btn"
                             title="Create Group"
                             onClick={() => setIsCreateGroupOpen(true)}
                         >
@@ -284,8 +284,8 @@ export default function MessagesPage() {
                         <div className="empty-state">No conversations yet</div>
                     ) : (
                         chats.map(chat => (
-                            <div 
-                                key={chat.id} 
+                            <div
+                                key={chat.id}
                                 className={`chat-item ${$activeChat?.id === chat.id ? 'active' : ''}`}
                                 onClick={() => openChat(chat)}
                             >
@@ -312,7 +312,16 @@ export default function MessagesPage() {
                 {$activeChat ? (
                     <>
                         <div className="chat-header">
-                            <a 
+                            <button 
+                                className="mobile-back-btn" 
+                                onClick={() => openChat(null)}
+                                title="Back to chats"
+                            >
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <path d="M19 12H5M12 19l-7-7 7-7" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </button>
+                            <a
                                 href={$activeChat.is_group ? '#' : `/profile/${$activeChat.other_user_id}`}
                                 className="header-user-info"
                                 style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none', color: 'inherit' }}
@@ -326,16 +335,16 @@ export default function MessagesPage() {
                                     <span>{$activeChat.is_group ? 'Group Chat' : 'Direct Message'}</span>
                                 </div>
                             </a>
-                            
+
                             <div className="header-options-wrapper" ref={optionsRef}>
-                                <button 
-                                    className="options-btn" 
+                                <button
+                                    className="options-btn"
                                     onClick={() => setIsOptionsOpen(!isOptionsOpen)}
                                 >
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <circle cx="12" cy="7" r="1.5" fill="currentColor"/>
-                                        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
-                                        <circle cx="12" cy="17" r="1.5" fill="currentColor"/>
+                                        <circle cx="12" cy="7" r="1.5" fill="currentColor" />
+                                        <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                                        <circle cx="12" cy="17" r="1.5" fill="currentColor" />
                                     </svg>
                                 </button>
 
@@ -344,16 +353,16 @@ export default function MessagesPage() {
                                         {!$activeChat.is_group && (
                                             <a href={`/profile/${$activeChat.other_user_id}`} className="dropdown-item">
                                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                                                 </svg>
                                                 View Profile
                                             </a>
                                         )}
                                         <button className="dropdown-item delete" onClick={handleDeleteChat}>
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                                <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                                             </svg>
-                                            {$activeChat.is_group 
+                                            {$activeChat.is_group
                                                 ? ($authUser.get()?.id === $activeChat.owner_id ? 'Delete Group' : 'Exit Group')
                                                 : 'Delete Chat'}
                                         </button>
@@ -375,15 +384,15 @@ export default function MessagesPage() {
                             <div ref={messagesEndRef} />
                         </div>
                         <form className="chat-input-area" onSubmit={handleSendMessage}>
-                            <input 
-                                type="text" 
-                                placeholder="Write a message..." 
+                            <input
+                                type="text"
+                                placeholder="Write a message..."
                                 value={newMessage}
                                 onChange={e => setNewMessage(e.target.value)}
                             />
                             <button type="submit" disabled={sending}>
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" strokeLinecap="round" strokeLinejoin="round"/>
+                                    <path d="M22 2L11 13M22 2L15 22L11 13M11 13L2 9L22 2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </button>
                         </form>
@@ -406,9 +415,9 @@ export default function MessagesPage() {
                             <button onClick={() => setIsCreateGroupOpen(false)}>&times;</button>
                         </div>
                         <div className="modal-body">
-                            <input 
-                                type="text" 
-                                placeholder="Group Name" 
+                            <input
+                                type="text"
+                                placeholder="Group Name"
                                 className="group-name-input"
                                 value={groupName}
                                 onChange={e => setGroupName(e.target.value)}
@@ -418,9 +427,9 @@ export default function MessagesPage() {
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <path d="M21 21l-4.35-4.35"></path>
                                 </svg>
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by name or username..." 
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or username..."
                                     className="modal-search-input"
                                     value={userSearchTerm}
                                     onChange={e => setUserSearchTerm(e.target.value)}
@@ -430,8 +439,8 @@ export default function MessagesPage() {
                             <p className="selection-label">Select Participants:</p>
                             <div className="user-selection-list">
                                 {filteredUsers.map(u => (
-                                    <div 
-                                        key={u.id} 
+                                    <div
+                                        key={u.id}
                                         className={`user-selection-item ${selectedUserIds.includes(u.id) ? 'selected' : ''}`}
                                         onClick={() => toggleUserSelection(u.id)}
                                     >
@@ -446,8 +455,8 @@ export default function MessagesPage() {
                         </div>
                         <div className="modal-footer">
                             <button className="cancel-btn" onClick={() => setIsCreateGroupOpen(false)}>Cancel</button>
-                            <button 
-                                className="confirm-btn" 
+                            <button
+                                className="confirm-btn"
                                 disabled={!groupName.trim() || selectedUserIds.length === 0 || isCreatingGroup}
                                 onClick={handleCreateGroup}
                             >
@@ -472,9 +481,9 @@ export default function MessagesPage() {
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <path d="M21 21l-4.35-4.35"></path>
                                 </svg>
-                                <input 
-                                    type="text" 
-                                    placeholder="Search by name or username..." 
+                                <input
+                                    type="text"
+                                    placeholder="Search by name or username..."
                                     className="modal-search-input"
                                     value={userSearchTerm}
                                     onChange={e => setUserSearchTerm(e.target.value)}
@@ -484,8 +493,8 @@ export default function MessagesPage() {
                             <p className="selection-label">Select a user to chat with:</p>
                             <div className="user-selection-list">
                                 {filteredUsers.map(u => (
-                                    <div 
-                                        key={u.id} 
+                                    <div
+                                        key={u.id}
                                         className="user-selection-item"
                                         onClick={() => handleCreateDm(u.id)}
                                     >
@@ -495,7 +504,7 @@ export default function MessagesPage() {
                                             <span className="user-username">@{u.username}</span>
                                         </div>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                                            <path d="M5 12h14M12 5l7 7-7 7" />
                                         </svg>
                                     </div>
                                 ))}
