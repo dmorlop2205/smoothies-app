@@ -20,6 +20,12 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Guard: skip seeding if data already exists (prevents duplicates on container restart)
+        if (User::count() > 0) {
+            $this->command->info('Database already seeded, skipping.');
+            return;
+        }
+
         // Test users
         $testUser = User::factory()->create([
             'name'     => 'Test User',

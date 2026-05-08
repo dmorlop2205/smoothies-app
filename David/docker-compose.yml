@@ -20,6 +20,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U blendus -d blendus"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   backend:
     build:
@@ -31,6 +36,7 @@ services:
       - ./Prototipo-version/smoothies-api:/var/www/html
       - backend_vendor:/var/www/html/vendor
     environment:
+      - APP_URL=http://localhost:8000
       - DB_HOST=postgres
       - DB_CONNECTION=pgsql
       - DB_DATABASE=blendus
@@ -42,16 +48,18 @@ services:
       - FRONTEND_URL=http://localhost:4321
       - SANCTUM_STATEFUL_DOMAINS=localhost:4321
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     command: >
       sh -c "
         composer install &&
         if [ ! -f .env ]; then cp .env.example .env; fi &&
         php artisan key:generate --force &&
         php artisan migrate --force &&
-        php artisan db:seed --force &&
-        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"nomic-embed-text\"}' &&
-        curl -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}' &&
+        php artisan db:seed --force --class=DatabaseSeeder 2>/dev/null || true &&
+        php artisan storage:link --force &&
+        curl -s -X POST http://ollama:11434/api/pull -d '{\"name\": \"nomic-embed-text\"}' &
+        curl -s -X POST http://ollama:11434/api/pull -d '{\"name\": \"llama3.2:1b\"}' &
 
         php artisan serve --host=0.0.0.0 --port=8000
       "
@@ -70,7 +78,7 @@ services:
       - ./Prototipo-version/blendus-frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - PUBLIC_API_URL=http://localhost:8000
     depends_on:
       - backend
     restart: unless-stopped
