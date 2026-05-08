@@ -215,12 +215,23 @@ EOT;
                 ->get();
         }
 
-        // C. Merge and Prioritize
-        $inventory = $keywordResults->merge($vectorResults)
+        // C. Merge and Prioritize: keyword results first (exact matches), then vector results
+        // If the user mentioned a specific ingredient, keyword results are more relevant
+        $hasKeywordResults = $keywordResults->isNotEmpty();
+
+        if ($hasKeywordResults) {
+            // Put keyword (exact ingredient) matches first, then fill with vector results
+            $merged = $keywordResults
+                ->merge($vectorResults->whereNotIn('id', $keywordResults->pluck('id')))
+                ->take(8);
+        } else {
+            $merged = $vectorResults->take(8);
+        }
+
+        $inventory = $merged
             ->unique('id')
-            ->take(10)
             ->map(fn(Post $p) => [
-                'POST_ID' => $p->id, // Make ID more prominent
+                'POST_ID' => $p->id,
                 'TITLE' => $p->title,
                 'DESCRIPTION' => $p->description,
                 'INGREDIENTS' => $p->ingredients->pluck('name')->toArray(),
@@ -235,15 +246,16 @@ EOT;
 You are the BlendUs AI Sommelier. Match the user's mood with the perfect smoothies.
 
 # Instructions
-1. Select EXACTLY 3-4 smoothies from the provided list.
+1. Select EXACTLY 3 smoothies from the provided inventory list.
 2. Be extremely concise. Write a VERY short explanation (max 2 sentences).
-3. If the user mentions a specific ingredient (e.g. "kiwi"), PRIORITIZE smoothies containing it.
+3. CRITICAL: If the user mentions a specific ingredient (e.g. "kiwi", "mango", "strawberry"), you MUST ONLY recommend smoothies whose INGREDIENTS list contains that ingredient. Do NOT recommend smoothies that lack it.
+4. The 'recommended_ids' MUST only contain IDs that exist in the provided inventory.
 
 # Output Format
-JSON ONLY. The 'recommended_ids' MUST be a list of numeric IDs from the 'Inventory' provided:
+JSON ONLY:
 {
   "explanation": "Short friendly message...",
-  "recommended_ids": [integer_id1, integer_id2, ...]
+  "recommended_ids": [integer_id1, integer_id2, integer_id3]
 }
 EOT;
 
@@ -339,7 +351,7 @@ You are an expert AI Cooking Assistant for the BlendUs app.
 # Fields to Generate
 - steps: An array of objects.
   - instruction: The actual cooking step.
-  - tip: A useful tip starting with "💡 Tip: ".
+  - tip: A short, useful cooking tip (plain text only).
 EOT;
 
         $userPrompt = "Ingredients: {$ingredients}\nRaw Instructions: {$prep}";

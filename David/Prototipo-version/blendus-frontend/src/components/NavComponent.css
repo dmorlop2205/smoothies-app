@@ -143,8 +143,10 @@ nav {
 }
 
 .btn-login:hover {
-    background: white !important;
+    background-color: var(--amber-600) !important;
+    opacity: 0.9;
 }
+
 
 .message-icon {
     width: 24px;
